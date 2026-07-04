@@ -4,6 +4,7 @@ package Dungeon_classes;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import Character_classes.*;
 
 public class Floor {
     //attributes
@@ -16,7 +17,7 @@ public class Floor {
     //constructor
     public Floor(int floorNum) {
         generateMap();
-        prevTile = null;
+        prevTile = new Tile(0, 0, '.');
         rowLen = map.length;
         colLen = map[0].length;
         this.floorNum = floorNum;
@@ -39,11 +40,38 @@ public class Floor {
         this.floorNum = floorNum;
     }  
 
+
+    public Tile getPrevTile() {
+        return this.prevTile;
+    }
+
+    public void setPrevTile(Tile prevTile) {
+        this.prevTile = prevTile;
+    }
+
+    public int getRowLen() {
+        return this.rowLen;
+    }
+
+    public void setRowLen(int rowLen) {
+        this.rowLen = rowLen;
+    }
+
+    public int getColLen() {
+        return this.colLen;
+    }
+
+    public void setColLen(int colLen) {
+        this.colLen = colLen;
+    }
+
+
     //additional methods
 
     public void generateMap() {
         int row, col, ROW, COL;
         String line;
+        char c;
         ROW = 12; //standard row count across all maps
         COL = 55; //standard column count across all maps
         row = col = 0;
@@ -56,8 +84,12 @@ public class Floor {
                 line = reader.nextLine();
 
                 for (col = 0; col < COL; col++) {
-                    map[row][col] = new Tile(row, col, line.charAt(col));
                     //col is y value
+                    map[row][col] = new Tile(row, col, line.charAt(col));
+
+                    if (map[row][col].isDestructible()) {
+                        map[row][col] = new DestructibleTile(map[row][col]);
+                    }
                 }
 
                 row++; //row is x value
@@ -79,33 +111,26 @@ public class Floor {
         }
     }
 
-    public boolean validateMove(char direction, Character entity) {
+    public boolean validateMove(Tile dest) {
         boolean valid;
         int x, y;
 
         valid = false;
-        x = entity.getTile().getX();
-        y = entity.getTile().getY();
-
-        switch (direction) {
-            case 'w': y++; break;
-            case 's': y--; break;
-            case 'd': x++; break;
-            case 'a': x--; break;
-            default: 
-                System.out.println("[!] Invalid direction.");
-                break;
-        }
+        x = dest.getX();
+        y = dest.getY();
 
         //check #1: if the new tile is within map bounds
         if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
-            //check #2: if the new tile is destructible (only applicable for Yohane)
-            if (map[x][y].isDestructible() && entity instanceof PlayableChar) {
+            System.out.println("CHECK 1 PASSED");
+            //check #2: if the new tile is destructible
+            if (map[x][y].isDestructible()) {
+                System.out.println("CHECK 2 PASSED");
                 valid = true;
             }
 
             //check #3: if the new tile is passable
             else if (map[x][y].isPassable()) {
+                System.out.println("CHECK 3 PASSED");
                 valid = true;
             }
         }
@@ -120,6 +145,32 @@ public class Floor {
         y = tile.getY();
         map[x][y].setSymbol('.');
         map[x][y].assignProperties();
+    }
+
+    public void moveCharacter(Tile prev, Tile next, GameCharacter entity) {
+        int x, y;
+        Tile temp;
+        char symbol;
+
+        temp = prevTile;
+        
+        x = next.getX();
+        y = next.getY();
+
+        prevTile = map[x][y]; 
+        symbol = entity.getTile().getSymbol();
+        next.setSymbol(symbol);
+        entity.setTile(next);
+        map[x][y].assignProperties();
+        
+        x = prev.getX();
+        y = prev.getY();
+
+        symbol = temp.getSymbol();
+        prev.setSymbol(symbol);
+        map[x][y].assignProperties();
+
+        prevTile = temp;
     }
 
     public boolean completeFloor() {
@@ -143,10 +194,5 @@ public class Floor {
         }
 
         return complete;
-    }
-    
-    public boolean gameOver() {
-        //TODO
-        return false;
     }
 }

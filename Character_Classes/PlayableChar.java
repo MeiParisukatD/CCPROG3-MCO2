@@ -1,8 +1,10 @@
 //PlayableChar subclass
 package Character_classes;
+
+import Item_classes.*;
 import java.util.ArrayList;
 
-public class PlayableChar extends Character {
+public class PlayableChar extends GameCharacter {
     //attributes
     private int goldOwned;
     private int curHealth;
@@ -64,21 +66,26 @@ public class PlayableChar extends Character {
     //additional methods
     public boolean switchItem(int index) {
         //TODO
+        return false;
     }
 
     public boolean useItem() {
         //TODO
+         return false;
     }
 
     public boolean buyItem(Item purchase) {
         //TODO
+         return false;
     }
 
     public boolean discardItem(int index) {
         //TODO
+         return false;
     }
 
     public boolean heal(float amount) {
         //TODO
+         return false;
     }
 }

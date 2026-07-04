@@ -1,5 +1,6 @@
 //DestructibleTile subclass
 package Dungeon_classes;
+import Item_classes.*;
 
 public class DestructibleTile extends Tile {
     //attributes
@@ -13,6 +14,12 @@ public class DestructibleTile extends Tile {
         this.treasure = treasure;
         this.goldDrop = goldDrop;
         this.itemDrop = itemDrop;
+    }
+
+    //copy constructor
+    public DestructibleTile(Tile parentTile) {
+        super(parentTile.getX(), parentTile.getY(), parentTile.getSymbol());
+        assignProperties();
     }
 
     //getters/setters
@@ -45,11 +52,18 @@ public class DestructibleTile extends Tile {
         //TODO
     }
 
-    public Item dropItem() {
-        //TODO
-    }
-
-    public int dropGold() {
-        //TODO
+    public void assignProperties() {
+        switch(this.symbol) {
+            case 'T': //treasure tiles
+                this.treasure = true;
+                this.goldDrop = (int)(Math.random() * 91 + 10); //random gold drop between 10 and 100
+                this.itemDrop = new Item("Noppo Bread"); //TODO: implement item drop
+                break;
+            default:
+                this.treasure = false;
+                this.goldDrop = 0;
+                this.itemDrop = null;
+                break;
+        }
     }
 }

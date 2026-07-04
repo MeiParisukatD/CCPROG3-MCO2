@@ -2,7 +2,7 @@
 package Character_classes;
 
 
-public class NPChar extends Character {
+public class NPChar extends GameCharacter {
     //attributes
     private Item item;
     private boolean saved;

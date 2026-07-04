@@ -1,7 +1,7 @@
 //EnemyChar subclass
 package Character_classes;
 
-public class EnemyChar extends Character {
+public class EnemyChar extends GameCharacter {
     //attributes
     private int goldDrop;
     private int turnsPerMove;

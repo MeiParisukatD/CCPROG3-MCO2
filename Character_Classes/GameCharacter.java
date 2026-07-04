@@ -1,8 +1,8 @@
-//Character class
-package Character_Classes;
+//GameCharacter class
+package Character_classes;
 import Dungeon_classes.*;
 
-public class Character {
+public class GameCharacter {
     //attributes
     protected String name;
     protected int health;
@@ -11,7 +11,7 @@ public class Character {
     protected String dialogue;
 
     //constructor
-    public Character(String name, int health, int attack, Tile tile, String dialogue) {
+    public GameCharacter(String name, int health, int attack, String dialogue) {
         this.name = name;
         this.health = health;
         this.attack = attack;
@@ -19,7 +19,7 @@ public class Character {
         this.dialogue = dialogue;
     }
 
-    public Character(String name, int health, int attack, Tile tile) {
+    public GameCharacter(String name, int health, int attack, Tile tile) {
         this.name = name;
         this.health = health;
         this.attack = attack;
@@ -27,7 +27,7 @@ public class Character {
         this.dialogue = null;
     }
 
-    public Character(String name, String dialogue) {
+    public GameCharacter(String name, String dialogue) {
         this.name = name;
         this.health = this.attack = 0;
         this.tile = null;
@@ -77,10 +77,6 @@ public class Character {
     }    
 
     //additional methods
-    public boolean evaluateTile(Tile tile) {
-        //TODO
-    }
-
     public boolean charDeath() {
         boolean isDead = false;
 
@@ -90,15 +86,55 @@ public class Character {
         return isDead;
     }
 
-    public void move(char direction) {
-        //TODO
+    public void move(char direction, Floor floor) {
+        int x, y;
+        Tile next;
+
+        x = tile.getX();
+        y = tile.getY();
+
+        switch (direction) {
+            case 'w': x--; break;
+            case 's': x++; break;
+            case 'd': y++; break;
+            case 'a': y--; break;
+            default: 
+                System.out.println("[!] Invalid direction.");
+                break;
+        }
+
+        if (floor.validateMove(floor.getMap()[x][y])) {
+            next = floor.getMap()[x][y];
+            floor.moveCharacter(tile, next, this);
+        }
     }
 
-    public void dealDmg(Character enemy) {
+    public void findCharTile(Tile[][] map) {
+        int i, j;
+        char key;
+
+        switch (name) {
+            case "Yohane": key = 'Y'; break;
+            case "Lailaps": key = 'L'; break;
+            case "Bat": key = 'b'; break;
+            case "Siren": key = 'S'; break;
+            default: key = ' '; break;
+        }
+
+        for (i = 0; i < map.length; i++) {
+            for (j = 0; j < map[i].length; j++) {
+                if (map[i][j].getSymbol() == key) {
+                    this.tile = map[i][j];
+                }
+            }
+        }
+    }
+
+    public void dealDmg(GameCharacter enemy) {
         //TODO
     }
 
     public int takeDmg(int damage) {
-        //TODO
+        return this.health - damage;
     }
 }

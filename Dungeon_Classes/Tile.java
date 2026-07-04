@@ -8,16 +8,14 @@ public class Tile {
     protected char symbol;
     protected boolean passable;
     protected boolean destructible;
-    protected int damage;
+    protected float damage;
 
     //constructors
     public Tile(int x, int y, char symbol) {
         this.x = x;
         this.y = y;
         this.symbol = symbol;
-        this.passable = true;
-        this.destructible = true;
-        this.damage = 0;
+        assignProperties();
     }
 
     //getters/setters 
@@ -62,11 +60,11 @@ public class Tile {
         this.destructible = destructible;
     }
 
-    public int getDamage() {
+    public float getDamage() {
         return this.damage;
     }
 
-    public void setDamage(int damage) {
+    public void setDamage(float damage) {
         this.damage = damage;
     }
     
@@ -77,8 +75,72 @@ public class Tile {
         return "";
     }
 
-    public String assignProperties() {
-        //TODO
-        return "";
+    public void assignProperties() {
+        switch(this.symbol) {
+            case '.': //passable tiles
+                this.passable = true;
+                this.destructible = false;
+                this.damage = 0.0f;
+                break;
+            case '*': //dungeon borders
+                this.passable = false;
+                this.destructible = false;
+                this.damage = 0.0f;
+                break;
+            case 'v': //wall tiles 
+                this.passable = false;
+                this.destructible = true;
+                this.damage = 0.0f;
+                break;
+            case 'x': //spike tiles
+                this.passable = false;
+                this.destructible = true;
+                this.damage = 0.5f;
+                break;
+            case 'w': //water tiles
+                this.passable = false;
+                this.destructible = false;
+                this.damage = 0.0f;
+                break;
+            case 'h': //heat tiles
+                this.passable = true;
+                this.destructible = false;
+                this.damage = 1.0f;
+                break;
+            case 'T': //treasure tiles
+                this.passable = false;
+                this.destructible = true;
+                this.damage = 0.0f;
+                break;
+            case 'E': //exit tiles
+                this.passable = true;
+                this.destructible = true;
+                this.damage = 0.0f;
+                break;
+            case 'Y': //Yohane tile
+                this.passable = false;
+                this.destructible = true;
+                this.damage = 1.0f;
+                break;
+            case 'b': //bat tile
+                this.passable = false;
+                this.destructible = true;
+                this.damage = 0.5f;
+                break;
+            case 'L': //Lailaps tile
+                this.passable = false;
+                this.destructible = true;
+                this.damage = 0.0f;
+                break;
+            case 'S': //Siren tile
+                this.passable = false;
+                this.destructible = true;
+                this.damage = 10.0f;
+                break;
+            default:
+                System.out.println("[!] Invalid tile symbol.");
+                System.out.println("Row " + x + ": " + y);
+                break;
+        }
     }
 }
