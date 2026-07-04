@@ -18,6 +18,14 @@ public class Tile {
         assignProperties();
     }
 
+    //copy constructor
+    public Tile(Tile refTile) {
+        this.x = refTile.getX();
+        this.y = refTile.getY();
+        this.symbol = refTile.getSymbol();
+        assignProperties();
+    }
+
     //getters/setters 
 
     public int getX() {

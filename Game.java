@@ -38,6 +38,8 @@ public class Game {
             if (input != 'x' && input != 'q') {
                 Yohane.move(input, dungeon.getFloors()[dungeon.getCurFloor()]);
             }
+
+            Yohane.setTurnCount(Yohane.getTurnCount() + 1);
         } while (input != 'q');
     }
 
@@ -61,7 +63,8 @@ public class Game {
         dungeon.getFloors()[dungeon.getCurFloor()].displayMap();
 
         System.out.println();
-        System.out.println("Where to, Yohane? ");
+        System.out.println("Turn Counter: " + Yohane.getTurnCount());
+        System.out.print("Where to, Yohane? ");
     }
 
     public static void displayStats(PlayableChar Yohane) {

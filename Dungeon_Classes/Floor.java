@@ -121,16 +121,13 @@ public class Floor {
 
         //check #1: if the new tile is within map bounds
         if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
-            System.out.println("CHECK 1 PASSED");
             //check #2: if the new tile is destructible
             if (map[x][y].isDestructible()) {
-                System.out.println("CHECK 2 PASSED");
                 valid = true;
             }
 
             //check #3: if the new tile is passable
             else if (map[x][y].isPassable()) {
-                System.out.println("CHECK 3 PASSED");
                 valid = true;
             }
         }
@@ -149,28 +146,29 @@ public class Floor {
 
     public void moveCharacter(Tile prev, Tile next, GameCharacter entity) {
         int x, y;
-        Tile temp;
         char symbol;
 
-        temp = prevTile;
+        //store previous tile in temp variable
+        Tile temp = new Tile(prevTile);
         
         x = next.getX();
         y = next.getY();
 
-        prevTile = map[x][y]; 
+        prevTile.setSymbol(map[x][y].getSymbol());
+        prevTile.setX(map[x][y].getX());
+        prevTile.setY(map[x][y].getY());
+
         symbol = entity.getTile().getSymbol();
-        next.setSymbol(symbol);
-        entity.setTile(next);
+        map[x][y].setSymbol(symbol);
         map[x][y].assignProperties();
+        entity.setTile(next);
         
         x = prev.getX();
         y = prev.getY();
 
         symbol = temp.getSymbol();
-        prev.setSymbol(symbol);
+        map[x][y].setSymbol(symbol);
         map[x][y].assignProperties();
-
-        prevTile = temp;
     }
 
     public boolean completeFloor() {
