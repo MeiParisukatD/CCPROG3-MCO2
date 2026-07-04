@@ -13,10 +13,11 @@ public class PlayableChar extends Character {
     //constructor
     public PlayableChar(String name, int health, int attack, String dialogue) {
         super(name, health, attack, dialogue);
-        this.goldOwned = this.turnCount = 0;
+        this.goldOwned = 0;
+        this.turnCount = 0;
         this.curHealth = health;
         this.inventory = new ArrayList<Item>();
-        this.curItem = new Item();
+        this.curItem = null;
     }
 
     //getters/setters
@@ -48,7 +49,7 @@ public class PlayableChar extends Character {
         return this.inventory;
     }
 
-    public void setInventory(Item[] inventory) {
+    public void setInventory(ArrayList<Item> inventory) {
         this.inventory = inventory;
     }
 

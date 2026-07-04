@@ -1,22 +1,19 @@
 //StaticTile subclass
-package Dungeon_classes;
+// package Dungeon_classes;
 
-public class StaticTile extends Tile {
-    //attributes
-    private char type;
+// public class StaticTile extends Tile {
+//     //constructor
+//     public StaticTile(int x, int y, char symbol, boolean passable, int damage, char type) {
+//         super(x, y, symbol, passable, damage);
+//         this.type = type;
+//     }
 
-    //constructor
-    public StaticTile(int x, int y, char symbol, boolean passable, boolean dealsDmg, int damage, char type) {
-        super(x, y, symbol, passable, dealsDmg, damage);
-        this.type = type;
-    }
+//     //getters/setters
+//     public char getType() {
+//         return this.type;
+//     }
 
-    //getters/setters
-    public char getType() {
-        return this.type;
-    }
-
-    public void setType(char type) {
-        this.type = type;
-    }
-}
+//     public void setType(char type) {
+//         this.type = type;
+//     }
+// }

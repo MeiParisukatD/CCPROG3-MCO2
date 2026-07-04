@@ -8,8 +8,8 @@ public class DestructibleTile extends Tile {
     private Item itemDrop;
 
     //constructor
-    public DestructibleTile(int x, int y, char symbol, boolean passable, boolean dealsDmg, int damage, int goldDrop, Item itemDrop, boolean treasure) {
-        super(x, y, symbol, passable, dealsDmg, damage);
+    public DestructibleTile(int x, int y, char symbol, int goldDrop, Item itemDrop, boolean treasure) {
+        super(x, y, symbol);
         this.treasure = treasure;
         this.goldDrop = goldDrop;
         this.itemDrop = itemDrop;

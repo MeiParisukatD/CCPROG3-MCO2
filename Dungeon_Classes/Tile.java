@@ -7,20 +7,21 @@ public class Tile {
     protected int y;
     protected char symbol;
     protected boolean passable;
-    protected boolean dealsDmg;
+    protected boolean destructible;
     protected int damage;
 
     //constructors
-    public Tile(int x, int y, char symbol, boolean passable, boolean dealsDmg, int damage) {
+    public Tile(int x, int y, char symbol) {
         this.x = x;
         this.y = y;
         this.symbol = symbol;
-        this.passable = passable;
-        this.dealsDmg = dealsDmg;
-        this.damage = damage;
+        this.passable = true;
+        this.destructible = true;
+        this.damage = 0;
     }
 
     //getters/setters 
+
     public int getX() {
         return this.x;
     }
@@ -45,7 +46,7 @@ public class Tile {
         this.symbol = symbol;
     }
 
-    public boolean getPassable() {
+    public boolean isPassable() {
         return this.passable;
     }
 
@@ -53,12 +54,12 @@ public class Tile {
         this.passable = passable;
     }
 
-    public boolean getDealsDmg() {
-        return this.dealsDmg;
+    public boolean isDestructible() {
+        return this.destructible;
     }
 
-    public void setDealsDmg(boolean dealsDmg) {
-        this.dealsDmg = dealsDmg;
+    public void setDestructible(boolean destructible) {
+        this.destructible = destructible;
     }
 
     public int getDamage() {
@@ -68,9 +69,15 @@ public class Tile {
     public void setDamage(int damage) {
         this.damage = damage;
     }
+    
 
     //additional methods
     public String assignColor() {
+        //TODO
+        return "";
+    }
+
+    public String assignProperties() {
         //TODO
         return "";
     }
