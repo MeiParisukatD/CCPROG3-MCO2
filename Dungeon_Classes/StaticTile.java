@@ -1,3 +1,4 @@
+package Dungeon_classes;
 //StaticTile subclass
 // package Dungeon_classes;
 

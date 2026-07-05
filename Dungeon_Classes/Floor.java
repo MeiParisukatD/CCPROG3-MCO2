@@ -1,6 +1,7 @@
 //Floor class
 package Dungeon_classes;
 
+import java.util.ArrayList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -9,13 +10,16 @@ import Character_classes.*;
 public class Floor {
     //attributes
     private Tile[][] map;
+    private ArrayList<EnemyChar> enemies;
     private Tile prevTile;
     private int rowLen;
     private int colLen;
     private int floorNum;
+    
 
     //constructor
     public Floor(int floorNum) {
+        enemies = new ArrayList<>();
         generateMap();
         prevTile = new Tile(0, 0, '.');
         rowLen = map.length;
@@ -40,6 +44,9 @@ public class Floor {
         this.floorNum = floorNum;
     }  
 
+    public ArrayList<EnemyChar> getEnemies() {
+        return enemies;
+    }
 
     public Tile getPrevTile() {
         return this.prevTile;
@@ -86,6 +93,10 @@ public class Floor {
                 for (col = 0; col < COL; col++) {
                     //col is y value
                     map[row][col] = new Tile(row, col, line.charAt(col));
+
+                    if (line.charAt(col) == 'b') {
+                        enemies.add(createBat(map[row][col]));
+                    }
 
                     if (map[row][col].isDestructible()) {
                         map[row][col] = new DestructibleTile(map[row][col]);
@@ -169,6 +180,21 @@ public class Floor {
         symbol = temp.getSymbol();
         map[x][y].setSymbol(symbol);
         map[x][y].assignProperties();
+    }
+
+    private EnemyChar createBat(Tile tile) {
+        EnemyChar bat = new EnemyChar(
+            "Bat",
+            1,      // HP
+            1,      // Attack
+            5,      // Gold Drop
+            2,      // Moves every 2 turns
+            1       // Detection Range
+        );
+
+        bat.setTile(tile);
+
+        return bat;
     }
 
     public boolean completeFloor() {

@@ -134,7 +134,7 @@ public class GameCharacter {
         //TODO
     }
 
-    public int takeDmg(int damage) {
-        return this.health - damage;
+    public void takeDmg(int damage) {
+        this.health -= damage;
     }
 }

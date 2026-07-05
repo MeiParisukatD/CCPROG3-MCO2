@@ -36,10 +36,17 @@ public class Game {
             input = Character.toLowerCase(input);
 
             if (input != 'x' && input != 'q') {
-                Yohane.move(input, dungeon.getFloors()[dungeon.getCurFloor()]);
-            }
 
-            Yohane.setTurnCount(Yohane.getTurnCount() + 1);
+                Floor currentFloor = dungeon.getFloors()[dungeon.getCurFloor()];
+
+                Yohane.move(input, currentFloor);
+
+                Yohane.setTurnCount(Yohane.getTurnCount() + 1);
+
+                for (EnemyChar enemy : currentFloor.getEnemies()) {
+                    enemy.moveTile(currentFloor, Yohane);
+                }
+            }
         } while (input != 'q');
     }
 
