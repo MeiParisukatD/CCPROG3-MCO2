@@ -163,13 +163,7 @@ public class Floor {
 
         //check #1: if the new tile is within map bounds
         if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
-            //check #2: if the new tile is destructible
-            if (map[x][y].isDestructible()) {
-                valid = true;
-            }
-
-            //check #3: if the new tile is passable
-            else if (map[x][y].isPassable()) {
+            if (map[x][y].isPassable()) {
                 valid = true;
             }
         }
@@ -182,8 +176,7 @@ public class Floor {
         
         x = tile.getX();
         y = tile.getY();
-        map[x][y].setSymbol('.');
-        map[x][y].assignProperties();
+        map[x][y] = new Tile(x, y, '.');
     }
 
     public void moveCharacter(Tile prev, Tile next, GameCharacter entity) {
@@ -201,11 +194,12 @@ public class Floor {
         prevTile.setSymbol(map[x][y].getSymbol());
         prevTile.setX(x);
         prevTile.setY(y);
+        prevTile.assignProperties();
 
         //update destination tile to hold properties of entity's tile
         symbol = entity.getTile().getSymbol();
-        map[x][y].setSymbol(symbol);
-        map[x][y].assignProperties();
+        next.setSymbol(symbol);
+        map[x][y] = new DestructibleTile(next);
         entity.setTile(next);
         
         //get x and y values of tile entity was previously on
@@ -214,8 +208,7 @@ public class Floor {
 
         //update previous tile to hold properties of temp variable
         symbol = temp.getSymbol();
-        map[x][y].setSymbol(symbol);
-        map[x][y].assignProperties();
+        map[x][y] = new Tile(x, y, symbol);
     }
 
     public boolean completeFloor() {

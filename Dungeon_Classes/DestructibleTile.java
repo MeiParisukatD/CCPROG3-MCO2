@@ -58,11 +58,9 @@ public class DestructibleTile extends Tile {
         }
     }
 
-    public void destroyTile() {
-        //TODO
-    }
-
     public void assignProperties() {
+        super.assignProperties();
+        
         switch(this.symbol) {
             case 'T': //treasure tiles
                 this.treasure = true;

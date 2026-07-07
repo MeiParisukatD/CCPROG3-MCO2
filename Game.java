@@ -37,18 +37,24 @@ public class Game {
             System.out.println();
 
             Game.displayDungeonMenu(dungeon, index, Yohane);
-            input = s.nextLine().charAt(0);
-            input = Character.toLowerCase(input);
 
-            if (input != 'x' && input != 'q') {
+            try {
+                input = s.nextLine().charAt(0);
+                input = Character.toLowerCase(input);
+            } catch (StringIndexOutOfBoundsException e) {
+                input = 'x';
+            };
+
+            Yohane.incrementTurn();
+
+            if ("wasd".contains(Character.toString(input))) {
                 Floor currentFloor = dungeon.getFloors()[index];
 
                 Yohane.move(input, currentFloor);
-                Yohane.setTurnCount(Yohane.getTurnCount() + 1);
 
                 //prompts action from enemy characters
                 for (EnemyChar enemy : currentFloor.getEnemies()) {
-                    enemy.moveTile(currentFloor, Yohane);
+                    enemy.move(currentFloor, Yohane);
                 }
             }
         } while (input != 'q');
@@ -79,7 +85,7 @@ public class Game {
     }
 
     public static void displayStats(PlayableChar Yohane) {
-        System.out.print("HP: " + Yohane.getCurHealth() + "/" + Yohane.getHealth());
+        System.out.print("HP: " + Yohane.getHealth() + "/" + Yohane.getMaxHealth());
         System.out.println("\t\tTotal Gold: " + Yohane.getGoldOwned() + " GP");
 
         int quantity;

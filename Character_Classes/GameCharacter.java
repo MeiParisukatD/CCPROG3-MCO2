@@ -86,48 +86,41 @@ public class GameCharacter {
         return isDead;
     }
 
-    public void move(char direction, Floor floor) {
+    protected Tile nextTile(int direction, Floor floor) {
         int x, y;
         Tile next;
 
-        x = tile.getX();
-        y = tile.getY();
+        x = this.tile.getX();
+        y = this.tile.getY();
 
         switch (direction) {
-            case 'w': x--; break;
-            case 's': x++; break;
-            case 'd': y++; break;
-            case 'a': y--; break;
-            default: 
-                System.out.println("[!] Invalid direction.");
-                break;
+            case 0: x--; break;
+            case 1: x++; break;
+            case 2: y--; break;
+            case 3: y++; break;
         }
 
-        if (floor.validateMove(floor.getMap()[x][y])) {
-            next = floor.getMap()[x][y];
-            floor.moveCharacter(tile, next, this);
-            System.out.println("MOVE SUCCESS");
-        }
+        next = floor.getMap()[x][y];
+        return next;
     }
 
-    public void findCharTile(Tile[][] map) {
-        int i, j;
-        char key;
+    public void move(int direction, Floor floor) {
+        // int x, y;
+        // Tile next;
 
-        switch (this.name) {
-            case "Yohane": key = 'Y'; break;
-            case "Lailaps": key = 'L'; break;
-            case "Bat": key = 'b'; break;
-            case "Siren": key = 'S'; break;
-            default: key = ' '; break;
-        }
+        // x = this.tile.getX();
+        // y = this.tile.getY();
 
-        for (i = 0; i < map.length; i++) {
-            for (j = 0; j < map[i].length; j++) {
-                if (map[i][j].getSymbol() == key) {
-                    this.tile = map[i][j];
-                }
-            }
+        // switch (direction) {
+        //     case 0: x--; break;
+        //     case 1: x++; break;
+        //     case 2: y--; break;
+        //     case 3: y++; break;
+        // }
+        Tile next = nextTile(direction, floor);
+
+        if (floor.validateMove(next)) {
+            floor.moveCharacter(this.tile, next, this);
         }
     }
 

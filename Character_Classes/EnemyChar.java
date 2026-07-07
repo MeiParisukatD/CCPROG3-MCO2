@@ -69,55 +69,32 @@ public class EnemyChar extends GameCharacter {
         return goldDrop;
     }
 
-    public void moveTile(Floor floor, PlayableChar Yohane) {
-        if (Yohane.getTurnCount() % turnsPerMove != 0) {
-            return;
-        }
+    public void move(Floor floor, PlayableChar Yohane) {
+        boolean move = Yohane.getTurnCount() % turnsPerMove == 0;
 
-        if (detectPlayer(floor.getMap(), Yohane)) {
-            dealDmg(Yohane);
-        }
-        else {
-            randomMove(floor);
+        if (move) {
+            if (detectPlayer(floor.getMap(), Yohane)) {
+                dealDmg(Yohane);
+            } else {
+                randomMove(floor);
+            }
         }
     }
 
     public void randomMove(Floor floor) {
-
-        Random rand = new Random();
-
         int direction;
-        int x, y;
-        Tile next;
+        Tile next = null;
 
-        direction = rand.nextInt(4);
+        //enemies are not mentioned to be able to move over heat tiles
+        //this is exclusive to enemies, thus is checked uniquely in this method
+        do {
+            //generate random direction
+            Random rand = new Random();
+            direction = rand.nextInt(4);
+            next = nextTile(direction, floor);
+        } while (next.getSymbol() == 'h');
 
-        x = getTile().getX();
-        y = getTile().getY();
-
-        switch (direction) {
-            case 0:
-                x--;
-                break;
-
-            case 1:
-                x++;
-                break;
-
-            case 2:
-                y--;
-                break;
-
-            case 3:
-                y++;
-                break;
-        }
-
-        next = floor.getMap()[x][y];
-
-        if (next.getSymbol() == '.') {
-            floor.moveCharacter(getTile(), next, this);
-        }
+        super.move(direction, floor);
     }
 
 }
