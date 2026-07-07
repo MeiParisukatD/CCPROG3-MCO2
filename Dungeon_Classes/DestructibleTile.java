@@ -4,9 +4,9 @@ import Item_classes.*;
 
 public class DestructibleTile extends Tile {
     //attributes
-    private boolean treasure;
-    private int goldDrop;
-    private Item itemDrop;
+    private boolean treasure; //does the item hold treasure
+    private int goldDrop; //amount of gold dropped when destroyed
+    private Item itemDrop; //item dropped when destroyed
 
     //constructor
     public DestructibleTile(int x, int y, char symbol, int goldDrop, Item itemDrop, boolean treasure) {
@@ -48,6 +48,16 @@ public class DestructibleTile extends Tile {
     }
 
     //additional methods
+    public void dropTreasure(int gold, Item item) {
+        int rand = (int)(Math.random() * 2);
+
+        if (rand == 0) {
+            item.setName(this.itemDrop.getName());
+        } else {
+            gold = this.goldDrop;
+        }
+    }
+
     public void destroyTile() {
         //TODO
     }

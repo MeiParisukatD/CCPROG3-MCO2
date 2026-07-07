@@ -16,6 +16,7 @@ public class Dungeon {
         this.name = name;
         this.dungeonNum = dungeonNum;
         this.numFloors = numFloors;
+        this.curFloor = 1; //curFloor always starts at one
         this.floors = floors;
         this.completion = false;
     }

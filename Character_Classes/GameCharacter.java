@@ -15,7 +15,7 @@ public class GameCharacter {
         this.name = name;
         this.health = health;
         this.attack = attack;
-        this.tile = tile;
+        this.tile = null;
         this.dialogue = dialogue;
     }
 
@@ -106,6 +106,7 @@ public class GameCharacter {
         if (floor.validateMove(floor.getMap()[x][y])) {
             next = floor.getMap()[x][y];
             floor.moveCharacter(tile, next, this);
+            System.out.println("MOVE SUCCESS");
         }
     }
 
@@ -113,7 +114,7 @@ public class GameCharacter {
         int i, j;
         char key;
 
-        switch (name) {
+        switch (this.name) {
             case "Yohane": key = 'Y'; break;
             case "Lailaps": key = 'L'; break;
             case "Bat": key = 'b'; break;

@@ -26,23 +26,27 @@ public class Game {
         char input;
 
         do {
+            int index = dungeon.getCurFloor() - 1;
             if (firstMove) {
-                Yohane.findCharTile(dungeon.getFloors()[dungeon.getCurFloor()].getMap());
+                Yohane.findCharTile(dungeon.getFloors()[index].getMap());
                 firstMove = false;
             }
 
-            Game.displayDungeonMenu(dungeon, Yohane);
+            System.out.println();
+            System.out.println(index);
+            System.out.println();
+
+            Game.displayDungeonMenu(dungeon, index, Yohane);
             input = s.nextLine().charAt(0);
             input = Character.toLowerCase(input);
 
             if (input != 'x' && input != 'q') {
-
-                Floor currentFloor = dungeon.getFloors()[dungeon.getCurFloor()];
+                Floor currentFloor = dungeon.getFloors()[index];
 
                 Yohane.move(input, currentFloor);
-
                 Yohane.setTurnCount(Yohane.getTurnCount() + 1);
 
+                //prompts action from enemy characters
                 for (EnemyChar enemy : currentFloor.getEnemies()) {
                     enemy.moveTile(currentFloor, Yohane);
                 }
@@ -59,7 +63,7 @@ public class Game {
         //TODO
     }
 
-    public static void displayDungeonMenu(Dungeon dungeon, PlayableChar Yohane) {
+    public static void displayDungeonMenu(Dungeon dungeon, int index, PlayableChar Yohane) {
         System.out.println("Dungeon #" + dungeon.getDungeonNum() + ": " + dungeon.getName());
         System.out.println("Floor " + dungeon.getCurFloor() + " of " + dungeon.getNumFloors());
 
@@ -67,7 +71,7 @@ public class Game {
         Game.displayStats(Yohane);
 
         System.out.println();
-        dungeon.getFloors()[dungeon.getCurFloor()].displayMap();
+        dungeon.getFloors()[index].displayMap();
 
         System.out.println();
         System.out.println("Turn Counter: " + Yohane.getTurnCount());

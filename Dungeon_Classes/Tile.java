@@ -79,8 +79,37 @@ public class Tile {
 
     //additional methods
     public String assignColor() {
-        //TODO
-        return "";
+        String color = "\u001B[0m"; //no effect
+
+        switch(this.symbol) {
+            case 'w': //water tiles
+                color = "\u001B[38;5;81m"; //blue
+                break;
+            case 'h': //heat tiles
+                color = "\u001B[38;5;214m"; //orange
+                break;
+            case 'T': //treasure tiles
+                color = "\u001B[38;5;119m"; //green
+                break;
+            case 'E': //exit tiles
+            case 'g':
+                color = "\u001B[38;5;227m"; //yellow
+                break;
+            case 'Y': //Yohane tile
+                color = "\u001B[38;5;153m"; //light blue
+                break;
+            case 'b': //bat tile
+            case 'S': //Siren tile
+                color = "\u001B[38;5;196m"; //red
+                break;
+            case 'L': //Lailaps tile
+                color = "\u001B[38;5;153m"; //blue
+                break;
+            default:
+                break;
+        }
+        
+        return color;
     }
 
     public void assignProperties() {
