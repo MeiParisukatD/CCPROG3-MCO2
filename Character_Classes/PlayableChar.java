@@ -4,6 +4,9 @@ package Character_classes;
 import Item_classes.*;
 import java.util.ArrayList;
 
+import Dungeon_classes.Floor;
+import Dungeon_classes.Tile;
+
 public class PlayableChar extends GameCharacter {
     //attributes
     private int goldOwned;
@@ -87,5 +90,51 @@ public class PlayableChar extends GameCharacter {
     public boolean heal(float amount) {
         //TODO
          return false;
+    }
+
+    @Override
+    public void move(char direction, Floor floor) {
+        int x = tile.getX();
+        int y = tile.getY();
+
+        switch (direction) {
+            case 'w': x--; break;
+            case 's': x++; break;
+            case 'd': y++; break;
+            case 'a': y--; break;
+            default:
+                System.out.println("[!] Invalid direction.");
+                return;
+        }
+
+        Tile next = floor.getMap()[x][y];
+
+        // Attack instead of moving if there's an enemy
+        EnemyChar enemy = floor.findEnemy(x, y);
+
+        if (enemy != null) {
+
+
+            dealDmg(enemy);
+
+            if (enemy.charDeath()) {
+                setGoldOwned(getGoldOwned() + enemy.getGoldDrop());
+                floor.removeEnemy(enemy);
+            }
+
+            return;
+        }
+
+        if (floor.validateMove(next)) {
+            floor.moveCharacter(tile, next, this);
+        }
+    }
+
+    @Override
+    public void takeDmg(float damage) {
+        curHealth -= damage;
+
+        if (curHealth < 0)
+            curHealth = 0;
     }
 }

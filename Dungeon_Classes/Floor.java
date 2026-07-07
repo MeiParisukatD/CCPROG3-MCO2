@@ -11,7 +11,6 @@ public class Floor {
     //attributes
     private Tile[][] map;
     private ArrayList<EnemyChar> enemies;
-    private Tile prevTile;
     private int rowLen;
     private int colLen;
     private int floorNum;
@@ -21,7 +20,6 @@ public class Floor {
     public Floor(int floorNum) {
         enemies = new ArrayList<>();
         generateMap();
-        prevTile = new Tile(0, 0, '.');
         rowLen = map.length;
         colLen = map[0].length;
         this.floorNum = floorNum;
@@ -46,14 +44,6 @@ public class Floor {
 
     public ArrayList<EnemyChar> getEnemies() {
         return enemies;
-    }
-
-    public Tile getPrevTile() {
-        return this.prevTile;
-    }
-
-    public void setPrevTile(Tile prevTile) {
-        this.prevTile = prevTile;
     }
 
     public int getRowLen() {
@@ -160,14 +150,14 @@ public class Floor {
         char symbol;
 
         //store previous tile in temp variable
-        Tile temp = new Tile(prevTile);
+        Tile temp = new Tile(entity.getPrevTile());
         
         x = next.getX();
         y = next.getY();
 
-        prevTile.setSymbol(map[x][y].getSymbol());
-        prevTile.setX(map[x][y].getX());
-        prevTile.setY(map[x][y].getY());
+        entity.getPrevTile().setSymbol(map[x][y].getSymbol());
+        entity.getPrevTile().setX(map[x][y].getX());
+        entity.getPrevTile().setY(map[x][y].getY());
 
         symbol = entity.getTile().getSymbol();
         map[x][y].setSymbol(symbol);
@@ -183,10 +173,28 @@ public class Floor {
     }
 
     private EnemyChar createBat(Tile tile) {
+
+        float attack;
+
+        switch (floorNum) {
+            case 1:
+                attack = 0.5f;
+                break;
+            case 2:
+                attack = 1.0f;
+                break;
+            case 3:
+                attack = 1.5f;
+                break;
+            default:
+                attack = 0.5f;
+                break;
+        }
+
         EnemyChar bat = new EnemyChar(
             "Bat",
             1,      // HP
-            1,      // Attack
+            attack,      // Attack
             5,      // Gold Drop
             2,      // Moves every 2 turns
             1       // Detection Range
@@ -218,5 +226,28 @@ public class Floor {
         }
 
         return complete;
+    }
+
+    public EnemyChar findEnemy(int x, int y) {
+        for (EnemyChar enemy : enemies) {
+
+            System.out.println(
+                "Enemy at (" +
+                enemy.getTile().getX() + ", " +
+                enemy.getTile().getY() + ")"
+            );
+
+            if (enemy.getTile().getX() == x &&
+                enemy.getTile().getY() == y) {
+                    System.out.println("MATCH!");
+                    return enemy;
+            }
+        }
+        return null;
+    }
+
+    public void removeEnemy(EnemyChar enemy) {
+        destroyTile(enemy.getTile());
+        enemies.remove(enemy);
     }
 }

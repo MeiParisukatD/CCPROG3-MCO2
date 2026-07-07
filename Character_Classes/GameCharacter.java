@@ -8,6 +8,7 @@ public class GameCharacter {
     protected float health;
     protected float attack;
     protected Tile tile;
+    protected Tile prevTile;
     protected String dialogue;
 
     //constructor
@@ -16,6 +17,7 @@ public class GameCharacter {
         this.health = health;
         this.attack = attack;
         this.tile = tile;
+        this.prevTile = new Tile(0, 0, '.');
         this.dialogue = dialogue;
     }
 
@@ -24,6 +26,7 @@ public class GameCharacter {
         this.health = health;
         this.attack = attack;
         this.tile = tile;
+        this.prevTile = new Tile(0, 0, '.');
         this.dialogue = null;
     }
 
@@ -31,6 +34,7 @@ public class GameCharacter {
         this.name = name;
         this.health = this.attack = 0;
         this.tile = null;
+        this.prevTile = new Tile(0, 0, '.');
         this.dialogue = dialogue;
     }
 
@@ -68,6 +72,14 @@ public class GameCharacter {
         this.tile = tile;
     }
 
+    public Tile getPrevTile() {
+        return prevTile;
+    }
+
+    public void setPrevTile(Tile prevTile) {
+        this.prevTile = prevTile;
+    }
+
     public String getDialogue() {
         return this.dialogue;
     }
@@ -103,8 +115,23 @@ public class GameCharacter {
                 break;
         }
 
-        if (floor.validateMove(floor.getMap()[x][y])) {
-            next = floor.getMap()[x][y];
+        next = floor.getMap()[x][y];
+
+        if (next.getSymbol() == 'b') {
+
+            EnemyChar enemy = floor.findEnemy(x, y);
+
+            enemy.setHealth(enemy.getHealth() - this.attack);
+
+            if (enemy.charDeath()) {
+                System.out.println("Removing bat...");
+                floor.removeEnemy(enemy);
+            }
+
+            return;
+        }
+
+        if (floor.validateMove(next)) {
             floor.moveCharacter(tile, next, this);
         }
     }
@@ -131,10 +158,14 @@ public class GameCharacter {
     }
 
     public void dealDmg(GameCharacter enemy) {
-        //TODO
+        enemy.takeDmg(this.attack);
     }
 
     public void takeDmg(float damage) {
         this.health -= damage;
+
+        if(this.health < 0) {
+            this.health = 0;
+        }
     }
 }
