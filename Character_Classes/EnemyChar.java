@@ -11,7 +11,7 @@ public class EnemyChar extends GameCharacter {
     private int detectionRange;
 
     //constructor
-    public EnemyChar(String name, int health, int attack, int goldDrop, int turnsPerMove, int detectionRange) {
+    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, int detectionRange) {
         super(name, health, attack, (Tile) null);
         this.goldDrop = goldDrop;
         this.turnsPerMove = turnsPerMove;

@@ -5,13 +5,13 @@ import Dungeon_classes.*;
 public class GameCharacter {
     //attributes
     protected String name;
-    protected int health;
-    protected int attack;
+    protected float health;
+    protected float attack;
     protected Tile tile;
     protected String dialogue;
 
     //constructor
-    public GameCharacter(String name, int health, int attack, String dialogue) {
+    public GameCharacter(String name, float health, float attack, String dialogue) {
         this.name = name;
         this.health = health;
         this.attack = attack;
@@ -19,7 +19,7 @@ public class GameCharacter {
         this.dialogue = dialogue;
     }
 
-    public GameCharacter(String name, int health, int attack, Tile tile) {
+    public GameCharacter(String name, float health, float attack, Tile tile) {
         this.name = name;
         this.health = health;
         this.attack = attack;
@@ -44,19 +44,19 @@ public class GameCharacter {
         this.name = name;
     }
 
-    public int getHealth() {
+    public float getHealth() {
         return this.health;
     }
 
-    public void setHealth(int health) {
+    public void setHealth(float health) {
         this.health = health;
     }
 
-    public int getAttack() {
+    public float getAttack() {
         return this.attack;
     }
 
-    public void setAttack(int attack) {
+    public void setAttack(float attack) {
         this.attack = attack;
     }
 
@@ -134,7 +134,7 @@ public class GameCharacter {
         //TODO
     }
 
-    public void takeDmg(int damage) {
+    public void takeDmg(float damage) {
         this.health -= damage;
     }
 }

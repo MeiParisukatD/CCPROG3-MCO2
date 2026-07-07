@@ -7,13 +7,13 @@ import java.util.ArrayList;
 public class PlayableChar extends GameCharacter {
     //attributes
     private int goldOwned;
-    private int curHealth;
+    private float curHealth;
     private int turnCount;
     private ArrayList<Item> inventory;
     private Item curItem;
 
     //constructor
-    public PlayableChar(String name, int health, int attack, String dialogue) {
+    public PlayableChar(String name, float health, float attack, String dialogue) {
         super(name, health, attack, dialogue);
         this.goldOwned = 0;
         this.turnCount = 0;
@@ -31,7 +31,7 @@ public class PlayableChar extends GameCharacter {
         this.goldOwned = goldOwned;
     }
 
-    public int getCurHealth() {
+    public float getCurHealth() {
         return this.curHealth;
     }
 
