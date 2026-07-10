@@ -7,16 +7,34 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import Character_Classes.*;
 
-
+/**
+ * Represents a single layer or floor layout within the dungeon.
+ * Handles reading structural text maps, generating and spawning hostile entities, 
+ * rendering colorized matrix maps to the console, and evaluating step coordinates.
+ * 
+ * @author Katigbak and Porciuncula
+ * @version 1.0
+ */
 public class Floor {
     //attributes
+    /** The 2D grid matrix of Tile items making up the map landscape. */
     private Tile[][] map;
+    /** The active tracking collection storing hostile NPCs on this floor layer. */
     private ArrayList<EnemyChar> enemies;
+    /** The overall row boundary limit capacity of the current map matrix grid. */
     private int rowLen;
+    /** The overall column boundary limit capacity of the current map matrix grid. */
     private int colLen;
+    /** The designation or layout index track level number of this floor. */
     private int floorNum;
 
     //constructor
+    /**
+     * Constructs a floor tracking environment, sets standard boundaries, and populates 
+     * structural elements via dynamic tile generations.
+     *
+     * @param floorNum the unique level index tracking identifier for this map
+     */
     public Floor(int floorNum) {
         enemies = new ArrayList<>();
         this.floorNum = floorNum;
@@ -26,44 +44,75 @@ public class Floor {
     }  
 
     //getters/setters
+    /**
+     * @return the multi-dimensional layout array of tiles
+     */
     public Tile[][] getMap() {
         return this.map;
     }
 
+    /**
+     * @param map the replacement 2D array structure layout
+     */
     public void setMap(Tile[][] map) {
         this.map = map;
     }
 
+    /**
+     * @return the current floor numerical index
+     */
     public int getFloorNum() {
         return this.floorNum;
     }
 
+    /**
+     * @param floorNum the new floor number value to record
+     */
     public void setFloorNum(int floorNum) {
         this.floorNum = floorNum;
     }  
 
+    /**
+     * @return the list reference containing spawned enemies
+     */
     public ArrayList<EnemyChar> getEnemies() {
         return enemies;
     }
 
+    /**
+     * @return the row maximum size metric
+     */
     public int getRowLen() {
         return this.rowLen;
     }
 
+    /**
+     * @param rowLen the new horizontal limit length
+     */
     public void setRowLen(int rowLen) {
         this.rowLen = rowLen;
     }
 
+    /**
+     * @return the column maximum size metric
+     */
     public int getColLen() {
         return this.colLen;
     }
 
+    /**
+     * @param colLen the new vertical limit length
+     */
     public void setColLen(int colLen) {
         this.colLen = colLen;
     }
 
 
     //additional methods
+    /**
+     * Parses the flat document matrix file stream to initialize structural symbols, 
+     * allocating destructible elements and forwarding enemy spawn definitions seamlessly.
+     */
     public void generateFloor() {
         int row, col, ROW, COL;
         String line;
@@ -108,6 +157,14 @@ public class Floor {
         };
     }
 
+    /**
+     * Instantiates hostile NPCs directly into the floor layout tracker, scaling metrics 
+     * like attack thresholds or step movement delay intervals based on current level progress.
+     *
+     * @param symbol the character key identifying enemy types ('b' for Bat, 'S' for Siren)
+     * @param row the target X coordinate destination
+     * @param col the target Y coordinate destination
+     */
     private void generateEnemy(char symbol, int row, int col) {
         switch (symbol) {
             case 'b': //spawns Bat and assigns to corresponding tile
@@ -140,6 +197,12 @@ public class Floor {
         }
     }
 
+    /**
+     * Compiles and outputs colorized display strings to print the visual map grid out, 
+     * handling priority layer overlays for the player character and active enemy status transformations.
+     *
+     * @param player the user character instance utilized to cross-check grid overlapping
+     */
     public void displayMap(PlayableChar player) {
         int i, j;
         String COLOR, RESET = "\u001B[0m";
@@ -181,6 +244,13 @@ public class Floor {
         }
     }
 
+    /**
+     * Validates if a chosen step destination falls safely inside the boundaries of the 
+     * map grid and checks whether the physical layout features allow structural passability.
+     *
+     * @param dest the target destination Tile component node being evaluated
+     * @return true if the character can move into this position, false otherwise
+     */
     public boolean validateMove(Tile dest) {
         boolean valid;
         int x, y;
@@ -200,6 +270,11 @@ public class Floor {
         return valid;
     }
 
+    /**
+     * Replaces a specific block node with a regular, passable floor layout tile upon breakdown.
+     *
+     * @param tile the blocking landscape component being wiped
+     */
     public void destroyTile(Tile tile) {
         int x, y;
         
@@ -210,6 +285,13 @@ public class Floor {
         map[x][y] = new Tile(x, y, '.');
     }
 
+    /**
+     * Checks if the user-controlled character stands directly on top of the escape Exit structure, 
+     * qualifying them to successfully finish exploration on this map level layer.
+     *
+     * @param entity the user character instance to cross-reference
+     * @return true if escape condition requirements are reached, false otherwise
+     */
     public boolean completeFloor(PlayableChar entity) {
         boolean complete;
         int i, j, x, y;
@@ -230,6 +312,14 @@ public class Floor {
         return complete;
     }
 
+    /**
+     * Iterates across tracking lists to find if a hostile enemy occupies the specified 
+     * coordinate values.
+     *
+     * @param x target row horizontal grid element coordinate
+     * @param y target column vertical grid element coordinate
+     * @return the matching EnemyChar instance found at that position, or null if none exist
+     */
     public EnemyChar findEnemy(int x, int y) {
         for (EnemyChar enemy : enemies) {
             if (enemy.getX() == x &&

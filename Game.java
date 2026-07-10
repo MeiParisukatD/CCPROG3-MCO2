@@ -7,13 +7,40 @@ import java.util.Iterator;
 import java.util.Collections;
 import java.util.Scanner;
 
+/**
+ * Serves as the main orchestrator for "Yohane The Parhelion! The Siren in the Mirror World!".
+ * Controls state transitions across menus, initializes level layers, sequences entity combat or 
+ * structural exploration loop tracking, and processes text-based keypad keystroke actions.
+ * 
+ * @author Katigbak and Porciuncula
+ * @version 1.0
+ */
 public class Game {
 
+    /**
+     * Private constructor to prevent instantiation of utility main runner class.
+     */
+    private Game() {
+        // Utility class
+    }
+    
+    /** Shared reader utility scanning string tokens input stream values from standard system consoles. */
     public static Scanner s = new Scanner(System.in);
+    
+    /**
+     * Entry programmatic hook establishing execution boundaries and forwarding flow controls 
+     * straight into home menu layouts.
+     *
+     * @param args array parameters passed from external CLI executions
+     */
     public static void main(String[] args) {
         displayMainMenu();
     }
 
+    /**
+     * Loops a terminal presentation displaying standard introduction sequences, 
+     * forwarding triggers to configure game models, evaluate status trackers, or terminate.
+     */
     public static void displayMainMenu() {
         char choice;
 
@@ -47,6 +74,10 @@ public class Game {
         } while(choice != 'q');
     }
 
+    /**
+     * Allocates memory for user references, maps sequence structural boundaries, 
+     * and sets up the test exploration loop scenario.
+     */
     public static void startGame(){
         PlayableChar Yohane = new PlayableChar("Yohane", 3, 1, null);
         
@@ -60,6 +91,13 @@ public class Game {
         displayGameMenu(Yohane, dungeon);
     }
 
+    /**
+     * Loops choices allowing the character to transition into physical environments, 
+     * check collected storage structures, or yield activities.
+     *
+     * @param Yohane  the user character instance model tracking state parameters
+     * @param dungeon the active complex mapping level configurations
+     */
     public static void displayGameMenu(PlayableChar Yohane, Dungeon dungeon){
         char choice;
 
@@ -94,6 +132,12 @@ public class Game {
         } while (choice != 'q');
     }
 
+    /**
+     * Pauses procedural states to write out tabular listings capturing metadata naming 
+     * parameters for all held item entities currently tracked inside storage.
+     *
+     * @param Yohane the user character reference containing target container collections
+     */
     public static void displayInventory(PlayableChar Yohane){
         System.out.print("\033[H\033[2J");
         System.out.flush();
@@ -119,6 +163,13 @@ public class Game {
         s.nextLine();
     }
 
+    /**
+     * Manages step sequences, user input updates, turn increments, enemy actions, 
+     * and victory state verifications inside an active floor scenario.
+     *
+     * @param Yohane  the player character traversing the dungeon environment
+     * @param dungeon the dungeon container hosting the exploration map levels
+     */
     public static void runDungeon(PlayableChar Yohane, Dungeon dungeon){
         boolean firstMove = true;
         char input;
@@ -182,6 +233,14 @@ public class Game {
         } while (!dungeon.gameOver(Yohane) && !dungeon.isCompleted(Yohane));
     }
 
+    /**
+     * Refreshes display lines tracking operational statistics, mapping metadata indexes, 
+     * and delegates control to paint structural tiles.
+     *
+     * @param dungeon the map tracking hub database reference
+     * @param index the calculated internal floor lookup pointer
+     * @param Yohane the entity character to render contextually
+     */
     public static void displayDungeonMenu(Dungeon dungeon, int index, PlayableChar Yohane) {
         System.out.print("\033[H\033[2J");
         System.out.flush();
@@ -200,6 +259,12 @@ public class Game {
         System.out.print("Where to, Yohane? ");
     }
 
+    /**
+     * Outputs text metrics formatting numerical properties like health status limits, 
+     * gold storage indexes, and calculates holding item structural frequencies.
+     *
+     * @param Yohane the targeted player reference being inspected
+     */
     public static void displayStats(PlayableChar Yohane) {
         System.out.print("\033[H\033[2J");
         System.out.flush();
@@ -219,6 +284,10 @@ public class Game {
         }
     }
 
+    /**
+     * Renders a placeholder block notification layout alerting that attribute inspections 
+     * are still undergoing engineering developments.
+     */
     public static void displayStatus(){
         System.out.print("\033[H\033[2J");
         System.out.flush();
