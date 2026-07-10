@@ -212,7 +212,7 @@ public class PlayableChar extends GameCharacter {
 
         //check for enemy
         EnemyChar enemy = floor.findEnemy(next.getX(), next.getY());
-        if (enemy != null) {
+        if (enemy != null && enemy.getX() == next.getX() && enemy.getY() == next.getY()) {
             this.dealDmg(enemy);
         } 
         //if next tile is not an entity
@@ -261,7 +261,8 @@ public class PlayableChar extends GameCharacter {
         for (i = 0; i < map.length; i++) {
             for (j = 0; j < map[i].length; j++) {
                 if (map[i][j].getSymbol() == key) {
-                    this.tile = map[i][j];
+                    this.x = i;
+                    this.y = j;
                 }
             }
         }

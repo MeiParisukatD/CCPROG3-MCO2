@@ -62,21 +62,13 @@ public class Dungeon {
         this.floors = floors;
     }
 
-    public boolean isCompletion() {
-        return this.completion;
-    }
-
-    public boolean getCompletion() {
-        return this.completion;
-    }
-
-    public void setCompletion(boolean completion) {
-        this.completion = completion;
-    }
-
     //additional methods
     public void assignFloors(Floor[] catalogue) {
         //TODO
+    }
+
+    public boolean isCompleted(PlayableChar entity) {
+        return this.floors[numFloors-1].completeFloor(entity);
     }
 
     public void incrementCurFloor() {

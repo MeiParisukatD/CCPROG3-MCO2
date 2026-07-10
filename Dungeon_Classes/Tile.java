@@ -153,8 +153,10 @@ public class Tile {
                 break;
             case 'E': //exit tiles
                 this.passable = true;
-                this.destructible = true;
+                this.destructible = false;
                 this.damage = 0.0f;
+                break;
+            case 'Y': //Yohane tile
                 break;
             default:
                 System.out.println("[!] Invalid tile symbol.");

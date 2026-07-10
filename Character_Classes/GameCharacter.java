@@ -7,33 +7,34 @@ public class GameCharacter {
     protected String name;
     protected float health;
     protected float attack;
-    protected Tile tile;
-    protected Tile prevTile;
+    //protected Tile tile;
     protected String dialogue;
+    protected int x, y; //coordinates
 
     //constructor
     public GameCharacter(String name, float health, float attack, String dialogue) {
         this.name = name;
         this.health = health;
         this.attack = attack;
-        this.tile = null;
+        this.x = 0;
+        this.y = 0;
         this.dialogue = dialogue;
     }
 
-    public GameCharacter(String name, float health, float attack, Tile tile) {
+    public GameCharacter(String name, float health, float attack, int x, int y) {
         this.name = name;
         this.health = health;
         this.attack = attack;
-        this.tile = tile;
-        this.prevTile = new Tile(0, 0, '.');
+        this.x = x;
+        this.y = y;
         this.dialogue = null;
     }
 
     public GameCharacter(String name, String dialogue) {
         this.name = name;
         this.health = this.attack = 0;
-        this.tile = null;
-        this.prevTile = new Tile(0, 0, '.');
+        this.x = 0;
+        this.y = 0;
         this.dialogue = dialogue;
     }
 
@@ -62,13 +63,20 @@ public class GameCharacter {
     public void setAttack(float attack) {
         this.attack = attack;
     }
-
-    public Tile getTile() {
-        return this.tile;
+    public int getX() {
+        return this.x;
     }
 
-    public void setTile(Tile tile) {
-        this.tile = tile;
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return this.y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
     
     public String getDialogue() {
@@ -98,29 +106,29 @@ public class GameCharacter {
     }
 
     protected Tile nextTile(int direction, Floor floor) {
-        int x, y;
+        int next_x, next_y;
         Tile next;
 
-        x = this.tile.getX();
-        y = this.tile.getY();
+        next_x = this.x;
+        next_y = this.y;
 
         switch (direction) {
-            case 0: x--; break;
-            case 1: x++; break;
-            case 2: y--; break;
-            case 3: y++; break;
+            case 0: next_x--; break;
+            case 1: next_x++; break;
+            case 2: next_y--; break;
+            case 3: next_y++; break;
         }
 
-        next = floor.getMap()[x][y];
+        next = floor.getMap()[next_x][next_y];
         return next;
     }
 
     public void move(int direction, Floor floor) {
-        Tile next = nextTile(direction, floor);
+        Tile next = this.nextTile(direction, floor);
 
         if (floor.validateMove(next)) {
-            this.tile.setX(next.getX());
-            this.tile.setY(next.getY());
+            this.x = next.getX();
+            this.y = next.getY();
         }
     }
 }

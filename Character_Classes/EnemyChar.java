@@ -10,8 +10,8 @@ public class EnemyChar extends GameCharacter {
     private int detectionRange;
 
     //constructor
-    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, int detectionRange, Tile tile) {
-        super(name, health, attack, tile);
+    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, int detectionRange, int x, int y) {
+        super(name, health, attack, x, y);
         this.goldDrop = goldDrop;
         this.turnsPerMove = turnsPerMove;
         this.detectionRange = detectionRange;
@@ -44,12 +44,12 @@ public class EnemyChar extends GameCharacter {
 // public DestructibleTile(int x, int y, char symbol, int goldDrop, Item itemDrop, boolean treasure)
     //additional methods
     public void dropGold(Floor floor) {
-        int x = this.getTile().getX();
-        int y = this.getTile().getY();
+        int x = this.getX();
+        int y = this.getY();
 
         floor.getMap()[x][y] = new DestructibleTile(
-            this.getTile().getX(), 
-            this.getTile().getY(),
+            this.getX(), 
+            this.getY(),
             'g', this.goldDrop,
             null, true);
     }
@@ -57,8 +57,8 @@ public class EnemyChar extends GameCharacter {
     public boolean detectPlayer(Tile[][] map, PlayableChar Yohane) {
         int dx, dy;
 
-        dx = this.getTile().getX() - Yohane.getTile().getX();
-        dy = this.getTile().getY() - Yohane.getTile().getY();
+        dx = this.getX() - Yohane.getX();
+        dy = this.getY() - Yohane.getY();
 
         if (dx < 0) {
             dx = dx * -1;

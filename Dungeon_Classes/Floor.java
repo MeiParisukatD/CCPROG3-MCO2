@@ -120,7 +120,8 @@ public class Floor {
                     5 * this.floorNum,         // Gold Drop
                     moves,                     // Moves every 2 turns
                     1,                         // Detection Range
-                    this.map[row][col]         // Tile
+                    row,
+                    col
                 );
                 this.enemies.add(bat);
                 break;
@@ -132,7 +133,8 @@ public class Floor {
                     750,                       // Gold Drop
                     1,                         // Moves every turn
                     rowLen,                    // Detection Range
-                    this.map[row][col]         // Tile
+                    row,
+                    col
                 );
                 this.enemies.add(siren);
         }
@@ -147,7 +149,7 @@ public class Floor {
                 boolean occupied = false;
 
                 // check player
-                if (player.getTile().getX() == i && player.getTile().getY() == j) {
+                if (player.getX() == i && player.getY() == j) {
                     COLOR = "\u001B[38;5;153m";
                     System.out.print(COLOR + 'Y' + RESET);
                     occupied = true;
@@ -155,7 +157,7 @@ public class Floor {
 
                 // check enemies
                 for (EnemyChar e : this.enemies) {
-                    if (e.getTile().getX() == i && e.getTile().getY() == j) {
+                    if (e.getX() == i && e.getY() == j) {
                         COLOR = "\u001B[38;5;196m";
                         char symbol = e.getName().equals("Bat") ? 'b' : 'S';
 
@@ -210,18 +212,17 @@ public class Floor {
 
     public boolean completeFloor(PlayableChar entity) {
         boolean complete;
-        int i, j;
+        int i, j, x, y;
 
+        x = entity.getX();
+        y = entity.getY();
         complete = false;
 
         //find Exit tile
         for (i = 0; i < this.rowLen; i++) {
             for (j = 0; j < this.colLen; j++) {
-                if (map[i][j].getSymbol() == 'E') {
-                    if (entity.getTile().getX() == i && entity.getTile().getY() == j) {
-                        complete = true;
-                        break;
-                    }
+                if (map[i][j].getSymbol() == 'E' && x == map[i][j].getX() && y == map[i][j].getY()) {
+                    complete = true;
                 }
             }
         }
@@ -231,14 +232,8 @@ public class Floor {
 
     public EnemyChar findEnemy(int x, int y) {
         for (EnemyChar enemy : enemies) {
-            // System.out.println(
-            //     "Enemy at (" +
-            //     enemy.getTile().getX() + ", " +
-            //     enemy.getTile().getY() + ")"
-            // );
-            if (enemy.getTile().getX() == x &&
-                enemy.getTile().getY() == y) {
-                    // System.out.println("MATCH!");
+            if (enemy.getX() == x &&
+                enemy.getY() == y) {
                     return enemy;
             }
         }
