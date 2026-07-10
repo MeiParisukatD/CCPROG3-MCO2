@@ -14,15 +14,14 @@ public class Floor {
     private int rowLen;
     private int colLen;
     private int floorNum;
-    
 
     //constructor
     public Floor(int floorNum) {
         enemies = new ArrayList<>();
-        generateMap();
+        this.floorNum = floorNum;
+        generateFloor();
         rowLen = map.length;
         colLen = map[0].length;
-        this.floorNum = floorNum;
     }  
 
     //getters/setters
@@ -64,8 +63,7 @@ public class Floor {
 
 
     //additional methods
-
-    public void generateMap() {
+    public void generateFloor() {
         int row, col, ROW, COL;
         String line;
         char c;
@@ -73,7 +71,7 @@ public class Floor {
         COL = 55; //standard column count across all maps
         row = col = 0;
 
-        map = new Tile[ROW][COL];
+        this.map = new Tile[ROW][COL];
         File file = new File("map1.txt");
 
         try (Scanner reader = new Scanner(file)) {
@@ -82,15 +80,24 @@ public class Floor {
 
                 for (col = 0; col < COL; col++) {
                     //col is y value
-                    map[row][col] = new Tile(row, col, line.charAt(col));
+                    char symbol = line.charAt(col);
 
-                    if (line.charAt(col) == 'b') {
-                        enemies.add(createBat(map[row][col]));
-                    }
-
-                    if (map[row][col].isDestructible()) {
-                        map[row][col] = new DestructibleTile(map[row][col]);
-                    }
+                    switch (symbol) {
+                    case 'b': // bat spawn
+                        this.map[row][col] = new Tile(row, col, '.'); // floor tile
+                        generateEnemy('b', row, col);
+                        break;
+                    case 'S': // siren spawn
+                        this.map[row][col] = new Tile(row, col, '.');
+                        generateEnemy('S', row, col);
+                        break;
+                    default:
+                        this.map[row][col] = new Tile(row, col, symbol);
+                        if (this.map[row][col].isDestructible()) {
+                            this.map[row][col] = new DestructibleTile(this.map[row][col]);
+                        }
+                        break;
+                }
                 }
 
                 row++; //row is x value
@@ -101,12 +108,72 @@ public class Floor {
         };
     }
 
-    public void displayMap() {
+    private void generateEnemy(char symbol, int row, int col) {
+        switch (symbol) {
+            case 'b': //spawns Bat and assigns to corresponding tile
+                int moves = this.floorNum == 1 ? 2 : 1;
+
+                EnemyChar bat = new EnemyChar(
+                    "Bat",
+                    1.0f,                      // HP
+                    0.5f * this.floorNum,      // Attack
+                    5 * this.floorNum,         // Gold Drop
+                    moves,                     // Moves every 2 turns
+                    1,                         // Detection Range
+                    this.map[row][col]         // Tile
+                );
+                this.enemies.add(bat);
+                break;
+            case 'S': //spawns Siren and assigns to corresponding tile
+                EnemyChar siren = new EnemyChar(
+                    "Siren",
+                    1.0f,                      // HP
+                    10.0f,                     // Attack
+                    750,                       // Gold Drop
+                    1,                         // Moves every turn
+                    rowLen,                    // Detection Range
+                    this.map[row][col]         // Tile
+                );
+                this.enemies.add(siren);
+        }
+    }
+
+    public void displayMap(PlayableChar player) {
         int i, j;
+        String COLOR, RESET = "\u001B[0m";
 
         for (i = 0; i < rowLen; i++) {
             for (j = 0; j < colLen; j++) {
-                System.out.print(map[i][j].getSymbol());
+                boolean occupied = false;
+
+                // check player
+                if (player.getTile().getX() == i && player.getTile().getY() == j) {
+                    COLOR = "\u001B[38;5;153m";
+                    System.out.print(COLOR + 'Y' + RESET);
+                    occupied = true;
+                }
+
+                // check enemies
+                for (EnemyChar e : this.enemies) {
+                    if (e.getTile().getX() == i && e.getTile().getY() == j) {
+                        COLOR = "\u001B[38;5;196m";
+                        char symbol = e.getName().equals("Bat") ? 'b' : 'S';
+
+                        if (e.getName().equals("Bat") && e.detectPlayer(this.map, player)) {
+                            symbol = 'B';
+                        }
+
+                        System.out.print(COLOR + symbol + RESET);
+                        occupied = true;
+                        break;
+                    }
+                }
+
+                // if no entity, print base tile
+                if (!occupied) {
+                    COLOR = map[i][j].assignColor(); //assigns color before printing
+                    System.out.print(COLOR + map[i][j].getSymbol() + RESET);
+                }
             }
             System.out.println();
         }
@@ -120,15 +187,10 @@ public class Floor {
         x = dest.getX();
         y = dest.getY();
 
-        //check #1: if the new tile is within map bounds
+        //check #1: if the destinatino tile is within map bounds
         if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
-            //check #2: if the new tile is destructible
-            if (map[x][y].isDestructible()) {
-                valid = true;
-            }
-
-            //check #3: if the new tile is passable
-            else if (map[x][y].isPassable()) {
+            //check #2: if the destination tile is passable
+            if (map[x][y].isPassable()) {
                 valid = true;
             }
         }
@@ -141,68 +203,9 @@ public class Floor {
         
         x = tile.getX();
         y = tile.getY();
-        map[x][y].setSymbol('.');
-        map[x][y].assignProperties();
-    }
 
-    public void moveCharacter(Tile prev, Tile next, GameCharacter entity) {
-        int x, y;
-        char symbol;
-
-        //store previous tile in temp variable
-        Tile temp = new Tile(entity.getPrevTile());
-        
-        x = next.getX();
-        y = next.getY();
-
-        entity.getPrevTile().setSymbol(map[x][y].getSymbol());
-        entity.getPrevTile().setX(map[x][y].getX());
-        entity.getPrevTile().setY(map[x][y].getY());
-
-        symbol = entity.getTile().getSymbol();
-        map[x][y].setSymbol(symbol);
-        map[x][y].assignProperties();
-        entity.setTile(next);
-        
-        x = prev.getX();
-        y = prev.getY();
-
-        symbol = temp.getSymbol();
-        map[x][y].setSymbol(symbol);
-        map[x][y].assignProperties();
-    }
-
-    private EnemyChar createBat(Tile tile) {
-
-        float attack;
-
-        switch (floorNum) {
-            case 1:
-                attack = 0.5f;
-                break;
-            case 2:
-                attack = 1.0f;
-                break;
-            case 3:
-                attack = 1.5f;
-                break;
-            default:
-                attack = 0.5f;
-                break;
-        }
-
-        EnemyChar bat = new EnemyChar(
-            "Bat",
-            1,      // HP
-            attack,      // Attack
-            5,      // Gold Drop
-            2,      // Moves every 2 turns
-            1       // Detection Range
-        );
-
-        bat.setTile(tile);
-
-        return bat;
+        //sets tile to a passable Tile
+        map[x][y] = new Tile(x, y, '.');
     }
 
     public boolean completeFloor() {
@@ -230,24 +233,17 @@ public class Floor {
 
     public EnemyChar findEnemy(int x, int y) {
         for (EnemyChar enemy : enemies) {
-
-            System.out.println(
-                "Enemy at (" +
-                enemy.getTile().getX() + ", " +
-                enemy.getTile().getY() + ")"
-            );
-
+            // System.out.println(
+            //     "Enemy at (" +
+            //     enemy.getTile().getX() + ", " +
+            //     enemy.getTile().getY() + ")"
+            // );
             if (enemy.getTile().getX() == x &&
                 enemy.getTile().getY() == y) {
-                    System.out.println("MATCH!");
+                    // System.out.println("MATCH!");
                     return enemy;
             }
         }
         return null;
-    }
-
-    public void removeEnemy(EnemyChar enemy) {
-        destroyTile(enemy.getTile());
-        enemies.remove(enemy);
     }
 }

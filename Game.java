@@ -4,6 +4,7 @@ import Dungeon_classes.*;
 import Item_classes.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Collections;
 import java.util.Scanner;
 
@@ -24,27 +25,48 @@ public class Game {
         Dungeon dungeon = new Dungeon("Test Dungeon", 1, 3, floors);
         Scanner s = new Scanner(System.in);
         char input;
+        int i;
 
         do {
+            int index = dungeon.getCurFloor() - 1;
+            Floor currentFloor = dungeon.getFloors()[index];
+
+            //spawn Yohane
             if (firstMove) {
-                Yohane.findCharTile(dungeon.getFloors()[dungeon.getCurFloor()].getMap());
+                int x, y;
+                Yohane.findCharTile(currentFloor.getMap());
+
+                x = Yohane.getTile().getX();
+                y = Yohane.getTile().getY();
+
+                currentFloor.getMap()[x][y] = new Tile(x, y, '.');
                 firstMove = false;
             }
 
-            Game.displayDungeonMenu(dungeon, Yohane);
-            input = s.nextLine().charAt(0);
-            input = Character.toLowerCase(input);
+            Game.displayDungeonMenu(dungeon, index, Yohane);
 
-            if (input != 'x' && input != 'q') {
+            try {
+                input = s.nextLine().charAt(0);
+                input = Character.toLowerCase(input);
+            } catch (StringIndexOutOfBoundsException e) {
+                input = 'x';
+            };
 
-                Floor currentFloor = dungeon.getFloors()[dungeon.getCurFloor()];
+            Yohane.incrementTurn();
 
+            if ("wasd".contains(Character.toString(input))) {
                 Yohane.move(input, currentFloor);
 
-                Yohane.setTurnCount(Yohane.getTurnCount() + 1);
-
-                for (EnemyChar enemy : currentFloor.getEnemies()) {
-                    enemy.moveTile(currentFloor, Yohane);
+                //prompts action from enemy characters
+                Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
+                while (it.hasNext()){
+                    EnemyChar enemy = it.next();
+                    if (enemy.charDeath()) {
+                        enemy.dropGold(currentFloor);
+                        it.remove();
+                    } else {
+                        enemy.move(currentFloor, Yohane);
+                    }
                 }
             }
         } while (input != 'q');
@@ -59,7 +81,7 @@ public class Game {
         //TODO
     }
 
-    public static void displayDungeonMenu(Dungeon dungeon, PlayableChar Yohane) {
+    public static void displayDungeonMenu(Dungeon dungeon, int index, PlayableChar Yohane) {
         System.out.println("Dungeon #" + dungeon.getDungeonNum() + ": " + dungeon.getName());
         System.out.println("Floor " + dungeon.getCurFloor() + " of " + dungeon.getNumFloors());
 
@@ -67,7 +89,7 @@ public class Game {
         Game.displayStats(Yohane);
 
         System.out.println();
-        dungeon.getFloors()[dungeon.getCurFloor()].displayMap();
+        dungeon.getFloors()[index].displayMap(Yohane);
 
         System.out.println();
         System.out.println("Turn Counter: " + Yohane.getTurnCount());
@@ -75,7 +97,7 @@ public class Game {
     }
 
     public static void displayStats(PlayableChar Yohane) {
-        System.out.print("HP: " + Yohane.getCurHealth() + "/" + Yohane.getHealth());
+        System.out.print("HP: " + Yohane.getHealth() + "/" + Yohane.getMaxHealth());
         System.out.println("\t\tTotal Gold: " + Yohane.getGoldOwned() + " GP");
 
         int quantity;

@@ -11,8 +11,8 @@ public class EnemyChar extends GameCharacter {
     private int detectionRange;
 
     //constructor
-    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, int detectionRange) {
-        super(name, health, attack, (Tile) null);
+    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, int detectionRange, Tile tile) {
+        super(name, health, attack, tile);
         this.goldDrop = goldDrop;
         this.turnsPerMove = turnsPerMove;
         this.detectionRange = detectionRange;
@@ -42,8 +42,19 @@ public class EnemyChar extends GameCharacter {
     public void setDetectionRange(int detectionRange) {
         this.detectionRange = detectionRange;
     }
-
+// public DestructibleTile(int x, int y, char symbol, int goldDrop, Item itemDrop, boolean treasure)
     //additional methods
+    public void dropGold(Floor floor) {
+        int x = this.getTile().getX();
+        int y = this.getTile().getY();
+
+        floor.getMap()[x][y] = new DestructibleTile(
+            this.getTile().getX(), 
+            this.getTile().getY(),
+            'g', this.goldDrop,
+            null, true);
+    }
+
     public boolean detectPlayer(Tile[][] map, PlayableChar Yohane) {
         int dx, dy;
 
@@ -58,66 +69,34 @@ public class EnemyChar extends GameCharacter {
             dy = dy * -1;
         }
 
-        if (dx + dy == detectionRange) {
+        if (dx + dy <= detectionRange) {
             return true;
         }
 
         return false;
     }
 
-    public int dropGold() {
-        return goldDrop;
-    }
+    public void move(Floor floor, PlayableChar entity) {
+        //determines if it is currently a turn for the enemy
+        boolean move = entity.getTurnCount() % turnsPerMove == 0;
 
-    public void moveTile(Floor floor, PlayableChar Yohane) {
-        if (Yohane.getTurnCount() % turnsPerMove != 0) {
-            return;
-        }
+        if (move) {
+            if (detectPlayer(floor.getMap(), entity)) {
+                this.dealDmg(entity); //attack Yohane if detected
+            } else { //if Yohane is not detected
+                int direction;
+                Tile next = null;
 
-        if (detectPlayer(floor.getMap(), Yohane)) {
-            dealDmg(Yohane);
-        }
-        else {
-            randomMove(floor);
-        }
-    }
+                //enemies are not mentioned to be able to move over heat tiles
+                //this is exclusive to enemies, thus is checked uniquely in this method
+                do {
+                    //generate random direction
+                    direction = (int)(Math.random() * 4);
+                    next = nextTile(direction, floor);
+                } while (next.getSymbol() == 'h');
 
-    public void randomMove(Floor floor) {
-
-        Random rand = new Random();
-
-        int direction;
-        int x, y;
-        Tile next;
-
-        direction = rand.nextInt(4);
-
-        x = getTile().getX();
-        y = getTile().getY();
-
-        switch (direction) {
-            case 0:
-                x--;
-                break;
-
-            case 1:
-                x++;
-                break;
-
-            case 2:
-                y--;
-                break;
-
-            case 3:
-                y++;
-                break;
-        }
-
-        next = floor.getMap()[x][y];
-
-        if (next.getSymbol() == '.') {
-            floor.moveCharacter(getTile(), next, this);
+                super.move(direction, floor);
+            }
         }
     }
-
 }

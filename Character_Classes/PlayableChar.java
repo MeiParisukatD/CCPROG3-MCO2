@@ -2,6 +2,7 @@
 package Character_classes;
 
 import Item_classes.*;
+import Dungeon_classes.*;
 import java.util.ArrayList;
 
 import Dungeon_classes.Floor;
@@ -10,7 +11,7 @@ import Dungeon_classes.Tile;
 public class PlayableChar extends GameCharacter {
     //attributes
     private int goldOwned;
-    private float curHealth;
+    private float maxHealth;
     private int turnCount;
     private ArrayList<Item> inventory;
     private Item curItem;
@@ -20,7 +21,7 @@ public class PlayableChar extends GameCharacter {
         super(name, health, attack, dialogue);
         this.goldOwned = 0;
         this.turnCount = 0;
-        this.curHealth = health;
+        this.maxHealth = health;
         this.inventory = new ArrayList<Item>();
         this.curItem = null;
     }
@@ -34,12 +35,12 @@ public class PlayableChar extends GameCharacter {
         this.goldOwned = goldOwned;
     }
 
-    public float getCurHealth() {
-        return this.curHealth;
+    public float getMaxHealth() {
+        return this.maxHealth;
     }
 
-    public void setCurHealth(int curHealth) {
-        this.curHealth = curHealth;
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
     }
 
     public int getTurnCount() {
@@ -48,6 +49,10 @@ public class PlayableChar extends GameCharacter {
 
     public void setTurnCount(int turnCount) {
         this.turnCount = turnCount;
+    }
+
+    public void addItem(Item i) {
+        this.inventory.add(i);
     }
 
     public ArrayList<Item> getInventory() {
@@ -67,6 +72,10 @@ public class PlayableChar extends GameCharacter {
     }
 
     //additional methods
+    public void incrementTurn() {
+        this.turnCount++;
+    }
+
     public boolean switchItem(int index) {
         //TODO
         return false;
@@ -92,49 +101,91 @@ public class PlayableChar extends GameCharacter {
          return false;
     }
 
-    @Override
-    public void move(char direction, Floor floor) {
-        int x = tile.getX();
-        int y = tile.getY();
+    public void dig(Tile tile, Floor floor) {
+        floor.destroyTile(tile);
+    }
 
-        switch (direction) {
-            case 'w': x--; break;
-            case 's': x++; break;
-            case 'd': y++; break;
-            case 'a': y--; break;
-            default:
-                System.out.println("[!] Invalid direction.");
-                return;
-        }
-
-        Tile next = floor.getMap()[x][y];
-
-        // Attack instead of moving if there's an enemy
-        EnemyChar enemy = floor.findEnemy(x, y);
-
-        if (enemy != null) {
-
-
-            dealDmg(enemy);
-
-            if (enemy.charDeath()) {
-                setGoldOwned(getGoldOwned() + enemy.getGoldDrop());
-                floor.removeEnemy(enemy);
+    public void collect(DestructibleTile tile, Floor floor) {
+        if (tile.getSymbol() == 'I') {
+            this.inventory.add(tile.getItemDrop());
+            
+            //if this is the first item the character receives
+            if (this.inventory.size() == 1) {
+                this.curItem = this.inventory.get(0);
             }
+        } else { //if the tile is a gold tile
+            this.goldOwned += tile.getGoldDrop();
+        }
+        //destroy tile after collected
+        floor.destroyTile(tile);
+    }
 
-            return;
+    public void openTreasure(DestructibleTile tile) {
+        tile.dropTreasure();
+    }
+
+    public void move(char direction, Floor floor) {
+        int d = -1;
+        Tile next;
+
+        //adjusting direction to numerical value
+        switch (direction) {
+            case 'w': d = 0; break;
+            case 's': d = 1; break;
+            case 'a': d = 2; break;
+            case 'd': d = 3; break;
         }
 
-        if (floor.validateMove(next)) {
-            floor.moveCharacter(tile, next, this);
+        next = nextTile(d, floor);
+
+        //check for enemy
+        EnemyChar enemy = floor.findEnemy(next.getX(), next.getY());
+        if (enemy != null) {
+            this.dealDmg(enemy);
+        } 
+        //if next tile is not an entity
+        else {
+            super.move(d, floor);
+            this.takeDmg(next.getDamage());
+
+            //if the destination tile is destructible, 
+            if(next.isDestructible()) {
+                DestructibleTile dTile = (DestructibleTile) next;
+
+                //if next tile is a collectible
+                if (next.getSymbol() == 'I' || next.getSymbol() == 'g') {
+                    this.collect(dTile, floor);
+                }
+                //if next tile is a treasure tile
+                else if (next.getSymbol() == 'T') {
+                    this.openTreasure(dTile);
+                }
+                //if next tile can be dug
+                else {
+                    this.dig(next, floor);
+                }
+            }
         }
     }
 
-    @Override
-    public void takeDmg(float damage) {
-        curHealth -= damage;
+    public void findCharTile(Tile[][] map) {
+        int i, j;
+        char key;
 
-        if (curHealth < 0)
-            curHealth = 0;
+        switch (this.name) {
+            case "Yohane": key = 'Y'; break;
+            case "Lailaps": key = 'L'; break;
+            case "Bat": key = 'b'; break;
+            case "Siren": key = 'S'; break;
+            default: key = ' '; break;
+        }
+
+        for (i = 0; i < map.length; i++) {
+            for (j = 0; j < map[i].length; j++) {
+                if (map[i][j].getSymbol() == key) {
+                    this.tile = map[i][j];
+                }
+            }
+        }
     }
 }

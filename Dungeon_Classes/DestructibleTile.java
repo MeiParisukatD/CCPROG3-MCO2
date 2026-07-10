@@ -1,12 +1,15 @@
 //DestructibleTile subclass
 package Dungeon_classes;
+
+import Character_classes.*;
 import Item_classes.*;
+import java.util.Random;
 
 public class DestructibleTile extends Tile {
     //attributes
-    private boolean treasure;
-    private int goldDrop;
-    private Item itemDrop;
+    private boolean treasure; //does the item hold treasure
+    private int goldDrop; //amount of gold dropped when destroyed
+    private Item itemDrop; //item dropped when destroyed
 
     //constructor
     public DestructibleTile(int x, int y, char symbol, int goldDrop, Item itemDrop, boolean treasure) {
@@ -14,6 +17,7 @@ public class DestructibleTile extends Tile {
         this.treasure = treasure;
         this.goldDrop = goldDrop;
         this.itemDrop = itemDrop;
+        super.assignProperties();
     }
 
     //copy constructor
@@ -48,11 +52,21 @@ public class DestructibleTile extends Tile {
     }
 
     //additional methods
-    public void destroyTile() {
-        //TODO
+    public void dropTreasure() {
+        int rand = (int)(Math.random() * 2);
+
+        if (rand == 0) { //randomized to item
+            this.symbol = 'I';
+        } else { //randomized to gold
+            this.symbol = 'g';
+        }
+
+        super.assignProperties();
     }
 
     public void assignProperties() {
+        super.assignProperties();
+
         switch(this.symbol) {
             case 'T': //treasure tiles
                 this.treasure = true;
