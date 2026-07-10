@@ -81,7 +81,7 @@ public class Game {
                     break;
             }
 
-        } while (choice != 'r');
+        } while (choice != 'q');
     }
 
     public static void displayInventory(PlayableChar Yohane){
