@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import Character_Classes.*;
-import Item_Classes.*;
+
 
 public class Floor {
     //attributes

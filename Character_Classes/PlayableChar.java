@@ -79,6 +79,15 @@ public class PlayableChar extends GameCharacter {
         this.turnCount++;
     }
 
+    public void takeDmg(GameCharacter entity) {
+        super.takeDmg(entity.getAttack());
+
+        //if character dies from taking damage
+        if (this.charDeath()) {
+            this.causeOfDeath = entity.getName();
+        }
+    }
+
     public boolean prevItem() {
         if (inventory.size() <= 1) {
             return false;
@@ -113,20 +122,6 @@ public class PlayableChar extends GameCharacter {
         curItem = inventory.get(index);
 
         return true;
-    }
-
-    public void takeDmg(GameCharacter entity) {
-        super.takeDmg(entity.getAttack());
-
-        //if character dies from taking damage
-        if (this.charDeath()) {
-            this.causeOfDeath = entity.getName();
-        }
-    }
-
-    public boolean switchItem(int index) {
-        //TODO
-        return false;
     }
 
     public boolean useItem() {

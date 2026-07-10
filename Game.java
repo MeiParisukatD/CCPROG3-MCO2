@@ -46,12 +46,23 @@ public class Game {
         } while(choice != 'q');
     }
 
+    public static void startGame(){
+        PlayableChar Yohane = new PlayableChar("Yohane", 3, 1, null);
+        
+        Floor[] floors = new Floor[3];
+        floors[0] = new Floor(1);
+        floors[1] = new Floor(2);
+        floors[2] = new Floor(3);
+        
+        Dungeon dungeon = new Dungeon("Test Dungeon", 1, 3, floors);
+
+        displayGameMenu(Yohane, dungeon);
+    }
+
     public static void displayGameMenu(PlayableChar Yohane, Dungeon dungeon){
         char choice;
 
         do {
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
             System.out.println();
             System.out.println("Lailaps: Yohane! Where should we go now?");
             System.out.println();
@@ -72,7 +83,6 @@ public class Game {
             }
 
             switch (choice) {
-
                 case '1':
                     runDungeon(Yohane, dungeon);
                     break;
@@ -81,7 +91,6 @@ public class Game {
                     displayInventory(Yohane);
                     break;
             }
-
         } while (choice != 'q');
     }
 
@@ -109,20 +118,6 @@ public class Game {
         s.nextLine();
     }
 
-    public static void startGame(){
-        PlayableChar Yohane = new PlayableChar("Yohane", 3, 1, null);
-        
-
-        Floor[] floors = new Floor[3];
-        floors[0] = new Floor(1);
-        floors[1] = new Floor(2);
-        floors[2] = new Floor(3);
-        
-        Dungeon dungeon = new Dungeon("Test Dungeon", 1, 3, floors);
-
-        displayGameMenu(Yohane, dungeon);
-    }
-
     public static void runDungeon(PlayableChar Yohane, Dungeon dungeon){
         boolean firstMove = true;
         char input;
@@ -131,32 +126,32 @@ public class Game {
             int index = dungeon.getCurFloor() - 1;
             Floor currentFloor = dungeon.getFloors()[index];
 
-            //spawn Yohane
+            //spawn Yohane on the first move
             if (firstMove) {
                 int x, y;
                 Yohane.findCharTile(currentFloor.getMap());
-
+                //assigns coordinates to Yohane
                 x = Yohane.getTile().getX();
                 y = Yohane.getTile().getY();
-
+                //sets underlying tile to passable tile
                 currentFloor.getMap()[x][y] = new Tile(x, y, '.');
                 firstMove = false;
             }
 
             Game.displayDungeonMenu(dungeon, index, Yohane);
 
-            try {
+            try { //in case user returns without input
                 input = s.nextLine().charAt(0);
                 input = Character.toLowerCase(input);
             } catch (StringIndexOutOfBoundsException e) {
                 input = 'x';
             };
 
-            Yohane.incrementTurn();
+            Yohane.incrementTurn(); //all actions are counted as a 'turn'
 
             if ("wasd".contains(Character.toString(input))) {
                 Yohane.move(input, currentFloor);
-            }
+            } //if valid direction, moves Yohane
             else if (input == ' ') {
                 Yohane.useItem();
             }
@@ -171,14 +166,19 @@ public class Game {
             Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
             while (it.hasNext()){
                 EnemyChar enemy = it.next();
-                if (enemy.charDeath()) {
+                if (enemy.charDeath()) { //if enemy is dead
                     enemy.dropGold(currentFloor);
                     it.remove();
-                } else {
+                } else { //if enemy is alive
                     enemy.move(currentFloor, Yohane);
                 }
             }
-        } while (input != 'q');
+
+            //check if floor is complete
+            if (currentFloor.completeFloor(Yohane)) {
+                dungeon.incrementCurFloor();
+            }
+        } while (!dungeon.gameOver(Yohane));
     }
 
     public static void displayDungeonMenu(Dungeon dungeon, int index, PlayableChar Yohane) {
