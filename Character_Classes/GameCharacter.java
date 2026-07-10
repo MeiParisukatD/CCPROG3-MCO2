@@ -7,7 +7,6 @@ public class GameCharacter {
     protected String name;
     protected float health;
     protected float attack;
-    //protected Tile tile;
     protected String dialogue;
     protected int x, y; //coordinates
 

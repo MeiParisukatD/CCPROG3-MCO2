@@ -68,7 +68,8 @@ public class Dungeon {
     }
 
     public boolean isCompleted(PlayableChar entity) {
-        return this.floors[numFloors-1].completeFloor(entity);
+        this.completion = this.floors[numFloors-1].completeFloor(entity);
+        return this.completion;
     }
 
     public void incrementCurFloor() {
