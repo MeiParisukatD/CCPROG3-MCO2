@@ -1,5 +1,5 @@
 //Tile class
-package Dungeon_classes;
+package Dungeon_Classes;
 
 public class Tile {
     //attribute

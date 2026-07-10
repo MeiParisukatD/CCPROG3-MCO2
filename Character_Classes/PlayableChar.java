@@ -1,12 +1,12 @@
 //PlayableChar subclass
-package Character_classes;
+package Character_Classes;
 
-import Item_classes.*;
-import Dungeon_classes.*;
+import Item_Classes.*;
+import Dungeon_Classes.*;
 import java.util.ArrayList;
 
-import Dungeon_classes.Floor;
-import Dungeon_classes.Tile;
+import Dungeon_Classes.Floor;
+import Dungeon_Classes.Tile;
 
 public class PlayableChar extends GameCharacter {
     //attributes

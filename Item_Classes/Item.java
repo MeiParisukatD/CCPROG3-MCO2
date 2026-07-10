@@ -1,5 +1,5 @@
 //temp item class
-package Item_classes;
+package Item_Classes;
 
 public class Item {
     //attributes

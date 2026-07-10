@@ -1,6 +1,6 @@
 //GameCharacter class
-package Character_classes;
-import Dungeon_classes.*;
+package Character_Classes;
+import Dungeon_Classes.*;
 
 public class GameCharacter {
     //attributes

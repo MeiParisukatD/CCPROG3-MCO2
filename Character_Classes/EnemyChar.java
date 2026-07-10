@@ -1,8 +1,7 @@
 //EnemyChar subclass
-package Character_classes;
+package Character_Classes;
 
-import Dungeon_classes.*;
-import java.util.Random;
+import Dungeon_Classes.*;
 
 public class EnemyChar extends GameCharacter {
     //attributes

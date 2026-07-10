@@ -1,9 +1,6 @@
 //DestructibleTile subclass
-package Dungeon_classes;
-
-import Character_classes.*;
-import Item_classes.*;
-import java.util.Random;
+package Dungeon_Classes;
+import Item_Classes.*;
 
 public class DestructibleTile extends Tile {
     //attributes

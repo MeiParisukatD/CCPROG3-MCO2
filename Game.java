@@ -1,9 +1,8 @@
 //Playable file
-import Character_classes.*;
-import Dungeon_classes.*;
-import Item_classes.*;
+import Character_Classes.*;
+import Dungeon_Classes.*;
+import Item_Classes.*;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Collections;
 import java.util.Scanner;

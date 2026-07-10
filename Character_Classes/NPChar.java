@@ -1,6 +1,6 @@
 //NPChar subclass
-package Character_classes;
-
+package Character_Classes;
+import Item_Classes.*;
 
 public class NPChar extends GameCharacter {
     //attributes

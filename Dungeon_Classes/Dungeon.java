@@ -1,6 +1,6 @@
 //Dungeon Class
-package Dungeon_classes;
-import Character_classes.*;
+package Dungeon_Classes;
+import Character_Classes.*;
 
 public class Dungeon {
     //attributes

@@ -1,11 +1,11 @@
 //Floor class
-package Dungeon_classes;
+package Dungeon_Classes;
 
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import Character_classes.*;
+import Character_Classes.*;
 
 public class Floor {
     //attributes
@@ -66,7 +66,6 @@ public class Floor {
     public void generateFloor() {
         int row, col, ROW, COL;
         String line;
-        char c;
         ROW = 12; //standard row count across all maps
         COL = 55; //standard column count across all maps
         row = col = 0;
