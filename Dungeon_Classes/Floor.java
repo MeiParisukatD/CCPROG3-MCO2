@@ -208,24 +208,22 @@ public class Floor {
         map[x][y] = new Tile(x, y, '.');
     }
 
-    public boolean completeFloor() {
-        boolean flag, complete;
+    public boolean completeFloor(PlayableChar entity) {
+        boolean complete;
         int i, j;
 
-        flag = complete = false;
+        complete = false;
 
-        //check if Exit Tile exists on the map
-        for (i = 0; i < rowLen && !flag; i++) {
-            for (j = 0; j < colLen && !flag; j++) {
+        //find Exit tile
+        for (i = 0; i < this.rowLen; i++) {
+            for (j = 0; j < this.colLen; j++) {
                 if (map[i][j].getSymbol() == 'E') {
-                    flag = true;
+                    if (entity.getTile().getX() == i && entity.getTile().getY() == j) {
+                        complete = true;
+                        break;
+                    }
                 }
             }
-        }
-
-        //if exit tile does not exist, floor is complete
-        if (!flag) {
-            complete = true;
         }
 
         return complete;

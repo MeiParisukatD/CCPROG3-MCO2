@@ -70,15 +70,7 @@ public class GameCharacter {
     public void setTile(Tile tile) {
         this.tile = tile;
     }
-
-    // public Tile getPrevTile() {
-    //     return prevTile;
-    // }
-
-    // public void setPrevTile(Tile prevTile) {
-    //     this.prevTile = prevTile;
-    // }
-
+    
     public String getDialogue() {
         return this.dialogue;
     }

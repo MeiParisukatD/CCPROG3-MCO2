@@ -79,7 +79,22 @@ public class Dungeon {
         //TODO
     }
 
-    public boolean gameOver(PlayableChar Yohane) {
-        return Yohane.charDeath();
+    public void incrementCurFloor() {
+        if (this.curFloor != this.numFloors) {
+            this.curFloor++;
+        }
+    }
+
+    public boolean gameOver(PlayableChar entity) {
+        boolean gameOver = entity.charDeath();
+        String RED, RESET;
+        RED = "\u001B[38;5;196m";
+        RESET = "\u001B[0m";
+
+        if (gameOver) {
+            System.out.println(RED + "You Died!" + RESET );
+            System.out.println("Killed by " + RED + entity.getCauseOfDeath() + RESET);
+        }
+        return gameOver;
     }
 }

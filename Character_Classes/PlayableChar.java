@@ -12,6 +12,7 @@ public class PlayableChar extends GameCharacter {
     private int turnCount;
     private ArrayList<Item> inventory;
     private Item curItem;
+    private String causeOfDeath;
 
     //constructor
     public PlayableChar(String name, float health, float attack, String dialogue) {
@@ -21,6 +22,7 @@ public class PlayableChar extends GameCharacter {
         this.maxHealth = health;
         this.inventory = new ArrayList<Item>();
         this.curItem = null;
+        this.causeOfDeath = null;
     }
 
     //getters/setters
@@ -68,6 +70,10 @@ public class PlayableChar extends GameCharacter {
         this.curItem = curItem;
     }
 
+    public String getCauseOfDeath() {
+        return this.causeOfDeath;
+    }
+
     //additional methods
     public void incrementTurn() {
         this.turnCount++;
@@ -107,6 +113,20 @@ public class PlayableChar extends GameCharacter {
         curItem = inventory.get(index);
 
         return true;
+    }
+
+    public void takeDmg(GameCharacter entity) {
+        super.takeDmg(entity.getAttack());
+
+        //if character dies from taking damage
+        if (this.charDeath()) {
+            this.causeOfDeath = entity.getName();
+        }
+    }
+
+    public boolean switchItem(int index) {
+        //TODO
+        return false;
     }
 
     public boolean useItem() {
@@ -182,7 +202,7 @@ public class PlayableChar extends GameCharacter {
     }
 
     public void move(char direction, Floor floor) {
-        int d = -1;
+        int d = -1; //assigned sentinel value to accomodate compilation
         Tile next;
 
         //adjusting direction to numerical value
@@ -203,23 +223,29 @@ public class PlayableChar extends GameCharacter {
         //if next tile is not an entity
         else {
             super.move(d, floor);
-            this.takeDmg(next.getDamage());
+            this.takeDmg(next.getDamage()); //receives damage from tile
 
-            //if the destination tile is destructible, 
-            if(next.isDestructible()) {
-                DestructibleTile dTile = (DestructibleTile) next;
+            //if character dies from tile damage 
+            if (this.charDeath()) {
+                this.causeOfDeath = (next.getSymbol() == 'h') ? "Heat Tiles" : "Spike Walls";
+            } 
+            else {
+                //if the destination tile is destructible, 
+                if(next.isDestructible()) {
+                    DestructibleTile dTile = (DestructibleTile) next;
 
-                //if next tile is a collectible
-                if (next.getSymbol() == 'I' || next.getSymbol() == 'g') {
-                    this.collect(dTile, floor);
-                }
-                //if next tile is a treasure tile
-                else if (next.getSymbol() == 'T') {
-                    this.openTreasure(dTile);
-                }
-                //if next tile can be dug
-                else {
-                    this.dig(next, floor);
+                    //if next tile is a collectible
+                    if (next.getSymbol() == 'I' || next.getSymbol() == 'g') {
+                        this.collect(dTile, floor);
+                    }
+                    //if next tile is a treasure tile
+                    else if (next.getSymbol() == 'T') {
+                        this.openTreasure(dTile);
+                    }
+                    //if next tile can be dug
+                    else {
+                        this.dig(next, floor);
+                    }
                 }
             }
         }
