@@ -1,21 +1,32 @@
 //temp item class
 package Item_Classes;
 
+import Character_Classes.PlayableChar;
+
 public class Item {
     //attributes
-    private String name;
+    protected String name;
+    protected int price;
 
-    //constructor
     public Item(String name) {
         this.name = name;
+        this.price = 0;
     }
-
-    //getters/setters
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
+    public Item(String name, int price) {
         this.name = name;
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public boolean use(PlayableChar player){
+        //override
+        return false; 
     }
 }

@@ -5,9 +5,6 @@ import Item_Classes.*;
 import Dungeon_Classes.*;
 import java.util.ArrayList;
 
-import Dungeon_Classes.Floor;
-import Dungeon_Classes.Tile;
-
 public class PlayableChar extends GameCharacter {
     //attributes
     private int goldOwned;
@@ -76,14 +73,63 @@ public class PlayableChar extends GameCharacter {
         this.turnCount++;
     }
 
-    public boolean switchItem(int index) {
-        //TODO
-        return false;
+    public boolean prevItem() {
+        if (inventory.size() <= 1) {
+            return false;
+        }
+
+        int index = inventory.indexOf(curItem);
+
+        index--;
+
+        if (index < 0) {
+            index = inventory.size() - 1;
+        }
+
+        curItem = inventory.get(index);
+
+        return true;
+    }
+
+    public boolean nextItem() {
+        if (inventory.size() <= 1) {
+            return false;
+        }
+
+        int index = inventory.indexOf(curItem);
+
+        index++;
+
+        if (index >= inventory.size()) {
+            index = 0;
+        }
+
+        curItem = inventory.get(index);
+
+        return true;
     }
 
     public boolean useItem() {
-        //TODO
-         return false;
+        if (curItem == null) {
+            return false;
+        }
+
+        boolean used = curItem.use(this);
+
+        if (used) {
+            inventory.remove(curItem);
+
+            if (inventory.isEmpty()) {
+                curItem = null;
+            }
+            else {
+                curItem = inventory.get(0);
+            }
+
+            incrementTurn();
+        }
+
+        return used;
     }
 
     public boolean buyItem(Item purchase) {
@@ -97,8 +143,19 @@ public class PlayableChar extends GameCharacter {
     }
 
     public boolean heal(float amount) {
-        //TODO
-         return false;
+        if (amount <= 0) {
+            return false;
+        }
+
+        float newHealth = this.health + amount;
+
+        if (newHealth > maxHealth) {
+            newHealth = maxHealth;
+        }
+
+        this.health = newHealth;
+
+        return true;
     }
 
     public void dig(Tile tile, Floor floor) {

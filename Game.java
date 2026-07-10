@@ -153,6 +153,15 @@ public class Game {
             if ("wasd".contains(Character.toString(input))) {
                 Yohane.move(input, currentFloor);
             }
+            else if (input == ' ') {
+                Yohane.useItem();
+            }
+            else if (input == '[') {
+                Yohane.prevItem();
+            }
+            else if (input == ']') {
+                Yohane.nextItem();
+            }
 
             //prompts action from enemy characters
             Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
