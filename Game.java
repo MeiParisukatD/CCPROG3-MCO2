@@ -153,17 +153,17 @@ public class Game {
 
             if ("wasd".contains(Character.toString(input))) {
                 Yohane.move(input, currentFloor);
+            }
 
-                //prompts action from enemy characters
-                Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
-                while (it.hasNext()){
-                    EnemyChar enemy = it.next();
-                    if (enemy.charDeath()) {
-                        enemy.dropGold(currentFloor);
-                        it.remove();
-                    } else {
-                        enemy.move(currentFloor, Yohane);
-                    }
+            //prompts action from enemy characters
+            Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
+            while (it.hasNext()){
+                EnemyChar enemy = it.next();
+                if (enemy.charDeath()) {
+                    enemy.dropGold(currentFloor);
+                    it.remove();
+                } else {
+                    enemy.move(currentFloor, Yohane);
                 }
             }
         } while (input != 'q');
