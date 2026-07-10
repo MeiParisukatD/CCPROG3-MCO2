@@ -15,7 +15,7 @@ public class Tile {
         this.x = x;
         this.y = y;
         this.symbol = symbol;
-        assignProperties();
+        this.assignProperties();
     }
 
     //copy constructor
@@ -23,7 +23,7 @@ public class Tile {
         this.x = refTile.getX();
         this.y = refTile.getY();
         this.symbol = refTile.getSymbol();
-        assignProperties();
+        this.assignProperties();
     }
 
     //getters/setters 
@@ -50,6 +50,7 @@ public class Tile {
 
     public void setSymbol(char symbol) {
         this.symbol = symbol;
+        this.assignProperties();
     }
 
     public boolean isPassable() {
@@ -75,7 +76,6 @@ public class Tile {
     public void setDamage(float damage) {
         this.damage = damage;
     }
-    
 
     //additional methods
     public String assignColor() {
@@ -95,20 +95,12 @@ public class Tile {
             case 'g':
                 color = "\u001B[38;5;227m"; //yellow
                 break;
-            case 'Y': //Yohane tile
-                color = "\u001B[38;5;153m"; //light blue
-                break;
-            case 'b': //bat tile
-            case 'S': //Siren tile
-                color = "\u001B[38;5;196m"; //red
-                break;
-            case 'L': //Lailaps tile
-                color = "\u001B[38;5;153m"; //blue
-                break;
+            case 'I': //item tiles
+                color = "\u001B[38;5;158m"; //turquoise
             default:
                 break;
         }
-        
+
         return color;
     }
 
@@ -149,30 +141,20 @@ public class Tile {
                 this.destructible = true;
                 this.damage = 0.0f;
                 break;
-            case 'E': //exit tiles
+            case 'g': //gold tiles
                 this.passable = true;
                 this.destructible = true;
                 this.damage = 0.0f;
                 break;
-            case 'Y': //Yohane tile
-                this.passable = false;
-                this.destructible = true;
-                this.damage = 1.0f;
-                break;
-            case 'b': //bat tile
-                this.passable = false;
-                this.destructible = true;
-                this.damage = 0.5f;
-                break;
-            case 'L': //Lailaps tile
-                this.passable = false;
+            case 'I': //item tiles
+                this.passable = true;
                 this.destructible = true;
                 this.damage = 0.0f;
                 break;
-            case 'S': //Siren tile
-                this.passable = false;
+            case 'E': //exit tiles
+                this.passable = true;
                 this.destructible = true;
-                this.damage = 10.0f;
+                this.damage = 0.0f;
                 break;
             default:
                 System.out.println("[!] Invalid tile symbol.");
@@ -181,3 +163,7 @@ public class Tile {
         }
     }
 }
+
+// case 'L': //Lailaps tile
+            //     color = "\u001B[38;5;153m"; //blue
+            //     break;

@@ -48,6 +48,10 @@ public class PlayableChar extends GameCharacter {
         this.turnCount = turnCount;
     }
 
+    public void addItem(Item i) {
+        this.inventory.add(i);
+    }
+
     public ArrayList<Item> getInventory() {
         return this.inventory;
     }
@@ -98,6 +102,25 @@ public class PlayableChar extends GameCharacter {
         floor.destroyTile(tile);
     }
 
+    public void collect(DestructibleTile tile, Floor floor) {
+        if (tile.getSymbol() == 'I') {
+            this.inventory.add(tile.getItemDrop());
+            
+            //if this is the first item the character receives
+            if (this.inventory.size() == 1) {
+                this.curItem = this.inventory.get(0);
+            }
+        } else { //if the tile is a gold tile
+            this.goldOwned += tile.getGoldDrop();
+        }
+        //destroy tile after collected
+        floor.destroyTile(tile);
+    }
+
+    public void openTreasure(DestructibleTile tile) {
+        tile.dropTreasure();
+    }
+
     public void move(char direction, Floor floor) {
         int d = -1;
         Tile next;
@@ -111,12 +134,34 @@ public class PlayableChar extends GameCharacter {
         }
 
         next = nextTile(d, floor);
-        super.move(d, floor);
-        this.takeDmg(next.getDamage());
 
-        //if the destination tile is destructible, dig the tile
-        if(next instanceof DestructibleTile) {
-            this.dig(next, floor);
+        //check for enemy
+        EnemyChar enemy = floor.findEnemy(next.getX(), next.getY());
+        if (enemy != null) {
+            this.dealDmg(enemy);
+        } 
+        //if next tile is not an entity
+        else {
+            super.move(d, floor);
+            this.takeDmg(next.getDamage());
+
+            //if the destination tile is destructible, 
+            if(next.isDestructible()) {
+                DestructibleTile dTile = (DestructibleTile) next;
+
+                //if next tile is a collectible
+                if (next.getSymbol() == 'I' || next.getSymbol() == 'g') {
+                    this.collect(dTile, floor);
+                }
+                //if next tile is a treasure tile
+                else if (next.getSymbol() == 'T') {
+                    this.openTreasure(dTile);
+                }
+                //if next tile can be dug
+                else {
+                    this.dig(next, floor);
+                }
+            }
         }
     }
 

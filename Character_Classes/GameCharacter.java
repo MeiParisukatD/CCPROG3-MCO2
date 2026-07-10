@@ -68,6 +68,14 @@ public class GameCharacter {
         this.tile = tile;
     }
 
+    // public Tile getPrevTile() {
+    //     return prevTile;
+    // }
+
+    // public void setPrevTile(Tile prevTile) {
+    //     this.prevTile = prevTile;
+    // }
+
     public String getDialogue() {
         return this.dialogue;
     }
@@ -84,6 +92,14 @@ public class GameCharacter {
             isDead = true;
 
         return isDead;
+    }
+
+    public void dealDmg(GameCharacter enemy) {
+        enemy.takeDmg(this.attack);
+    }
+
+    public void takeDmg(float damage) {
+        this.health -= damage;
     }
 
     protected Tile nextTile(int direction, Floor floor) {
@@ -105,30 +121,11 @@ public class GameCharacter {
     }
 
     public void move(int direction, Floor floor) {
-        // int x, y;
-        // Tile next;
-
-        // x = this.tile.getX();
-        // y = this.tile.getY();
-
-        // switch (direction) {
-        //     case 0: x--; break;
-        //     case 1: x++; break;
-        //     case 2: y--; break;
-        //     case 3: y++; break;
-        // }
         Tile next = nextTile(direction, floor);
 
         if (floor.validateMove(next)) {
-            floor.moveCharacter(this.tile, next, this);
+            this.tile.setX(next.getX());
+            this.tile.setY(next.getY());
         }
-    }
-
-    public void dealDmg(GameCharacter enemy) {
-        //TODO
-    }
-
-    public void takeDmg(float damage) {
-        this.health -= damage;
     }
 }

@@ -4,6 +4,7 @@ import Dungeon_classes.*;
 import Item_classes.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Collections;
 import java.util.Scanner;
 
@@ -24,17 +25,23 @@ public class Game {
         Dungeon dungeon = new Dungeon("Test Dungeon", 1, 3, floors);
         Scanner s = new Scanner(System.in);
         char input;
+        int i;
 
         do {
             int index = dungeon.getCurFloor() - 1;
+            Floor currentFloor = dungeon.getFloors()[index];
+
+            //spawn Yohane
             if (firstMove) {
-                Yohane.findCharTile(dungeon.getFloors()[index].getMap());
+                int x, y;
+                Yohane.findCharTile(currentFloor.getMap());
+
+                x = Yohane.getTile().getX();
+                y = Yohane.getTile().getY();
+
+                currentFloor.getMap()[x][y] = new Tile(x, y, '.');
                 firstMove = false;
             }
-
-            System.out.println();
-            System.out.println(index);
-            System.out.println();
 
             Game.displayDungeonMenu(dungeon, index, Yohane);
 
@@ -48,13 +55,18 @@ public class Game {
             Yohane.incrementTurn();
 
             if ("wasd".contains(Character.toString(input))) {
-                Floor currentFloor = dungeon.getFloors()[index];
-
                 Yohane.move(input, currentFloor);
 
                 //prompts action from enemy characters
-                for (EnemyChar enemy : currentFloor.getEnemies()) {
-                    enemy.move(currentFloor, Yohane);
+                Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
+                while (it.hasNext()){
+                    EnemyChar enemy = it.next();
+                    if (enemy.charDeath()) {
+                        enemy.dropGold(currentFloor);
+                        it.remove();
+                    } else {
+                        enemy.move(currentFloor, Yohane);
+                    }
                 }
             }
         } while (input != 'q');
@@ -77,7 +89,7 @@ public class Game {
         Game.displayStats(Yohane);
 
         System.out.println();
-        dungeon.getFloors()[index].displayMap();
+        dungeon.getFloors()[index].displayMap(Yohane);
 
         System.out.println();
         System.out.println("Turn Counter: " + Yohane.getTurnCount());

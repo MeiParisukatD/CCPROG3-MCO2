@@ -42,8 +42,19 @@ public class EnemyChar extends GameCharacter {
     public void setDetectionRange(int detectionRange) {
         this.detectionRange = detectionRange;
     }
-
+// public DestructibleTile(int x, int y, char symbol, int goldDrop, Item itemDrop, boolean treasure)
     //additional methods
+    public void dropGold(Floor floor) {
+        int x = this.getTile().getX();
+        int y = this.getTile().getY();
+
+        floor.getMap()[x][y] = new DestructibleTile(
+            this.getTile().getX(), 
+            this.getTile().getY(),
+            'g', this.goldDrop,
+            null, true);
+    }
+
     public boolean detectPlayer(Tile[][] map, PlayableChar Yohane) {
         int dx, dy;
 
@@ -58,43 +69,34 @@ public class EnemyChar extends GameCharacter {
             dy = dy * -1;
         }
 
-        if (dx + dy == detectionRange) {
+        if (dx + dy <= detectionRange) {
             return true;
         }
 
         return false;
     }
 
-    public int dropGold() {
-        return goldDrop;
-    }
-
-    public void move(Floor floor, PlayableChar Yohane) {
-        boolean move = Yohane.getTurnCount() % turnsPerMove == 0;
+    public void move(Floor floor, PlayableChar entity) {
+        //determines if it is currently a turn for the enemy
+        boolean move = entity.getTurnCount() % turnsPerMove == 0;
 
         if (move) {
-            if (detectPlayer(floor.getMap(), Yohane)) {
-                dealDmg(Yohane);
-            } else {
-                randomMove(floor);
+            if (detectPlayer(floor.getMap(), entity)) {
+                this.dealDmg(entity); //attack Yohane if detected
+            } else { //if Yohane is not detected
+                int direction;
+                Tile next = null;
+
+                //enemies are not mentioned to be able to move over heat tiles
+                //this is exclusive to enemies, thus is checked uniquely in this method
+                do {
+                    //generate random direction
+                    direction = (int)(Math.random() * 4);
+                    next = nextTile(direction, floor);
+                } while (next.getSymbol() == 'h');
+
+                super.move(direction, floor);
             }
         }
     }
-
-    public void randomMove(Floor floor) {
-        int direction;
-        Tile next = null;
-
-        //enemies are not mentioned to be able to move over heat tiles
-        //this is exclusive to enemies, thus is checked uniquely in this method
-        do {
-            //generate random direction
-            Random rand = new Random();
-            direction = rand.nextInt(4);
-            next = nextTile(direction, floor);
-        } while (next.getSymbol() == 'h');
-
-        super.move(direction, floor);
-    }
-
 }
