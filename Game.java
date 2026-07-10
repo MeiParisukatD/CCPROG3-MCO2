@@ -9,13 +9,106 @@ import java.util.Collections;
 import java.util.Scanner;
 
 public class Game {
-    public static void main(String[] args) {
-        // PlayableChar Yohane, Lailaps;
-        // initializeGame();
 
-        //test
+    public static Scanner s = new Scanner(System.in);
+    public static void main(String[] args) {
+        displayMainMenu();
+    }
+
+    public static void displayMainMenu() {
+        char choice;
+
+        do {
+
+            System.out.println("************************************************");
+            System.out.println("*             Yohane The Parhelion!            *");
+            System.out.println("*        The Siren in the Mirror World!        *");
+            System.out.println("************************************************");
+            System.out.println("        [N]ew Game");
+            System.out.println("        [S]tatus");
+            System.out.println("        [Q]uit");
+            System.out.print("\nYour choice: ");
+
+            choice = Character.toLowerCase(
+                    s.nextLine().charAt(0));
+
+            switch(choice) {
+
+                case 'n':
+                    startGame();
+                    break;
+
+                case 's':
+                    displayStatus();
+                    break;
+            }
+
+        } while(choice != 'q');
+    }
+
+    public static void displayGameMenu(PlayableChar Yohane, Dungeon dungeon){
+        char choice;
+
+        do {
+
+            System.out.println();
+            System.out.println("Lailaps: Yohane! Where should we go now?");
+            System.out.println();
+
+            displayStats(Yohane);
+
+            System.out.println();
+            System.out.println("[1] Visit Test Dungeon");
+            System.out.println("[I] Inventory");
+            System.out.println("[Q] Quit");
+            System.out.print("\nChoice: ");
+
+            try {
+                choice = Character.toLowerCase(
+                        s.nextLine().charAt(0));
+            } catch (StringIndexOutOfBoundsException e) {
+                choice = 'x';
+            }
+
+            switch (choice) {
+
+                case '1':
+                    runDungeon(Yohane, dungeon);
+                    break;
+
+                case 'i':
+                    displayInventory(Yohane);
+                    break;
+            }
+
+        } while (choice != 'r');
+    }
+
+    public static void displayInventory(PlayableChar Yohane){
+        System.out.println();
+        System.out.println("Viewing Inventory");
+
+        displayStats(Yohane);
+
+        System.out.println();
+        System.out.println("Items:");
+
+        if (Yohane.getInventory().isEmpty()) {
+            System.out.println("No items.");
+        } else {
+            for (Item item : Yohane.getInventory()) {
+                System.out.println("- " + item.getName());
+            }
+        }
+
+        System.out.println();
+        System.out.println("Press Enter to return...");
+        s.nextLine();
+    }
+
+    public static void startGame(){
         PlayableChar Yohane = new PlayableChar("Yohane", 3, 1, null);
-        boolean firstMove = true;
+        
 
         Floor[] floors = new Floor[3];
         floors[0] = new Floor(1);
@@ -23,9 +116,13 @@ public class Game {
         floors[2] = new Floor(3);
         
         Dungeon dungeon = new Dungeon("Test Dungeon", 1, 3, floors);
-        Scanner s = new Scanner(System.in);
+
+        displayGameMenu(Yohane, dungeon);
+    }
+
+    public static void runDungeon(PlayableChar Yohane, Dungeon dungeon){
+        boolean firstMove = true;
         char input;
-        int i;
 
         do {
             int index = dungeon.getCurFloor() - 1;
@@ -72,15 +169,6 @@ public class Game {
         } while (input != 'q');
     }
 
-    // public initializeGame() {
-    //     Yohane = new PlayableChar("Yohane", 3, 1,  null);
-    //     Lailaps = new PlayableChar("Lailaps", 1, 0,  "Yohane! Where should we go to now?");
-    // }
-
-    public static void displayMainMenu() {
-        //TODO
-    }
-
     public static void displayDungeonMenu(Dungeon dungeon, int index, PlayableChar Yohane) {
         System.out.println("Dungeon #" + dungeon.getDungeonNum() + ": " + dungeon.getName());
         System.out.println("Floor " + dungeon.getCurFloor() + " of " + dungeon.getNumFloors());
@@ -110,5 +198,9 @@ public class Game {
         } catch (NullPointerException e) {
             System.out.println("Item on Hand: N/A");
         }
+    }
+
+    public static void displayStatus(){
+        System.out.println("Status not implemented yet");
     }
 }
