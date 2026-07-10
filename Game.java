@@ -18,7 +18,8 @@ public class Game {
         char choice;
 
         do {
-
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
             System.out.println("************************************************");
             System.out.println("*             Yohane The Parhelion!            *");
             System.out.println("*        The Siren in the Mirror World!        *");
@@ -49,7 +50,8 @@ public class Game {
         char choice;
 
         do {
-
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
             System.out.println();
             System.out.println("Lailaps: Yohane! Where should we go now?");
             System.out.println();
@@ -84,6 +86,8 @@ public class Game {
     }
 
     public static void displayInventory(PlayableChar Yohane){
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
         System.out.println();
         System.out.println("Viewing Inventory");
 
@@ -178,6 +182,8 @@ public class Game {
     }
 
     public static void displayDungeonMenu(Dungeon dungeon, int index, PlayableChar Yohane) {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
         System.out.println("Dungeon #" + dungeon.getDungeonNum() + ": " + dungeon.getName());
         System.out.println("Floor " + dungeon.getCurFloor() + " of " + dungeon.getNumFloors());
 
@@ -193,6 +199,8 @@ public class Game {
     }
 
     public static void displayStats(PlayableChar Yohane) {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
         System.out.print("HP: " + Yohane.getHealth() + "/" + Yohane.getMaxHealth());
         System.out.println("\t\tTotal Gold: " + Yohane.getGoldOwned() + " GP");
 
@@ -209,6 +217,12 @@ public class Game {
     }
 
     public static void displayStatus(){
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
         System.out.println("Status not implemented yet");
+
+        System.out.println();
+        System.out.println("Press Enter to return...");
+        s.nextLine();
     }
 }
