@@ -2,7 +2,6 @@
 package Character_Classes;
 
 import Dungeon_Classes.*;
-import Item_Classes.Item;
 
 /**
  * Represents a hostile NPC entity within the dungeon grid.

@@ -62,11 +62,9 @@ public class Game {
                     s.nextLine().charAt(0));
 
             switch(choice) {
-
                 case 'n':
                     startGame();
                     break;
-
                 case 's':
                     displayStatus();
                     break;
@@ -84,10 +82,11 @@ public class Game {
         
         Floor[] floors = new Floor[1];
         floors[0] = new Floor(1);
-        // floors[1] = new Floor(2);
-        // floors[2] = new Floor(3);
+
+        Item stewshine = new Item("Stewshine", 1000); //TODO: IMPLEMENT SUPPORT ITEMS
+        NPChar mari = new NPChar("Mari", null, stewshine);
         
-        Dungeon dungeon = new Dungeon("Shougetsu Confectionary", 1, 1, floors);
+        Dungeon dungeon = new Dungeon("Awashima Marine Park", 1, 1, floors, mari);
 
         displayGameMenu(Yohane, dungeon);
     }
@@ -111,7 +110,8 @@ public class Game {
             displayStats(Yohane);
 
             System.out.println();
-            System.out.println("[1] Visit Shougetsu Confectionary");
+            String avail = dungeon.getMember().getSaved() ? "X" : "1";
+            System.out.println("[" + avail + "] Visit " + dungeon.getName());
             System.out.println("[I] Inventory");
             System.out.println("[Q] Quit");
             if (shopUnlocked) {
@@ -128,9 +128,10 @@ public class Game {
 
             switch (choice) {
                 case '1':
-                    runDungeon(Yohane, dungeon);
+                    if (!dungeon.isCompleted(Yohane)) {
+                        runDungeon(Yohane, dungeon);
+                    }
                     break;
-
                 case 'i':
                     displayInventory(Yohane);
                     break;
@@ -247,6 +248,11 @@ public class Game {
                 break;
             }
         } while (!dungeon.gameOver(Yohane) && !dungeon.isCompleted(Yohane));
+
+        //resets Yohane's health if dungeon ends in death
+        if (dungeon.gameOver(Yohane)) {
+            Yohane.setHealth(3);
+        }
     }
 
     /**
@@ -287,18 +293,20 @@ public class Game {
 
         System.out.println("\n************************************************************");
         System.out.println("                      Dungeon Cleared!                      ");
-        System.out.println("              Shougetsu Confectionary Completed!            ");
+        System.out.println("              "+dungeon.getName()+"Completed!            ");
         System.out.println("                 Hanamaru Kunikida rescued!                 ");
         System.out.println("\nUnlocked: Hanamaru's Store Now Available!\n");
         System.out.println("************************************************************\n");
         System.out.println("Hanamaru: Yohane-chan, zura! You're here!");
         System.out.println("Yohane: Hanamaru! We have to get out of here quickly!");
-        System.out.println("Hanamaru: Oh? I was wondering what this place was and why there are bats everywhere, zura!");
-        System.out.println("Yohane: Seems like there's a Siren that wants to take your voices and is holding you in this dimension so that your counterparts in the real world can't sing!");
-        System.out.println("Hanamaru: Really? That sounds terrifying, zura. What have we got to do?");
-        System.out.println("Yohane: First, we have to get out of here, Zuramaru! I know the way out.");
+        System.out.println("Hanamaru: Oh? I was wondering what this place was and why there \nare bats everywhere, zura!");
+        System.out.println("Yohane: Seems like there's a Siren that wants to take your voices \n
+                            and is holding you in this dimension so that your \n
+                            counterparts in the real world can't sing!");
+        System.out.println("Hanamaru: Really? That sounds terrifying, zura. What have we \ngot to do?");
+        System.out.println("Yohane: First, we have to get out of here, Zuramaru! I know the \nway out.");
         System.out.println("Hanamaru: Lead the way, zura!");
-        System.out.println("Press Enter to return...");
+        System.out.println("\nPress Enter to return...");
         s.nextLine();
     }
 
