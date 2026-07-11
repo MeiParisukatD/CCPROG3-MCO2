@@ -108,13 +108,6 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
-     * @param inventory the new list allocation replacing the current data
-     */
-    public void setInventory(ArrayList<Item> inventory) {
-        this.inventory = inventory;
-    }
-
-    /**
      * @return the item currently targeted for upcoming action steps
      */
     public Item getCurItem() {
