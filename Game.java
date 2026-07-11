@@ -243,7 +243,7 @@ public class Game {
             }
 
             if (dungeon.isCompleted(Yohane)) {
-                displayDungeonClearScene();
+                displayDungeonClearScene(dungeon);
                 shopUnlocked = true;
                 break;
             }
@@ -287,22 +287,20 @@ public class Game {
      *
      * @param Yohane the targeted player reference being inspected
      */
-    public static void displayDungeonClearScene() {
+    public static void displayDungeonClearScene(Dungeon dungeon) {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
         System.out.println("\n************************************************************");
         System.out.println("                      Dungeon Cleared!                      ");
         System.out.println("              "+dungeon.getName()+" Completed!            ");
-        System.out.println("                 "+dungeon.member()+" rescued!                 ");
+        System.out.println("                 "+dungeon.getMember().getName()+" rescued!                 ");
         System.out.println("\nUnlocked: Hanamaru's Store Now Available!\n");
         System.out.println("************************************************************\n");
         System.out.println("Hanamaru: Yohane-chan, zura! You're here!");
         System.out.println("Yohane: Hanamaru! We have to get out of here quickly!");
         System.out.println("Hanamaru: Oh? I was wondering what this place was and why there \nare bats everywhere, zura!");
-        System.out.println("Yohane: Seems like there's a Siren that wants to take your voices \n
-                            and is holding you in this dimension so that your \n
-                            counterparts in the real world can't sing!");
+        System.out.println("Yohane: Seems like there's a Siren that wants to take your voices \nand is holding you in this dimension so that your \ncounterparts in the real world can't sing!");
         System.out.println("Hanamaru: Really? That sounds terrifying, zura. What have we \ngot to do?");
         System.out.println("Yohane: First, we have to get out of here, Zuramaru! I know the \nway out.");
         System.out.println("Hanamaru: Lead the way, zura!");
