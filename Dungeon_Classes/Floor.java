@@ -45,6 +45,8 @@ public class Floor {
 
     //getters/setters
     /**
+     * Retrieves the entire grid layout of the game world.
+     * 
      * @return the multi-dimensional layout array of tiles
      */
     public Tile[][] getMap() {
@@ -52,6 +54,8 @@ public class Floor {
     }
 
     /**
+     * Overwrites the current game grid with a completely new grid layout.
+     * 
      * @param map the replacement 2D array structure layout
      */
     public void setMap(Tile[][] map) {
@@ -59,6 +63,8 @@ public class Floor {
     }
 
     /**
+     * Gets the current level or dungeon floor the player is exploring.
+     * 
      * @return the current floor numerical index
      */
     public int getFloorNum() {
@@ -66,6 +72,8 @@ public class Floor {
     }
 
     /**
+     * Updates the current floor tracker to a new level index.
+     * 
      * @param floorNum the new floor number value to record
      */
     public void setFloorNum(int floorNum) {
@@ -73,6 +81,8 @@ public class Floor {
     }  
 
     /**
+     * Retrieves a collection of all active opponents currently present on this floor.
+     * 
      * @return the list reference containing spawned enemies
      */
     public ArrayList<EnemyChar> getEnemies() {
@@ -80,6 +90,8 @@ public class Floor {
     }
 
     /**
+     * Gets the maximum number of rows (horizontal height) defining the map boundaries.
+     * 
      * @return the row maximum size metric
      */
     public int getRowLen() {
@@ -87,6 +99,8 @@ public class Floor {
     }
 
     /**
+     * Sets the maximum number of rows to redefine the map's horizontal boundary.
+     * 
      * @param rowLen the new horizontal limit length
      */
     public void setRowLen(int rowLen) {
@@ -94,6 +108,8 @@ public class Floor {
     }
 
     /**
+     * Gets the maximum number of columns (vertical width) defining the map boundaries.
+     * 
      * @return the column maximum size metric
      */
     public int getColLen() {
@@ -101,6 +117,8 @@ public class Floor {
     }
 
     /**
+     * Sets the maximum number of columns to redefine the map's vertical boundary.
+     * 
      * @param colLen the new vertical limit length
      */
     public void setColLen(int colLen) {

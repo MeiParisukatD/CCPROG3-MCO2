@@ -42,6 +42,8 @@ public class EnemyChar extends GameCharacter {
 
     //getters/setters
     /**
+     * Calculates or retrieves the amount of currency awarded when this entity is defeated.
+     * 
      * @return the gold drop amount
      */
     public int getGoldDrop() {
@@ -49,6 +51,8 @@ public class EnemyChar extends GameCharacter {
     }
 
     /**
+     * Updates the currency reward value assigned to this entity.
+     * 
      * @param goldDrop the new gold drop amount
      */
     public void setGoldDrop(int goldDrop) {
@@ -56,6 +60,8 @@ public class EnemyChar extends GameCharacter {
     }
 
     /**
+     * Gets the movement delay factor determining how frequently this entity acts relative to game turns.
+     * 
      * @return the number of turns required per move
      */
     public int getTurnsPerMove() {
@@ -63,6 +69,8 @@ public class EnemyChar extends GameCharacter {
     }
 
     /**
+     * Modifies the movement frequency rate for this entity.
+     * 
      * @param turnsPerMove the new turn interval layout
      */
     public void setTurnsPerMove(int turnsPerMove) {
@@ -70,6 +78,8 @@ public class EnemyChar extends GameCharacter {
     }
 
     /**
+     * Retrieves the distance threshold within which this entity can spot or track the player.
+     * 
      * @return the player detection radius
      */
     public int getDetectionRange() {
@@ -77,6 +87,8 @@ public class EnemyChar extends GameCharacter {
     }
 
     /**
+     * Updates the vision boundaries or awareness radius for tracking targets.
+     * 
      * @param detectionRange the new player detection radius
      */
     public void setDetectionRange(int detectionRange) {

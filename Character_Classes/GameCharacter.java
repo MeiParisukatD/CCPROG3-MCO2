@@ -74,6 +74,8 @@ public class GameCharacter {
 
     //getters/setters
     /**
+     * Retrieves the display name identifying the character entity.
+     * 
      * @return the character's name
      */
     public String getName() {
@@ -81,6 +83,8 @@ public class GameCharacter {
     }
 
     /**
+     * Changes the character's display name to a new identity string.
+     * 
      * @param name the new name string
      */
     public void setName(String name) {
@@ -88,6 +92,8 @@ public class GameCharacter {
     }
 
     /**
+     * Retrieves the character's remaining life or durability points.
+     * 
      * @return the current health value
      */
     public float getHealth() {
@@ -95,6 +101,8 @@ public class GameCharacter {
     }
 
     /**
+     * Directly updates the character's current pool of health points.
+     * 
      * @param health the new health value
      */
     public void setHealth(float health) {
@@ -102,6 +110,8 @@ public class GameCharacter {
     }
 
     /**
+     * Retrieves the base offensive strength score used during combat interactions.
+     * 
      * @return the current attack power
      */
     public float getAttack() {
@@ -109,6 +119,8 @@ public class GameCharacter {
     }
 
     /**
+     * Modifies the offensive damage potential of the character.
+     * 
      * @param attack the new attack value
      */
     public void setAttack(float attack) {
@@ -116,6 +128,8 @@ public class GameCharacter {
     }
 
     /**
+     * Gets the current horizontal placement index on the world map grid.
+     * 
      * @return the current X grid coordinate
      */
     public int getX() {
@@ -123,6 +137,8 @@ public class GameCharacter {
     }
 
     /**
+     * Updates the character's horizontal placement index to a new map grid position.
+     * 
      * @param x the new X coordinate
      */
     public void setX(int x) {
@@ -130,6 +146,8 @@ public class GameCharacter {
     }
 
     /**
+     * Gets the current vertical placement index on the world map grid.
+     * 
      * @return the current Y grid coordinate
      */
     public int getY() {
@@ -137,6 +155,8 @@ public class GameCharacter {
     }
 
     /**
+     * Updates the character's vertical placement index to a new map grid position.
+     * 
      * @param y the new Y coordinate
      */
     public void setY(int y) {
@@ -144,6 +164,8 @@ public class GameCharacter {
     }
     
     /**
+     * Retrieves the text line spoken or triggered when interacting with this character.
+     * 
      * @return the character's dialogue text, or null if none
      */
     public String getDialogue() {
@@ -151,11 +173,13 @@ public class GameCharacter {
     }
 
     /**
+     * Assigns a new text string or conversation sequence to the character.
+     * 
      * @param dialogue the new dialogue string
      */
     public void setDialogue(String dialogue) {
         this.dialogue = dialogue;
-    }    
+    }  
 
     //additional methods
     /**

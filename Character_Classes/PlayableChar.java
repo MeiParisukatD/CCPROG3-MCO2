@@ -101,6 +101,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Retrieves the character's entire inventory.
+     * 
      * @return the full list structure tracking held items
      */
     public ArrayList<Item> getInventory() {
@@ -108,6 +110,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Gets the item that is currently selected or focused for the character's next action.
+     * 
      * @return the item currently targeted for upcoming action steps
      */
     public Item getCurItem() {
@@ -115,6 +119,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Updates the currently selected item to a new target item.
+     * 
      * @param curItem the item node to swap selection toward
      */
     public void setCurItem(Item curItem) {
@@ -122,6 +128,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Retrieves the explanation or name of the entity/hazard that defeated the character.
+     *
      * @return the identifier string explaining what defeated the character
      */
     public String getCauseOfDeath() {

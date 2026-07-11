@@ -34,6 +34,8 @@ public class NPChar extends GameCharacter {
 
     //getters/setters
     /**
+     * Retrieves the specific item currently carried or held by this NPC.
+     * 
      * @return the item held by this NPC
      */
     public Item getItem() {
@@ -41,6 +43,8 @@ public class NPChar extends GameCharacter {
     }
 
     /**
+     * Checks the rescue status of the NPC to see if they are out of danger.
+     * 
      * @return true if the NPC has been saved, false otherwise
      */
     public boolean getSaved() {
@@ -48,6 +52,8 @@ public class NPChar extends GameCharacter {
     }
 
     /**
+     * Updates the rescue status of the NPC.
+     * 
      * @param saved the new status indicating whether the NPC is saved
      */
     public void isSaved(boolean saved) {

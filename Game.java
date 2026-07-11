@@ -83,10 +83,9 @@ public class Game {
         Floor[] floors = new Floor[1];
         floors[0] = new Floor(1);
 
-        Item stewshine = new Item("Stewshine", 1000); //TODO: IMPLEMENT SUPPORT ITEMS
-        NPChar mari = new NPChar("Mari", null, stewshine);
+        NPChar hanamaru = new NPChar("Hanamaru Kunikida", null, null);
         
-        Dungeon dungeon = new Dungeon("Awashima Marine Park", 1, 1, floors, mari);
+        Dungeon dungeon = new Dungeon("Shougetsu Confectionary", 1, 1, floors, hanamaru);
 
         displayGameMenu(Yohane, dungeon);
     }
@@ -155,7 +154,7 @@ public class Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("nViewing Inventory");
+        System.out.println("\nViewing Inventory");
 
         displayStats(Yohane);
 
@@ -292,10 +291,9 @@ public class Game {
     }
 
     /**
-     * Outputs text metrics formatting numerical properties like health status limits, 
-     * gold storage indexes, and calculates holding item structural frequencies.
+     * Outputs the dialogue for unlocking Hanamaru's shop after saving Hanamaru
      *
-     * @param Yohane the targeted player reference being inspected
+     * @param dungeon the dungeon cleared
      */
     public static void displayDungeonClearScene(Dungeon dungeon) {
         System.out.print("\033[H\033[2J");
