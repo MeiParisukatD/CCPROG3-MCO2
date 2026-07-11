@@ -174,8 +174,6 @@ public class Dungeon {
         if (this.completion) {
             System.out.println(YELLOW + this.name + " completed!" + RESET);
             this.member.isSaved(true);
-            entity.addItem(this.member.getItem());
-            System.out.println("Received " + this.member.getItem().getName() + " from " + this.member.getName());
         }
         return this.completion;
     }
