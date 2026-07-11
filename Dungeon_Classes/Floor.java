@@ -121,6 +121,7 @@ public class Floor {
 
         this.map = new Tile[ROW][COL];
         File file = new File("map1.txt");
+        this.enemies.clear();
 
         try (Scanner reader = new Scanner(file)) {
             while (reader.hasNextLine()){
