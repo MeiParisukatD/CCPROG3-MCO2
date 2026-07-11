@@ -260,8 +260,8 @@ public class Game {
             System.out.println("Killed by " + RED + Yohane.getCauseOfDeath() + RESET);
 
             Yohane.setHealth(3);
-            Yohane.setX(dungeon.getFloors()[dungeon.getCurFloor()-1].getStartX());
-            Yohane.setY(dungeon.getFloors()[dungeon.getCurFloor()-1].getStartY());
+            //regen floor
+            dungeon.getFloors()[dungeon.getCurFloor()-1].generateFloor();
         }
     }
 
