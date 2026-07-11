@@ -167,9 +167,12 @@ public class Dungeon {
      */
     public boolean isCompleted(PlayableChar entity) {
         this.completion = this.floors[numFloors-1].completeFloor(entity);
+        String YELLOW, RESET;
+        YELLOW = "\u001B[38;5;227m";
+        RESET = "\u001B[0m";
 
         if (this.completion) {
-            System.out.println(this.name + " completed!");
+            System.out.println(YELLOW + this.name + " completed!" + RESET);
             this.member.isSaved(true);
             entity.addItem(this.member.getItem());
             System.out.println("Received " + this.member.getItem().getName() + " from " + this.member.getName());
