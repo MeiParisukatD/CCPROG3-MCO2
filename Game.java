@@ -23,9 +23,10 @@ public class Game {
     private Game() {
         // Utility class
     }
-    
+
     /** Shared reader utility scanning string tokens input stream values from standard system consoles. */
     public static Scanner s = new Scanner(System.in);
+    private static boolean shopUnlocked = false;
     
     /**
      * Entry programmatic hook establishing execution boundaries and forwarding flow controls 
@@ -86,7 +87,7 @@ public class Game {
         // floors[1] = new Floor(2);
         // floors[2] = new Floor(3);
         
-        Dungeon dungeon = new Dungeon("Test Dungeon", 1, 1, floors);
+        Dungeon dungeon = new Dungeon("Shougetsu Confectionary", 1, 1, floors);
 
         displayGameMenu(Yohane, dungeon);
     }
@@ -108,9 +109,12 @@ public class Game {
             displayStats(Yohane);
 
             System.out.println();
-            System.out.println("[1] Visit Test Dungeon");
+            System.out.println("[1] Visit Shougetsu Confectionary");
             System.out.println("[I] Inventory");
             System.out.println("[Q] Quit");
+            if (shopUnlocked) {
+                System.out.println("[H] Hanamaru's Store");
+            }
             System.out.print("\nChoice: ");
 
             try {
@@ -127,6 +131,12 @@ public class Game {
 
                 case 'i':
                     displayInventory(Yohane);
+                    break;
+
+                case 'h':
+                    if (shopUnlocked) {
+                        displayShop();
+                    }
                     break;
             }
         } while (choice != 'q');
@@ -230,6 +240,12 @@ public class Game {
             if (currentFloor.completeFloor(Yohane)) {
                 dungeon.incrementCurFloor();
             }
+
+            if (dungeon.isCompleted(Yohane)) {
+                displayDungeonClearScene();
+                shopUnlocked = true;
+                break;
+            }
         } while (!dungeon.gameOver(Yohane) && !dungeon.isCompleted(Yohane));
     }
 
@@ -265,6 +281,37 @@ public class Game {
      *
      * @param Yohane the targeted player reference being inspected
      */
+    public static void displayDungeonClearScene() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+
+        System.out.println("************************************************************");
+        System.out.println("                      Dungeon Cleared!                      ");
+        System.out.println("              Shougetsu Confectionary Completed!            ");
+        System.out.println("                 Hanamaru Kunikida rescued!                 ");
+        System.out.println("\nUnlocked: Hanamaru's Store Now Available!\n");
+        System.out.println("************************************************************\n");
+        System.out.println("Hanamaru: Yohane-chan, zura! You're here!");
+        System.out.println("Yohane: Hanamaru! We have to get out of here quickly!");
+        System.out.println("Hanamaru: Oh? I was wondering what this place was and why there are bats everywhere, zura!");
+        System.out.println("Yohane: Seems like there's a Siren that wants to take your voices and is holding you in this dimension so that your counterparts in the real world can't sing!");
+        System.out.println("Hanamaru: Really? That sounds terrifying, zura. What have we got to do?");
+        System.out.println("Yohane: First, we have to get out of here, Zuramaru! I know the way out.");
+        System.out.println("Hanamaru: Lead the way, zura!");
+        System.out.println("Press Enter to return...");
+        s.nextLine();
+    }
+
+    public static void displayShop() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+
+        System.out.println("Hanamaru's Store not implemented yet\n");
+
+        System.out.println("\nPress Enter to return...");
+        s.nextLine();
+    }
+
     public static void displayStats(PlayableChar Yohane) {
         System.out.print("\033[H\033[2J");
         System.out.flush();
@@ -292,10 +339,9 @@ public class Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("Status not implemented yet");
+        System.out.println("Status not implemented yet\n");
 
-        System.out.println();
-        System.out.println("Press Enter to return...");
+        System.out.println("\nPress Enter to return...");
         s.nextLine();
     }
 }
