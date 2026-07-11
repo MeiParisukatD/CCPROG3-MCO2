@@ -197,14 +197,6 @@ public class Dungeon {
      */
     public boolean gameOver(PlayableChar entity) {
         boolean gameOver = entity.charDeath();
-        String RED, RESET;
-        RED = "\u001B[38;5;196m";
-        RESET = "\u001B[0m";
-
-        if (gameOver) {
-            System.out.println(RED + "You Died!" + RESET );
-            System.out.println("Killed by " + RED + entity.getCauseOfDeath() + RESET);
-        }
         return gameOver;
     }
 }
