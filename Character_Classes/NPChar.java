@@ -41,13 +41,6 @@ public class NPChar extends GameCharacter {
     }
 
     /**
-     * @param item the new item to assign to this NPC
-     */
-    public void setItem(Item item) {
-        this.item = item;
-    }
-
-    /**
      * @return true if the NPC has been saved, false otherwise
      */
     public boolean getSaved() {
