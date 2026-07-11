@@ -24,6 +24,8 @@ public class Dungeon {
     private Floor[] floors;
     /** Flag tracking whether the final floor has been fully cleared. */
     private boolean completion;
+    /** Member to be saved from dungeon. */
+    private NPChar member;
 
     //constructor
     /**
@@ -35,13 +37,14 @@ public class Dungeon {
      * @param numFloors the ceiling number of floors inside this structure
      * @param floors the composite array of Floor items making up the dungeon layout
      */
-    public Dungeon(String name, int dungeonNum, int numFloors, Floor[] floors) {
+    public Dungeon(String name, int dungeonNum, int numFloors, Floor[] floors, NPChar member) {
         this.name = name;
         this.dungeonNum = dungeonNum;
         this.numFloors = numFloors;
         this.curFloor = 1; //curFloor always starts at one
         this.floors = floors;
         this.completion = false;
+        this.member = member;
     }
 
     //getters/setters
@@ -135,6 +138,16 @@ public class Dungeon {
         this.floors = floors;
     }
 
+     /**
+     * Retrieves the associated member.
+     *
+     * @return NPChar instance
+     */
+    public NPChar getMember() {
+        return this.member;
+    }
+
+
     //additional methods
     /**
      * Assigns a series of floor structures matching a specific map index catalogue.
@@ -154,6 +167,13 @@ public class Dungeon {
      */
     public boolean isCompleted(PlayableChar entity) {
         this.completion = this.floors[numFloors-1].completeFloor(entity);
+
+        if (this.completion) {
+            System.out.println(this.name + " completed!");
+            this.member.isSaved(true);
+            entity.addItem(this.member.getItem());
+            System.out.println("Received " + this.member.getItem().getName() + " from " + this.member.getName());
+        }
         return this.completion;
     }
 

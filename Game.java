@@ -61,11 +61,9 @@ public class Game {
                     s.nextLine().charAt(0));
 
             switch(choice) {
-
                 case 'n':
                     startGame();
                     break;
-
                 case 's':
                     displayStatus();
                     break;
@@ -83,10 +81,11 @@ public class Game {
         
         Floor[] floors = new Floor[1];
         floors[0] = new Floor(1);
-        // floors[1] = new Floor(2);
-        // floors[2] = new Floor(3);
+
+        Item stewshine = new Item("Stewshine", 1000); //TODO: IMPLEMENT SUPPORT ITEMS
+        NPChar mari = new NPChar("Mari", null, stewshine);
         
-        Dungeon dungeon = new Dungeon("Test Dungeon", 1, 1, floors);
+        Dungeon dungeon = new Dungeon("Awashima Marine Park", 1, 1, floors, mari);
 
         displayGameMenu(Yohane, dungeon);
     }
@@ -108,7 +107,8 @@ public class Game {
             displayStats(Yohane);
 
             System.out.println();
-            System.out.println("[1] Visit Test Dungeon");
+            String avail = dungeon.getMember().getSaved() ? "X" : "1";
+            System.out.println("[" + avail + "] Visit " + dungeon.getName());
             System.out.println("[I] Inventory");
             System.out.println("[Q] Quit");
             System.out.print("\nChoice: ");
@@ -122,9 +122,10 @@ public class Game {
 
             switch (choice) {
                 case '1':
-                    runDungeon(Yohane, dungeon);
+                    if (!dungeon.isCompleted(Yohane)) {
+                        runDungeon(Yohane, dungeon);
+                    }
                     break;
-
                 case 'i':
                     displayInventory(Yohane);
                     break;
@@ -231,6 +232,11 @@ public class Game {
                 dungeon.incrementCurFloor();
             }
         } while (!dungeon.gameOver(Yohane) && !dungeon.isCompleted(Yohane));
+
+        //resets Yohane's health if dungeon ends in death
+        if (dungeon.gameOver(Yohane)) {
+            Yohane.setHealth(3);
+        }
     }
 
     /**

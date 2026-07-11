@@ -57,7 +57,7 @@ public class NPChar extends GameCharacter {
     /**
      * @param saved the new status indicating whether the NPC is saved
      */
-    public void setSaved(boolean saved) {
+    public void isSaved(boolean saved) {
         this.saved = saved;
     }
 }
