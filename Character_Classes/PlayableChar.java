@@ -73,7 +73,7 @@ public class PlayableChar extends GameCharacter {
     /**
      * @param maxHealth the new upper threshold for health
      */
-    public void setMaxHealth(int maxHealth) {
+    public void setMaxHealth(float maxHealth) {
         this.maxHealth = maxHealth;
     }
 
