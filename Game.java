@@ -293,8 +293,8 @@ public class Game {
 
         System.out.println("\n************************************************************");
         System.out.println("                      Dungeon Cleared!                      ");
-        System.out.println("              "+dungeon.getName()+"Completed!            ");
-        System.out.println("                 Hanamaru Kunikida rescued!                 ");
+        System.out.println("              "+dungeon.getName()+" Completed!            ");
+        System.out.println("                 "+dungeon.member()+" rescued!                 ");
         System.out.println("\nUnlocked: Hanamaru's Store Now Available!\n");
         System.out.println("************************************************************\n");
         System.out.println("Hanamaru: Yohane-chan, zura! You're here!");
