@@ -27,10 +27,6 @@ public class Floor {
     private int colLen;
     /** The designation or layout index track level number of this floor. */
     private int floorNum;
-    /** The starting x tile of Yohane */
-    private int startX;
-    /** The starting y tile of Yohane */
-    private int startY;
 
     //constructor
     /**
@@ -110,22 +106,7 @@ public class Floor {
     public void setColLen(int colLen) {
         this.colLen = colLen;
     }
-
-    /**
-     * @return the x value of the starting point
-     */
-    public int getStartX() {
-        return this.startX;
-    }
-
-    /**
-     * @return the y value of the starting point
-     */
-    public int getStartY() {
-        return this.startY;
-    }
-
-
+    
     //additional methods
     /**
      * Parses the flat document matrix file stream to initialize structural symbols, 
@@ -150,11 +131,6 @@ public class Floor {
                     char symbol = line.charAt(col);
 
                     switch (symbol) {
-                    case 'Y':
-                        this.startX = row;
-                        this.startY = col;
-                        this.map[row][col] = new Tile(row, col, 'Y'); // make it a floor tile
-                        break;
                     case 'b': // bat spawn
                         this.map[row][col] = new Tile(row, col, '.'); // floor tile
                         generateEnemy('b', row, col);
