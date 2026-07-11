@@ -250,8 +250,18 @@ public class Game {
         } while (!dungeon.gameOver(Yohane) && !dungeon.isCompleted(Yohane));
 
         //resets Yohane's health if dungeon ends in death
+        //resets Yohane's health if dungeon ends in death
         if (dungeon.gameOver(Yohane)) {
+            String RED, RESET;
+            RED = "\u001B[38;5;196m";
+            RESET = "\u001B[0m";
+
+            System.out.println(RED + "You Died!" + RESET );
+            System.out.println("Killed by " + RED + Yohane.getCauseOfDeath() + RESET);
+
             Yohane.setHealth(3);
+            Yohane.setX(dungeon.getFloors()[dungeon.getCurFloor()-1].getStartX());
+            Yohane.setY(dungeon.getFloors()[dungeon.getCurFloor()-1].getStartY());
         }
     }
 
