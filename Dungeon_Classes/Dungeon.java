@@ -155,7 +155,7 @@ public class Dungeon {
      * @param catalogue the input array mapping available layout references
      */
     public void assignFloors(Floor[] catalogue) {
-        //TODO
+        //TODO: WILL IMPLEMENT IN MCO2
     }
 
     /**
@@ -166,7 +166,7 @@ public class Dungeon {
      * @return true if the final map floor conditions are cleared, false otherwise
      */
     public boolean isCompleted(PlayableChar entity) {
-        this.completion = this.floors[numFloors-1].completeFloor(entity);
+        this.completion = this.floors[numFloors-1].completeFloor(entity) && this.curFloor == numFloors;
         String YELLOW, RESET;
         YELLOW = "\u001B[38;5;227m";
         RESET = "\u001B[0m";
