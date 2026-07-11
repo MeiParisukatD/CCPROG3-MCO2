@@ -234,7 +234,7 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
-     * Facilitates purchasing an item asset if fiscal gold limits allow.
+     * Facilitates purchasing an item asset if gold amount allow.
      *
      * @param purchase the Item targeted for purchase
      * @return true if bought successfully, false otherwise
@@ -397,10 +397,14 @@ public class PlayableChar extends GameCharacter {
         for (i = 0; i < map.length; i++) {
             for (j = 0; j < map[i].length; j++) {
                 if (map[i][j].getSymbol() == key) {
-                    this.x = i;
-                    this.y = j;
+                    this.x = map[i][j].getX();
+                    this.y = map[i][j].getY();
+                    return;
                 }
             }
         }
+        // not found: leave at 0,0
+        this.x = 0;
+        this.y = 0;
     }
 }

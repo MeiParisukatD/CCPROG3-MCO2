@@ -49,7 +49,7 @@ public class Game {
             System.out.print("\033[H\033[2J");
             System.out.flush();
 
-            System.out.println("************************************************");
+            System.out.println("\n************************************************");
             System.out.println("*             Yohane The Parhelion!            *");
             System.out.println("*        The Siren in the Mirror World!        *");
             System.out.println("************************************************");
@@ -103,8 +103,10 @@ public class Game {
         char choice;
 
         do {
-            System.out.println("Lailaps: Yohane! Where should we go now?");
-            System.out.println();
+
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+            System.out.println("\nLailaps: Yohane! Where should we go now?\n");
 
             displayStats(Yohane);
 
@@ -152,13 +154,11 @@ public class Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println();
-        System.out.println("Viewing Inventory");
+        System.out.println("nViewing Inventory");
 
         displayStats(Yohane);
 
-        System.out.println();
-        System.out.println("Items:");
+        System.out.println("\nItems:");
 
         if (Yohane.getInventory().isEmpty()) {
             System.out.println("No items.");
@@ -261,7 +261,7 @@ public class Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("Dungeon #" + dungeon.getDungeonNum() + ": " + dungeon.getName());
+        System.out.println("\nDungeon #" + dungeon.getDungeonNum() + ": " + dungeon.getName());
         System.out.println("Floor " + dungeon.getCurFloor() + " of " + dungeon.getNumFloors());
 
         System.out.println();
@@ -285,7 +285,7 @@ public class Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("************************************************************");
+        System.out.println("\n************************************************************");
         System.out.println("                      Dungeon Cleared!                      ");
         System.out.println("              Shougetsu Confectionary Completed!            ");
         System.out.println("                 Hanamaru Kunikida rescued!                 ");
@@ -306,16 +306,13 @@ public class Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("Hanamaru's Store not implemented yet\n");
+        System.out.println("\nHanamaru's Store not implemented yet\n");
 
         System.out.println("\nPress Enter to return...");
         s.nextLine();
     }
 
     public static void displayStats(PlayableChar Yohane) {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-
         System.out.print("HP: " + Yohane.getHealth() + "/" + Yohane.getMaxHealth());
         System.out.println("\t\tTotal Gold: " + Yohane.getGoldOwned() + " GP");
 
@@ -339,7 +336,7 @@ public class Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("Status not implemented yet\n");
+        System.out.println("\nStatus not implemented yet\n");
 
         System.out.println("\nPress Enter to return...");
         s.nextLine();
