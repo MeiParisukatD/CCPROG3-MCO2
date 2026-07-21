@@ -1,0 +1,13 @@
+MAP GUIDE:
+
+map1.txt --> basic map (always floor 1)
+map_boss.txt --> Siren/final map (always final floor)
+
+<randomized maps>
+map2.txt --> spike maze
+map3.txt --> upgraded basic map
+map4.txt --> river map
+map5.txt --> treasure vault
+map6.txt --> mineshaft
+map7.txt --> Eye of Sauron
+map8.txt --> bat hoardes
