@@ -8,7 +8,7 @@ import Item_Classes.*;
  * and track whether they have been rescued or interacted with.
  * 
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class NPChar extends GameCharacter {
     //attributes
