@@ -253,7 +253,16 @@ public class Tile {
                 this.destructible = false;
                 this.damage = 0.0f;
                 break;
+            case '0': //button tiles
+                this.passable = false;
+                this.destructible = false;
+                this.damage = 0.0f;
+                break;
+            //to prevent character tiles from being 'invalid'
             case 'Y': //Yohane tile
+            case 'L': //Lailaps tile
+            case 'b': //Bat tile
+            case 'S': //Siren tile
                 break;
             default:
                 System.out.println("[!] Invalid tile symbol.");
