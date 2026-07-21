@@ -260,7 +260,7 @@ public class Game {
 
             Yohane.setHealth(3);
             //regen floor
-            dungeon.getFloors()[dungeon.getCurFloor()-1].generateFloor();
+            dungeon.getFloors()[dungeon.getCurFloor()-1].generateFloor(dungeon.getFloors()[dungeon.getCurFloor()-1].getFile());
         }
     }
 
