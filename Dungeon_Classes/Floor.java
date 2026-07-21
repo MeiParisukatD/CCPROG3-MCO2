@@ -40,10 +40,19 @@ public class Floor {
         enemies = new ArrayList<>();
         this.floorNum = floorNum;
         this.file = this.assignFile();
-        this.generateFloor(this.file);
+        this.generateFloor();
         rowLen = map.length;
         colLen = map[0].length;
     }  
+
+    public Floor(int floorNum, String file) {
+        enemies = new ArrayList<>();
+        this.floorNum = floorNum;
+        this.file = file;
+        this.generateFloor();
+        rowLen = map.length;
+        colLen = map[0].length;
+    } 
 
     //getters/setters
     /**
@@ -136,22 +145,9 @@ public class Floor {
         //temporary string to hold incomplete file name
         String temp = "map";
 
-        //if floor is the first in the dungeon
-        if (this.floorNum == 1) {
-            temp += "1";
-        } 
-        
-        //if the floor is part of the boss level
-        else if (this.floorNum == 0) {
-            temp += "_boss";
-        }
-
-        //if generic floor to be randomized
-        else {
-            //minimum 2, maximum 8
-            int num = (int)(Math.random() * 7) + 2;
-            temp += num;
-        }
+        //minimum 2, maximum 8
+        int num = (int)(Math.random() * 7) + 2;
+        temp += num;
 
         //appends .txt
         temp += ".txt";
@@ -162,7 +158,7 @@ public class Floor {
      * Parses the flat document matrix file stream to initialize structural symbols, 
      * allocating destructible elements and forwarding enemy spawn definitions seamlessly.
      */
-    public void generateFloor(String map) {
+    public void generateFloor() {
         int row, col, ROW, COL;
         String line;
         ROW = 12; //standard row count across all maps
@@ -170,7 +166,7 @@ public class Floor {
         row = col = 0;
 
         this.map = new Tile[ROW][COL];
-        File file = new File(map);
+        File file = new File(this.file);
         this.enemies.clear();
 
         try (Scanner reader = new Scanner(file)) {
@@ -222,26 +218,26 @@ public class Floor {
 
                 EnemyChar bat = new EnemyChar(
                     "Bat",
-                    1.0f,                      // HP
+                    1.0f,               // HP
                     0.5f * this.floorNum,      // Attack
                     5 * this.floorNum,         // Gold Drop
                     moves,                     // Moves every 2 turns
-                    1,                         // Detection Range
-                    row,
-                    col
+                    1,         // Detection Range
+                    this.floorNum != 1,       // diagonal movement if NOT floor 1
+                    row, col                  //coordinates
                 );
                 this.enemies.add(bat);
                 break;
             case 'S': //spawns Siren and assigns to corresponding tile
                 EnemyChar siren = new EnemyChar(
                     "Siren",
-                    1.0f,                      // HP
-                    10.0f,                     // Attack
-                    750,                       // Gold Drop
-                    1,                         // Moves every turn
-                    rowLen,                    // Detection Range
-                    row,
-                    col
+                    1.0f,                // HP
+                    10.0f,               // Attack
+                    750,               // Gold Drop
+                    1,             // Moves every turn
+                    rowLen,                     // Detection Range
+                    true,             // diagonal movement true
+                    row, col                   //coordinates
                 );
                 this.enemies.add(siren);
         }
