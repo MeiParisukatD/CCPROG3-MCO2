@@ -17,16 +17,17 @@ import java.util.Scanner;
  */
 public class Game {
 
+    /** Shared reader utility scanning string tokens input stream values from standard system consoles. */
+    public static Scanner s = new Scanner(System.in);
+    private static boolean shopUnlocked = false;
+    private static PlayableChar Yohane;
+
     /**
      * Private constructor to prevent instantiation of utility main runner class.
      */
     private Game() {
         // Utility class
     }
-
-    /** Shared reader utility scanning string tokens input stream values from standard system consoles. */
-    public static Scanner s = new Scanner(System.in);
-    private static boolean shopUnlocked = false;
     
     /**
      * Entry programmatic hook establishing execution boundaries and forwarding flow controls 
@@ -78,7 +79,7 @@ public class Game {
      * and sets up the test exploration loop scenario.
      */
     public static void startGame(){
-        PlayableChar Yohane = new PlayableChar("Yohane", 3, 1, null);
+        Yohane = new PlayableChar("Yohane", 3, 1, null);
         
         Floor[] floors = new Floor[1];
         floors[0] = new Floor(1);
@@ -317,14 +318,44 @@ public class Game {
     }
 
     public static void displayShop() {
+    Shop shop = new Shop();
+    String input;
+    String statusMessage = "";
+
+    do {
+        // Clear terminal screen
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("\nHanamaru's Store not implemented yet\n");
+        // 1. Display shop items along with player's gold and last transaction message
+        shop.displayItems(null, Yohane, statusMessage);
 
-        System.out.println("\nPress Enter to return...");
-        s.nextLine();
-    }
+        // 2. Read user choice
+        input = s.nextLine().trim();
+
+        // Check if user wants to return/exit shop
+        if (input.equalsIgnoreCase("r") || input.equalsIgnoreCase("0")) {
+            break;
+        }
+
+        try {
+            int choice = Integer.parseInt(input);
+            
+            // 3. Process purchase
+            boolean success = shop.sellItem(choice, Yohane);
+
+            if (success) {
+                statusMessage = "Successfully purchased item!";
+            } else {
+                statusMessage = "Purchase failed! Check your gold balance or duplicate items.";
+            }
+
+        } catch (NumberFormatException e) {
+            statusMessage = "Invalid selection. Please enter a valid number or 'R'.";
+        }
+
+    } while (true);
+}
 
     public static void displayStats(PlayableChar Yohane) {
         System.out.print("HP: " + Yohane.getHealth() + "/" + Yohane.getMaxHealth());

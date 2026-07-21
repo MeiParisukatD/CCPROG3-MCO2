@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * step counts, item usage, tile interactions, and dynamic combat outcomes.
  * 
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class PlayableChar extends GameCharacter {
     //attributes
@@ -157,6 +157,16 @@ public class PlayableChar extends GameCharacter {
         if (this.charDeath()) {
             this.causeOfDeath = entity.getName();
         }
+
+        if (health <= 0 &&
+            curItem != null &&
+            curItem.getName().equals("Choco-Mint Ice Cream")) {
+
+            setHealth(getMaxHealth());
+            inventory.remove(curItem);
+
+            System.out.println("Choco-Mint Ice Cream saved Yohane!");
+}
     }
 
     /**
@@ -241,8 +251,24 @@ public class PlayableChar extends GameCharacter {
      * @return true if bought successfully, false otherwise
      */
     public boolean buyItem(Item purchase) {
-        //TODO
-         return false;
+        if (purchase == null || this.goldOwned < purchase.getPrice()) {
+            return false;
+        }
+
+        this.goldOwned -= purchase.getPrice();
+
+        if (purchase instanceof UpgradeItem) {
+            ((UpgradeItem) purchase).applyUpgrade(this);
+        } else if (purchase instanceof PassiveItem) {
+            ((PassiveItem) purchase).activate(this);
+        } else if (purchase instanceof ConsumableItem) {
+            this.addItem(purchase);
+            if (this.curItem == null) {
+                this.curItem = purchase;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -252,8 +278,15 @@ public class PlayableChar extends GameCharacter {
      * @return true if dropped successfully, false otherwise
      */
     public boolean discardItem(int index) {
-        //TODO
-         return false;
+        if (index < 0 || index >= inventory.size()) {
+            return false;
+        }
+
+        Item removed = inventory.remove(index);
+        if (curItem == removed) {
+            curItem = inventory.isEmpty() ? null : inventory.get(0);
+        }
+        return true;
     }
 
     /**
