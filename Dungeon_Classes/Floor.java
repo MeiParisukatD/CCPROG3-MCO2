@@ -249,7 +249,7 @@ public class Floor {
      *
      * @param player the user character instance utilized to cross-check grid overlapping
      */
-    public void displayMap(PlayableChar player) {
+    public void displayMap(PlayableChar player, PlayableChar companion) {
         int i, j;
         String COLOR, RESET = "\u001B[0m";
 
@@ -257,32 +257,40 @@ public class Floor {
             for (j = 0; j < colLen; j++) {
                 boolean occupied = false;
 
-                // check player
+                // 1. Check Yohane
                 if (player.getX() == i && player.getY() == j) {
-                    COLOR = "\u001B[38;5;153m";
+                    COLOR = "\u001B[38;5;153m"; // Light Blue
                     System.out.print(COLOR + 'Y' + RESET);
+                    occupied = true;
+                } 
+                // 2. Check Lailaps
+                else if (companion != null && companion.getX() == i && companion.getY() == j) {
+                    COLOR = "\u001B[38;5;153m"; // Light Blue
+                    System.out.print(COLOR + 'L' + RESET);
                     occupied = true;
                 }
 
-                // check enemies
-                for (EnemyChar e : this.enemies) {
-                    if (e.getX() == i && e.getY() == j) {
-                        COLOR = "\u001B[38;5;196m";
-                        char symbol = e.getName().equals("Bat") ? 'b' : 'S';
+                // 3. Check Enemies (Bats & Siren)
+                if (!occupied) {
+                    for (EnemyChar e : this.enemies) {
+                        if (e.getX() == i && e.getY() == j) {
+                            COLOR = "\u001B[38;5;196m"; // Red
+                            char symbol = e.getName().equalsIgnoreCase("Bat") ? 'b' : 'S';
 
-                        if (e.getName().equals("Bat") && e.detectPlayer(this.map, player)) {
-                            symbol = 'B';
+                            if (e.getName().equalsIgnoreCase("Bat") && e.detectPlayer(this.map, player)) {
+                                symbol = 'B';
+                            }
+
+                            System.out.print(COLOR + symbol + RESET);
+                            occupied = true;
+                            break;
                         }
-
-                        System.out.print(COLOR + symbol + RESET);
-                        occupied = true;
-                        break;
                     }
                 }
 
-                // if no entity, print base tile
+                // 4. Print base tile if no entity is standing on it
                 if (!occupied) {
-                    COLOR = map[i][j].assignColor(); //assigns color before printing
+                    COLOR = map[i][j].assignColor();
                     System.out.print(COLOR + map[i][j].getSymbol() + RESET);
                 }
             }

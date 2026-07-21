@@ -135,7 +135,9 @@ public class Game {
                 case 'i':
                     displayInventory(Yohane);
                     break;
-
+                case 'b': // TEMPORARY TESTING KEY FOR BOSS BATTLE
+                    runFinalBoss(Yohane, dungeon);
+                    break;
                 case 'h':
                     if (shopUnlocked) {
                         displayShop();
@@ -284,7 +286,7 @@ public class Game {
         Game.displayStats(Yohane);
 
         System.out.println();
-        dungeon.getFloors()[index].displayMap(Yohane);
+        dungeon.getFloors()[index].displayMap(Yohane, null);
 
         System.out.println();
         System.out.println("Turn Counter: " + Yohane.getTurnCount());
@@ -385,5 +387,313 @@ public class Game {
 
         System.out.println("\nPress Enter to return...");
         s.nextLine();
+    }
+
+    /**
+     * Orchestrates the Final Boss battle against the Siren of the Mirror World.
+     * Manages dual-character movement (Yohane & Lailaps), switch activation pairing,
+     * dynamic bat spawning tiers, Siren movement AI, and win/loss states.
+     * 
+     * @param yohane  the primary user-controlled character
+     * @param dungeon the active final dungeon structure
+     */
+    public static void runFinalBoss(PlayableChar yohane, Dungeon dungeon) {
+        dungeon.getFloors()[dungeon.getCurFloor() - 1] = new Floor(dungeon.getCurFloor(), "map_boss.txt");
+        
+        int index = dungeon.getCurFloor() - 1;
+        Floor bossFloor = dungeon.getFloors()[index];
+
+        // 1. Initialize Lailaps & locate starting tiles on map ('Y' and 'L')
+        PlayableChar lailaps = new PlayableChar("Lailaps", 4.0f, 0.0f, null);
+        
+        yohane.findCharTile(bossFloor.getMap());
+        lailaps.findCharTile(bossFloor.getMap());
+
+        // Clear initial spawn tiles to passable floor
+        bossFloor.getMap()[yohane.getX()][yohane.getY()] = new Tile(yohane.getX(), yohane.getY(), '.');
+        bossFloor.getMap()[lailaps.getX()][lailaps.getY()] = new Tile(lailaps.getX(), lailaps.getY(), '.');
+
+        // 2. Fetch Siren created by Floor.generateFloor()
+        EnemyChar siren = null;
+        for (EnemyChar enemy : bossFloor.getEnemies()) {
+            if (enemy.getName().equalsIgnoreCase("Siren")) {
+                siren = enemy;
+                break;
+            }
+        }
+
+        // 3. State Tracking Variables
+        int switchTriggersCount = 0;
+        boolean sirenPhase = false;
+        char input;
+        
+        // Spawn initial pair of switches ('0')
+        Tile[] activeSwitches = spawnSwitchPair(bossFloor);
+
+        // Main Boss Stage Loop
+        do {
+            // Render HUD & Boss Map with both characters
+            displayBossMenu(dungeon, index, yohane, lailaps);
+
+            // Process User Input
+            try {
+                input = s.nextLine().charAt(0);
+                input = Character.toLowerCase(input);
+            } catch (StringIndexOutOfBoundsException e) {
+                input = 'x';
+            }
+
+            yohane.incrementTurn(); // Turn engine step
+
+            // Save position prior to move to evaluate attack step
+            int prevYohaneX = yohane.getX();
+            int prevYohaneY = yohane.getY();
+
+            // Handle Input & Item Commands or Synchronized Dual Movement
+            if ("wasd".contains(Character.toString(input))) {
+                moveDualCharacters(input, yohane, lailaps, bossFloor);
+            } else if (input == ' ') {
+                yohane.useItem();
+            } else if (input == '[') {
+                yohane.prevItem();
+            } else if (input == ']') {
+                yohane.nextItem();
+            }
+
+            // --- PHASE 1: SWITCH ACTIVATION MECHANIC ---
+            if (!sirenPhase) {
+                boolean yOnS1 = (yohane.getX() == activeSwitches[0].getX() && yohane.getY() == activeSwitches[0].getY());
+                boolean lOnS2 = (lailaps.getX() == activeSwitches[1].getX() && lailaps.getY() == activeSwitches[1].getY());
+
+                boolean yOnS2 = (yohane.getX() == activeSwitches[1].getX() && yohane.getY() == activeSwitches[1].getY());
+                boolean lOnS1 = (lailaps.getX() == activeSwitches[0].getX() && lailaps.getY() == activeSwitches[0].getY());
+
+                // Check if BOTH stand on switches simultaneously
+                if ((yOnS1 && lOnS2) || (yOnS2 && lOnS1)) {
+                    switchTriggersCount++;
+
+                    // Clear current switches
+                    bossFloor.destroyTile(activeSwitches[0]);
+                    bossFloor.destroyTile(activeSwitches[1]);
+
+                    if (switchTriggersCount < 3) {
+                        activeSwitches = spawnSwitchPair(bossFloor);
+                    } else {
+                        // Trigger Phase 2: Break Siren's barriers
+                        sirenPhase = true;
+                        breakSirenBarriers(bossFloor, siren);
+                    }
+                }
+
+                // Bat Spawning Engine (Every 8 turns)
+                if (yohane.getTurnCount() % 8 == 0) {
+                    spawnBossBat(bossFloor, switchTriggersCount);
+                }
+            }
+
+            // --- ENEMY ACTIONS (BATS) ---
+            Iterator<EnemyChar> it = bossFloor.getEnemies().iterator();
+            while (it.hasNext()) {
+                EnemyChar enemy = it.next();
+                
+                // Skip Siren here as she uses custom phase movement
+                if (enemy.getName().equalsIgnoreCase("Siren")) continue;
+
+                if (enemy.charDeath()) {
+                    enemy.dropGold(bossFloor);
+                    it.remove();
+                } else {
+                    enemy.move(bossFloor, yohane);
+                }
+            }
+
+            // --- PHASE 2: SIREN PURSUIT & COMBAT ---
+            if (sirenPhase && siren != null && !siren.charDeath()) {
+                // Check if Yohane stepped into Siren's tile to ATTACK
+                if (yohane.getX() == siren.getX() && yohane.getY() == siren.getY()) {
+                    // Defeat Siren
+                    yohane.dealDmg(siren);
+                    siren.dropGold(bossFloor);
+                    
+                    // Revert Yohane to pre-move tile so Exit 'E' spawns cleanly at Siren's spot
+                    yohane.setX(prevYohaneX);
+                    yohane.setY(prevYohaneY);
+                    bossFloor.getMap()[siren.getX()][siren.getY()] = new Tile(siren.getX(), siren.getY(), 'E');
+                } else {
+                    // Siren pursues closest target
+                    moveSiren(siren, yohane, lailaps, bossFloor);
+
+                    // Attack Evaluation
+                    if (isAdjacent(siren, lailaps)) {
+                        lailaps.takeDmg(siren.getAttack()); // Game Over for Lailaps
+                    } else if (isAdjacent(siren, yohane)) {
+                        yohane.takeDmg(siren.getAttack()); // Triggers Choco-Mint Ice Cream or Death
+                    }
+                }
+            }
+
+            // Check Stage Clear (Stepping on Exit 'E')
+            if (bossFloor.completeFloor(yohane)) {
+                displayDungeonClearScene(dungeon);
+                break;
+            }
+
+        } while (!yohane.charDeath() && !lailaps.charDeath() && !dungeon.gameOver(yohane));
+
+        // Game Over Handler
+        if (yohane.charDeath() || lailaps.charDeath()) {
+            String RED = "\u001B[38;5;196m";
+            String RESET = "\u001B[0m";
+
+            System.out.println(RED + "You Died!" + RESET);
+            String killer = lailaps.charDeath() ? "Siren (Lailaps Defeated)" : yohane.getCauseOfDeath();
+            System.out.println("Killed by " + RED + killer + RESET);
+
+            yohane.setHealth(3);
+            bossFloor.generateFloor(); // Regenerate stage map
+        }
+    }
+
+    // =========================================================================
+    // HELPER METHODS
+    // =========================================================================
+
+    /**
+     * Spawns 2 switches ('0') within row distance <= 2 and col distance <= 5.
+     */
+    private static Tile[] spawnSwitchPair(Floor floor) {
+        Tile[][] map = floor.getMap();
+        Tile[] switches = new Tile[2];
+        int r1, c1, r2, c2;
+        boolean valid = false;
+
+        do {
+            r1 = (int)(Math.random() * (floor.getRowLen() - 2)) + 1;
+            c1 = (int)(Math.random() * (floor.getColLen() - 2)) + 1;
+
+            int rMin = Math.max(1, r1 - 2);
+            int rMax = Math.min(floor.getRowLen() - 2, r1 + 2);
+            int cMin = Math.max(1, c1 - 5);
+            int cMax = Math.min(floor.getColLen() - 2, c1 + 5);
+
+            r2 = (int)(Math.random() * (rMax - rMin + 1)) + rMin;
+            c2 = (int)(Math.random() * (cMax - cMin + 1)) + cMin;
+
+            if ((r1 != r2 || c1 != c2) && 
+                map[r1][c1].getSymbol() == '.' && 
+                map[r2][c2].getSymbol() == '.') {
+                valid = true;
+            }
+        } while (!valid);
+
+        switches[0] = new Tile(r1, c1, '0');
+        switches[1] = new Tile(r2, c2, '0');
+        map[r1][c1] = switches[0];
+        map[r2][c2] = switches[1];
+
+        return switches;
+    }
+
+    /**
+     * Moves Yohane and Lailaps simultaneously, evaluating individual tile collisions.
+     */
+    private static void moveDualCharacters(char input, PlayableChar yohane, PlayableChar lailaps, Floor floor) {
+        if ("wasd".contains(Character.toString(input))) {
+            yohane.move(input, floor);
+            lailaps.move(input, floor);
+        }
+    }
+
+    /**
+     * Spawns a Bat with tiered difficulty based on switch triggers.
+     */
+    private static void spawnBossBat(Floor floor, int switchTriggers) {
+        int tier = switchTriggers + 1; // Tier 1, 2, or 3
+        int r, c;
+        
+        do {
+            r = (int)(Math.random() * floor.getRowLen());
+            c = (int)(Math.random() * floor.getColLen());
+        } while (floor.getMap()[r][c].getSymbol() != '.');
+
+        EnemyChar bat = new EnemyChar(
+            "Bat",
+            1.0f,
+            0.5f * tier,
+            5 * tier,
+            tier == 1 ? 2 : 1, // Tier 1 moves every 2 turns; Tier 2/3 move every turn
+            1,
+            tier == 3, // Diagonal allowed on Tier 3
+            r, c
+        );
+        floor.getEnemies().add(bat);
+    }
+
+    /**
+     * Clears barrier walls ('*') surrounding Siren when Phase 2 starts.
+     */
+    private static void breakSirenBarriers(Floor floor, EnemyChar siren) {
+        Tile[][] map = floor.getMap();
+        int sx = siren.getX();
+        int sy = siren.getY();
+
+        for (int i = sx - 2; i <= sx + 2; i++) {
+            for (int j = sy - 2; j <= sy + 2; j++) {
+                if (i >= 0 && i < floor.getRowLen() && j >= 0 && j < floor.getColLen()) {
+                    if (map[i][j].getSymbol() == '*') {
+                        floor.destroyTile(map[i][j]);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Moves the Siren towards the closest target (Yohane or Lailaps).
+     */
+    private static void moveSiren(EnemyChar siren, PlayableChar yohane, PlayableChar lailaps, Floor floor) {
+        int distY = Math.abs(siren.getX() - yohane.getX()) + Math.abs(siren.getY() - yohane.getY());
+        int distL = Math.abs(siren.getX() - lailaps.getX()) + Math.abs(siren.getY() - lailaps.getY());
+        
+        PlayableChar target = (distY <= distL) ? yohane : lailaps;
+
+        int dx = Integer.compare(target.getX(), siren.getX());
+        int dy = Integer.compare(target.getY(), siren.getY());
+
+        int newX = siren.getX() + dx;
+        int newY = siren.getY() + dy;
+
+        if (floor.getMap()[newX][newY].isPassable()) {
+            siren.setX(newX);
+            siren.setY(newY);
+        }
+    }
+
+    /**
+     * Checks if an enemy and player are adjacent (orthogonally or diagonally).
+     */
+    private static boolean isAdjacent(EnemyChar enemy, PlayableChar player) {
+        int dx = Math.abs(enemy.getX() - player.getX());
+        int dy = Math.abs(enemy.getY() - player.getY());
+        return dx <= 1 && dy <= 1;
+    }
+
+    /**
+     * Boss HUD Display renderer.
+     */
+    private static void displayBossMenu(Dungeon dungeon, int index, PlayableChar yohane, PlayableChar lailaps) {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+
+        System.out.println("\nFinal Battle: Siren of the Mirror world!");
+        System.out.print("HP: " + yohane.getHealth() + "/" + yohane.getMaxHealth());
+        System.out.println("\tLailaps HP: " + lailaps.getHealth() + "/" + lailaps.getMaxHealth());
+        System.out.println("Total Gold: " + yohane.getGoldOwned() + " GP");
+
+        System.out.println();
+        dungeon.getFloors()[index].displayMap(yohane, lailaps);
+
+        System.out.println("\nTurn Counter: " + yohane.getTurnCount());
+        System.out.print("Where to, Yohane? ");
     }
 }
