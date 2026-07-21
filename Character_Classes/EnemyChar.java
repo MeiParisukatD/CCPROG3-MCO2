@@ -19,6 +19,7 @@ public class EnemyChar extends GameCharacter {
     private int turnsPerMove;
     /** The Manhattan distance radius within which the enemy can detect the player. */
     private int detectionRange;
+    private boolean diagonal;
 
     //constructor
     /**
@@ -33,11 +34,12 @@ public class EnemyChar extends GameCharacter {
      * @param x the starting X grid coordinate
      * @param y the starting Y grid coordinate
      */
-    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, int detectionRange, int x, int y) {
+    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, int detectionRange, boolean diagonal, int x, int y) {
         super(name, health, attack, x, y);
         this.goldDrop = goldDrop;
         this.turnsPerMove = turnsPerMove;
         this.detectionRange = detectionRange;
+        this.diagonal = diagonal;
     }
 
     //getters/setters
@@ -158,16 +160,30 @@ public class EnemyChar extends GameCharacter {
             if (detectPlayer(floor.getMap(), entity)) {
                 this.dealDmg(entity); //attack Yohane if detected
             } else { //if Yohane is not detected
-                int direction;
+                int direction, max;
+                boolean enemy;
                 Tile next = null;
+
+                //makes diagonal moves available if diagonal = true
+                max = (diagonal) ? 8 : 4;
 
                 //enemies are not mentioned to be able to move over heat tiles
                 //this is exclusive to enemies, thus is checked uniquely in this method
                 do {
+                    //checks if another enemy is already at that position
+                    enemy = false;
+
                     //generate random direction
-                    direction = (int)(Math.random() * 4);
+                    direction = (int)(Math.random() * max);
                     next = nextTile(direction, floor);
-                } while (next.getSymbol() == 'h');
+
+                    for (EnemyChar e: floor.getEnemies()) {
+                        if (e.getX() == next.getX() && e.getY() == next.getY()) {
+                            enemy = true;
+                            break;
+                        }
+                    }
+                } while (next.getSymbol() == 'h' || enemy);
 
                 super.move(direction, floor);
             }

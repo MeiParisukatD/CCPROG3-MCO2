@@ -230,10 +230,26 @@ public class GameCharacter {
         next_y = this.y;
 
         switch (direction) {
-            case 0: next_x--; break;
-            case 1: next_x++; break;
-            case 2: next_y--; break;
-            case 3: next_y++; break;
+            case 0: next_x--; break; //up
+            case 1: next_x++; break; //down
+            case 2: next_y--; break; //left
+            case 3: next_y++; break; //right
+            case 4: //upper left
+                next_x--;
+                next_y--;
+                break;
+            case 5: //upper right
+                next_x--;
+                next_y++;
+                break;
+            case 6: //bottom left
+                next_x++;
+                next_y--;
+                break;
+            case 7: //bottom right
+                next_x++;
+                next_y++;
+                break;
         }
 
         next = floor.getMap()[next_x][next_y];
