@@ -318,38 +318,44 @@ public class Game {
     }
 
     public static void displayShop() {
-        Shop shop = new Shop();
-        String input;
+    Shop shop = new Shop();
+    String input;
+    String statusMessage = "";
 
-        do {
-            // Clear terminal screen
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
+    do {
+        // Clear terminal screen
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
 
-            // 1. Display the shop items via Shop.java
-            shop.displayItems();
+        // 1. Display shop items along with player's gold and last transaction message
+        shop.displayItems(null, Yohane, statusMessage);
 
-            // 2. Read user choice
-            input = s.nextLine().trim();
+        // 2. Read user choice
+        input = s.nextLine().trim();
 
-            // Check if user wants to return/exit shop
-            if (input.equalsIgnoreCase("r") || input.equalsIgnoreCase("0")) {
-                break;
+        // Check if user wants to return/exit shop
+        if (input.equalsIgnoreCase("r") || input.equalsIgnoreCase("0")) {
+            break;
+        }
+
+        try {
+            int choice = Integer.parseInt(input);
+            
+            // 3. Process purchase
+            boolean success = shop.sellItem(choice, Yohane);
+
+            if (success) {
+                statusMessage = "Successfully purchased item!";
+            } else {
+                statusMessage = "Purchase failed! Check your gold balance or duplicate items.";
             }
 
-            try {
-                int choice = Integer.parseInt(input);
-                // 3. Process purchase using Shop.sellItem(choice, Yohane)
-                shop.sellItem(choice, Yohane);
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid selection. Please enter a valid number or 'R'.");
-            }
+        } catch (NumberFormatException e) {
+            statusMessage = "Invalid selection. Please enter a valid number or 'R'.";
+        }
 
-            System.out.println("\nPress Enter to continue...");
-            s.nextLine();
-
-        } while (true);
-    }
+    } while (true);
+}
 
     public static void displayStats(PlayableChar Yohane) {
         System.out.print("HP: " + Yohane.getHealth() + "/" + Yohane.getMaxHealth());

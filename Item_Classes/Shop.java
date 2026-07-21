@@ -92,8 +92,8 @@ public class Shop {
             }
         }
 
-        System.out.println("[R]eturn");
-        System.out.print("Choice: ");
+        System.out.println("\n[R]eturn");
+        System.out.print("\nChoice: ");
     }
 
     /**
