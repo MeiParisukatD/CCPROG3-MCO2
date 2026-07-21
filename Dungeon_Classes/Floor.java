@@ -19,6 +19,7 @@ public class Floor {
     //attributes
     /** The 2D grid matrix of Tile items making up the map landscape. */
     private Tile[][] map;
+    private final String file;
     /** The active tracking collection storing hostile NPCs on this floor layer. */
     private ArrayList<EnemyChar> enemies;
     /** The overall row boundary limit capacity of the current map matrix grid. */
@@ -38,7 +39,8 @@ public class Floor {
     public Floor(int floorNum) {
         enemies = new ArrayList<>();
         this.floorNum = floorNum;
-        generateFloor();
+        this.file = this.assignFile();
+        this.generateFloor(this.file);
         rowLen = map.length;
         colLen = map[0].length;
     }  
@@ -60,6 +62,10 @@ public class Floor {
      */
     public void setMap(Tile[][] map) {
         this.map = map;
+    }
+
+    public String getFile() {
+        return this.file;
     }
 
     /**
@@ -126,11 +132,37 @@ public class Floor {
     }
     
     //additional methods
+    private String assignFile() {
+        //temporary string to hold incomplete file name
+        String temp = "map";
+
+        //if floor is the first in the dungeon
+        if (this.floorNum == 1) {
+            temp += "1";
+        } 
+        
+        //if the floor is part of the boss level
+        else if (this.floorNum == 0) {
+            temp += "_boss";
+        }
+
+        //if generic floor to be randomized
+        else {
+            //minimum 2, maximum 8
+            int num = (int)(Math.random() * 7) + 2;
+            temp += num;
+        }
+
+        //appends .txt
+        temp += ".txt";
+        return temp;
+    }
+
     /**
      * Parses the flat document matrix file stream to initialize structural symbols, 
      * allocating destructible elements and forwarding enemy spawn definitions seamlessly.
      */
-    public void generateFloor() {
+    public void generateFloor(String map) {
         int row, col, ROW, COL;
         String line;
         ROW = 12; //standard row count across all maps
@@ -138,7 +170,7 @@ public class Floor {
         row = col = 0;
 
         this.map = new Tile[ROW][COL];
-        File file = new File("map1.txt");
+        File file = new File(map);
         this.enemies.clear();
 
         try (Scanner reader = new Scanner(file)) {
