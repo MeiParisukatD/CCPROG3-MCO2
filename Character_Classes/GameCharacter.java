@@ -202,7 +202,7 @@ public class GameCharacter {
      * @param enemy the target GameCharacter to damage
      */
     public void dealDmg(GameCharacter enemy) {
-        enemy.takeDmg(this.attack);
+        enemy.takeDmg(this);
     }
 
     /**
@@ -210,6 +210,10 @@ public class GameCharacter {
      *
      * @param damage the amount of health to lose
      */
+    public void takeDmg(GameCharacter enemy) {
+        this.health -= enemy.getAttack();
+    }
+
     public void takeDmg(float damage) {
         this.health -= damage;
     }

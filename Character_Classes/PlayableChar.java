@@ -150,8 +150,9 @@ public class PlayableChar extends GameCharacter {
      *
      * @param entity the attacking entity dealing the blow
      */
+    @Override
     public void takeDmg(GameCharacter entity) {
-        super.takeDmg(entity.getAttack());
+        this.health -= entity.getAttack();
 
         //if character dies from taking damage
         if (this.charDeath()) {
@@ -166,7 +167,7 @@ public class PlayableChar extends GameCharacter {
             inventory.remove(curItem);
 
             System.out.println("Choco-Mint Ice Cream saved Yohane!");
-}
+        }
     }
 
     /**

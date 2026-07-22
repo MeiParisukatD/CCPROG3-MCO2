@@ -525,9 +525,9 @@ public class Game {
 
                     // Attack Evaluation
                     if (isAdjacent(siren, lailaps)) {
-                        lailaps.takeDmg(siren.getAttack()); // Game Over for Lailaps
+                        lailaps.takeDmg(siren); // Game Over for Lailaps
                     } else if (isAdjacent(siren, yohane)) {
-                        yohane.takeDmg(siren.getAttack()); // Triggers Choco-Mint Ice Cream or Death
+                        yohane.takeDmg(siren); // Triggers Choco-Mint Ice Cream or Death
                     }
                 }
             }
