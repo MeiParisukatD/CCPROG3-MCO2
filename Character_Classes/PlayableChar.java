@@ -27,6 +27,7 @@ public class PlayableChar extends GameCharacter {
     private Item curItem;
     /** The source of damage or hazard that caused the character to lose all health. */
     private String causeOfDeath;
+    private boolean justDamaged;
 
     //constructor
     /**
@@ -46,6 +47,7 @@ public class PlayableChar extends GameCharacter {
         this.inventory = new ArrayList<Item>();
         this.curItem = null;
         this.causeOfDeath = null;
+        this.justDamaged = false;
     }
 
     //getters/setters
@@ -136,6 +138,14 @@ public class PlayableChar extends GameCharacter {
         return this.causeOfDeath;
     }
 
+    public boolean isJustDamaged() {
+        return this.justDamaged;
+    }
+
+    public void setJustDamaged(boolean status) {
+        this.justDamaged = status;
+    }
+
     //additional methods
     /**
      * Increments the total running turn engine index step count by one.
@@ -153,6 +163,7 @@ public class PlayableChar extends GameCharacter {
     @Override
     public void takeDmg(GameCharacter entity) {
         this.health -= entity.getAttack();
+        this.justDamaged = true;
 
         //if character dies from taking damage
         if (this.charDeath()) {

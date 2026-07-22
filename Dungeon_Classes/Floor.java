@@ -259,10 +259,18 @@ public class Floor {
 
                 // 1. Check Yohane
                 if (player.getX() == i && player.getY() == j) {
-                    COLOR = "\u001B[38;5;153m"; // Light Blue
+                    //Dynamically chooses color if Yohane is being damaged
+                    if (player.isJustDamaged()) {
+                        COLOR = "\u001B[38;5;214m"; //Orange
+                        player.setJustDamaged(false);
+                    } else {
+                        COLOR = "\u001B[38;5;153m"; //Light Blue
+                    }
+
                     System.out.print(COLOR + 'Y' + RESET);
                     occupied = true;
                 } 
+                
                 // 2. Check Lailaps
                 else if (companion != null && companion.getX() == i && companion.getY() == j) {
                     COLOR = "\u001B[38;5;153m"; // Light Blue
@@ -277,7 +285,9 @@ public class Floor {
                             COLOR = "\u001B[38;5;196m"; // Red
                             char symbol = e.getName().equalsIgnoreCase("Bat") ? 'b' : 'S';
 
-                            if (e.getName().equalsIgnoreCase("Bat") && e.detectPlayer(this.map, player)) {
+                            if (e.getName().equalsIgnoreCase("Bat") 
+                                && e.detectPlayer(this.map, player)
+                                && player.getTurnCount() % e.getTurnsPerMove() == 0) {
                                 symbol = 'B';
                             }
 
