@@ -93,8 +93,8 @@ public class Initialize {
             do {
                 n = (int)(Math.random() * 7);
                 name = names[n];
-                this.taken.add(name);
             } while(taken.contains(name));
+            this.taken.add(name);
 
             //deciding number of floors
             switch(i) {
@@ -121,12 +121,11 @@ public class Initialize {
         //assigns for every member of local variable floors[]
         for (i = 0; i < amount; i++) {
             floors[i] = new Floor(i+1);
-            this.taken.add(floors[i].getFile());
-
             //if floor file is already taken by randomizer, reroll
             do {
                 floors[i].assignFile();
             } while(taken.contains(floors[i].getFile()));
+            this.taken.add(floors[i].getFile());
         }
 
         return floors;
