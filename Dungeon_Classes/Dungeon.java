@@ -174,6 +174,7 @@ public class Dungeon {
         if (this.completion) {
             System.out.println(YELLOW + this.name + " completed!" + RESET);
             this.member.isSaved(true);
+            this.member.incrementTimesSaved();
         }
         return this.completion;
     }
