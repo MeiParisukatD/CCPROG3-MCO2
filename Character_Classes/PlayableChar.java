@@ -37,10 +37,9 @@ public class PlayableChar extends GameCharacter {
      * @param name     the identifier name of the playable character
      * @param health   the starting health and ceiling threshold capacity
      * @param attack   the base attack damage capacity
-     * @param dialogue the interaction line text
      */
-    public PlayableChar(String name, float health, float attack, String dialogue) {
-        super(name, health, attack, dialogue);
+    public PlayableChar(String name, float health, float attack) {
+        super(name, health, attack);
         this.goldOwned = 0;
         this.turnCount = 0;
         this.maxHealth = health;
