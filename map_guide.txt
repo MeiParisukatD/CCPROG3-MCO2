@@ -1,9 +1,9 @@
 MAP GUIDE:
 
-map1.txt --> basic map (always floor 1)
 map_boss.txt --> Siren/final map (always final floor)
 
 <randomized maps>
+map1.txt --> basic map
 map2.txt --> spike maze
 map3.txt --> upgraded basic map
 map4.txt --> river map
