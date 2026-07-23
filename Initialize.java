@@ -45,6 +45,7 @@ public class Initialize {
 
     //initializers
     private void initializeItems() {
+        //all game items
         this.items = new Item[] {
             new ConsumableItem("Tears of a fallen angel", 30, 0.5f),
             new ConsumableItem("Noppo Bread", 100, 0.5f),
@@ -59,6 +60,7 @@ public class Initialize {
     }
 
     private void initializeNPCs() {
+        //idols to be saved
         this.NPCs = new NPChar[] {
             new NPChar("Kanan Matsuura"),
             new NPChar("Hanamaru Kunikida"),
@@ -80,17 +82,16 @@ public class Initialize {
             "Izu-Mito Sea Paradise",
             "Numazu Deep Sea Aquarium",
             "Awashima Marine Park",
-            "Siren of Numazu"
         };
         
         this.dungeons = new Dungeon[4];
         int i, n, NumFloor;
-        int size = this.dungeons.length;
         String name;
-        for (i = 0; i < size; i++) {
+        //assigns for every member in this.dungeons
+        for (i = 0; i < 4; i++) {
             //if dungeon name is already taken by randomizer, reroll
             do {
-                n = (int)(Math.random() * 8);
+                n = (int)(Math.random() * 7);
                 name = names[n];
                 this.taken.add(name);
             } while(taken.contains(name));
@@ -103,8 +104,13 @@ public class Initialize {
                 default: NumFloor = 1; break; //1 floor (final dungeon)
             }
 
-            Floor[] floors = assignFloors(NumFloor);
-            this.dungeons[i] = new Dungeon(name, i, NumFloor, floors, assignNPC(name));
+            if (i != 3) { //if not final floor, generate normally
+                Floor[] floors = assignFloors(NumFloor);
+                this.dungeons[i] = new Dungeon(name, i+1, NumFloor, floors, assignNPC(name));
+            } else { //if final floor, boss map
+                Floor[] boss = new Floor[] {new Floor(1, "map_boss.txt")};
+                this.dungeons[i] = new Dungeon("Siren of Numazu", i+1, 1, boss, null);
+            }
         }
     }
 
@@ -112,11 +118,14 @@ public class Initialize {
         Floor[] floors = new Floor[amount];
         int i;
 
+        //assigns for every member of local variable floors[]
         for (i = 0; i < amount; i++) {
+            floors[i] = new Floor(i+1);
+            this.taken.add(floors[i].getFile());
+
             //if floor file is already taken by randomizer, reroll
             do {
-                floors[i] = new Floor(i+1);
-                this.taken.add(floors[i].getFile());
+                floors[i].assignFile();
             } while(taken.contains(floors[i].getFile()));
         }
 
