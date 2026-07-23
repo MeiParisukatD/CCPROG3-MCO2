@@ -13,6 +13,7 @@ public class NPChar extends GameCharacter {
     //attributes
     /** Flag tracking whether the NPC has been rescued or completed their objective. */
     private boolean saved;
+    private int Times_Saved;
 
     //constructor
     /**
@@ -24,6 +25,7 @@ public class NPChar extends GameCharacter {
     public NPChar(String name) {
         super(name);
         this.saved = false;
+        this.Times_Saved = 0;
     }
 
     //getters/setters
@@ -43,5 +45,13 @@ public class NPChar extends GameCharacter {
      */
     public void isSaved(boolean saved) {
         this.saved = saved;
+    }
+
+    public int getTimesSaved() {
+        return this.Times_Saved;
+    }
+
+    public void incrementTimesSaved() {
+        this.Times_Saved++;
     }
 }
