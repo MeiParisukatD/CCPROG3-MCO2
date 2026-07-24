@@ -634,15 +634,13 @@ public class Game {
      */
     private static void breakSirenBarriers(Floor floor, EnemyChar siren) {
         Tile[][] map = floor.getMap();
-        int sx = siren.getX();
-        int sy = siren.getY();
 
-        for (int i = sx - 2; i <= sx + 2; i++) {
-            for (int j = sy - 2; j <= sy + 2; j++) {
-                if (i >= 0 && i < floor.getRowLen() && j >= 0 && j < floor.getColLen()) {
-                    if (map[i][j].getSymbol() == '*') {
-                        floor.destroyTile(map[i][j]);
-                    }
+        // Loop through the map rows where barriers exist (Rows 0 to 4)
+        for (int i = 1; i < 5; i++) {
+            for (int j = 1; j < floor.getColLen()-1; j++) {
+                // Destroy any wall tile '*' in the barrier zone
+                if (map[i][j].getSymbol() == '*') {
+                    floor.destroyTile(map[i][j]);
                 }
             }
         }

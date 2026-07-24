@@ -254,7 +254,7 @@ public class Tile {
                 this.damage = 0.0f;
                 break;
             case '0': //button tiles
-                this.passable = false;
+                this.passable = true;
                 this.destructible = false;
                 this.damage = 0.0f;
                 break;
