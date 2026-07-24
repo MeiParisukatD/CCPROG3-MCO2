@@ -144,12 +144,12 @@ public class Game {
      * and sets up the test exploration loop scenario.
      */
     public static void startGame(){
-        Yohane = new PlayableChar("Yohane", 3, 1, null);
+        Yohane = new PlayableChar("Yohane", 3, 1);
         
         Floor[] floors = new Floor[1];
         floors[0] = new Floor(1);
 
-        NPChar hanamaru = new NPChar("Hanamaru Kunikida", null, null);
+        NPChar hanamaru = new NPChar("Hanamaru Kunikida");
         
         Dungeon dungeon = new Dungeon("Shougetsu Confectionary", 1, 1, floors, hanamaru);
 
@@ -455,7 +455,7 @@ public class Game {
         Floor bossFloor = dungeon.getFloors()[index];
 
         // 1. Initialize Lailaps & locate starting tiles on map ('Y' and 'L')
-        PlayableChar lailaps = new PlayableChar("Lailaps", 4.0f, 0.0f, null);
+        PlayableChar lailaps = new PlayableChar("Lailaps", 4.0f, 0.0f);
         
         yohane.findCharTile(bossFloor.getMap());
         lailaps.findCharTile(bossFloor.getMap());
@@ -471,6 +471,12 @@ public class Game {
                 siren = enemy;
                 break;
             }
+        }
+
+        // Right after fetching Siren in runFinalBoss:
+        if (siren != null) {
+            siren.setHealth(1.0f); // Or set Siren's health to whatever Yohane's attack is
+            siren.setAttack(999.0f); // Siren 1-hits Yohane or Lailaps
         }
 
         // 3. State Tracking Variables
@@ -501,14 +507,29 @@ public class Game {
             int prevYohaneY = yohane.getY();
 
             // Handle Input & Item Commands or Synchronized Dual Movement
+           // Handle Input & Item Commands or Synchronized Dual Movement
             if ("wasd".contains(Character.toString(input))) {
-                moveDualCharacters(input, yohane, lailaps, bossFloor);
+                // Calculate target coordinates based on WASD input
+                int targetX = yohane.getX();
+                int targetY = yohane.getY();
+
+                switch (input) {
+                    case 'w': targetX--; break;
+                    case 's': targetX++; break;
+                    case 'a': targetY--; break;
+                    case 'd': targetY++; break;
+                }
+
+                // Check if stepping directly into Siren's tile
+                if (sirenPhase && siren != null && targetX == siren.getX() && targetY == siren.getY()) {
+                    siren.setHealth(0);
+                    siren.dropGold(bossFloor);
+                    bossFloor.getMap()[siren.getX()][siren.getY()] = new Tile(siren.getX(), siren.getY(), 'E');
+                } else {
+                    moveDualCharacters(input, yohane, lailaps, bossFloor);
+                }
             } else if (input == ' ') {
                 yohane.useItem();
-            } else if (input == '[') {
-                yohane.prevItem();
-            } else if (input == ']') {
-                yohane.nextItem();
             }
 
             // --- PHASE 1: SWITCH ACTIVATION MECHANIC ---
@@ -562,23 +583,24 @@ public class Game {
             if (sirenPhase && siren != null && !siren.charDeath()) {
                 // Check if Yohane stepped into Siren's tile to ATTACK
                 if (yohane.getX() == siren.getX() && yohane.getY() == siren.getY()) {
-                    // Defeat Siren
-                    yohane.dealDmg(siren);
+                    
+                    // Instant 1-hit kill on Siren
+                    siren.setHealth(0); 
                     siren.dropGold(bossFloor);
                     
-                    // Revert Yohane to pre-move tile so Exit 'E' spawns cleanly at Siren's spot
+                    // Bounce Yohane back and spawn Exit
                     yohane.setX(prevYohaneX);
                     yohane.setY(prevYohaneY);
                     bossFloor.getMap()[siren.getX()][siren.getY()] = new Tile(siren.getX(), siren.getY(), 'E');
-                } else {
-                    // Siren pursues closest target
-                    moveSiren(siren, yohane, lailaps, bossFloor);
 
-                    // Attack Evaluation
+                } else {
+                    // Siren attacks (1-hit kill on whoever is adjacent)
                     if (isAdjacent(siren, lailaps)) {
-                        lailaps.takeDmg(siren); // Game Over for Lailaps
+                        lailaps.setHealth(0);
                     } else if (isAdjacent(siren, yohane)) {
-                        yohane.takeDmg(siren); // Triggers Choco-Mint Ice Cream or Death
+                        yohane.setHealth(0);
+                    } else {
+                        moveSiren(siren, yohane, lailaps, bossFloor);
                     }
                 }
             }
@@ -631,6 +653,7 @@ public class Game {
             c2 = (int)(Math.random() * (cMax - cMin + 1)) + cMin;
 
             if ((r1 != r2 || c1 != c2) && 
+                r1 > 3 && r2 > 3 &&
                 map[r1][c1].getSymbol() == '.' && 
                 map[r2][c2].getSymbol() == '.') {
                 valid = true;
