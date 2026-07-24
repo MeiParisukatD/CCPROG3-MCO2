@@ -19,7 +19,7 @@ public class Floor {
     //attributes
     /** The 2D grid matrix of Tile items making up the map landscape. */
     private Tile[][] map;
-    private final String file;
+    private String file;
     /** The active tracking collection storing hostile NPCs on this floor layer. */
     private ArrayList<EnemyChar> enemies;
     /** The overall row boundary limit capacity of the current map matrix grid. */
@@ -39,7 +39,7 @@ public class Floor {
     public Floor(int floorNum) {
         enemies = new ArrayList<>();
         this.floorNum = floorNum;
-        this.file = this.assignFile();
+        this.assignFile();
         this.generateFloor();
         rowLen = map.length;
         colLen = map[0].length;
@@ -141,17 +141,16 @@ public class Floor {
     }
     
     //additional methods
-    private String assignFile() {
+    public void assignFile() {
         //temporary string to hold incomplete file name
-        String temp = "map";
+        this.file = "map";
 
-        //minimum 2, maximum 8
-        int num = (int)(Math.random() * 7) + 2;
-        temp += num;
+        //minimum 1, maximum 8
+        int num = (int)(Math.random() * 8) + 1;
+        this.file += num;
 
         //appends .txt
-        temp += ".txt";
-        return temp;
+        this.file += ".txt";
     }
 
     /**
@@ -270,7 +269,7 @@ public class Floor {
                     System.out.print(COLOR + 'Y' + RESET);
                     occupied = true;
                 } 
-                
+
                 // 2. Check Lailaps
                 else if (companion != null && companion.getX() == i && companion.getY() == j) {
                     COLOR = "\u001B[38;5;153m"; // Light Blue

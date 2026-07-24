@@ -20,15 +20,25 @@ public class Game {
     /** Shared reader utility scanning string tokens input stream values from standard system consoles. */
     public static Scanner s = new Scanner(System.in);
     private static boolean shopUnlocked = false;
+    private static int goldSpent = 0;
+    private static int sirenDefeated = 0;
+    private static int gameOvers = 0;
+
+    // Central initializer
+    private static Initialize init;
+
+    // References pulled from initializer
     private static PlayableChar Yohane;
+    private static PlayableChar Lailaps;
+    private static Dungeon[] dungeons;
+    private static Item[] items;
+    private static NPChar[] npcs;
 
     /**
      * Private constructor to prevent instantiation of utility main runner class.
      */
-    private Game() {
-        // Utility class
-    }
-    
+    private Game() { /* Utility class */ }
+
     /**
      * Entry programmatic hook establishing execution boundaries and forwarding flow controls 
      * straight into home menu layouts.
@@ -36,6 +46,17 @@ public class Game {
      * @param args array parameters passed from external CLI executions
      */
     public static void main(String[] args) {
+        // Run initializer once
+        init = new Initialize();
+
+        // Grab references
+        Yohane = init.getYohane();
+        Lailaps = init.getLailaps();
+        dungeons = init.getDungeons();
+        items = init.getItems();
+        npcs = init.getNPCs();
+
+        // Start game loop
         displayMainMenu();
     }
 
@@ -72,6 +93,50 @@ public class Game {
             }
 
         } while(choice != 'q');
+    }
+
+    /**
+     * Renders a placeholder block notification layout alerting that attribute inspections 
+     * are still undergoing engineering developments.
+     */
+    public static void displayStatus(){
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+
+        int i, target = 45; //target index to print x amount of times an idol was saved
+        String[] text = {
+            "Times Kanan was saved",
+            "Times Hanamaru was saved",
+            "Times Ruby was saved",
+            "Times Dia was saved",
+            "Times Chika was saved",
+            "Times You was saved",
+            "Times Riko was saved",
+            "Times Mari was saved",
+            "Time Siren was defeated",
+            "No. of game overs",
+            "Total gold spent"
+        };
+
+        System.out.println("\n************************************************************");
+        System.out.println("                       Overall Status");
+        System.out.println("************************************************************");
+        for (i = 0; i < text.length-3; i++) {
+            System.out.println(text[i] + " ".repeat(target-text[i].length()) + npcs[i].getTimesSaved() + " times");
+        }
+        
+        System.out.println();
+        System.out.println(text[i] + " ".repeat(target-text[i].length()) + sirenDefeated + " times");
+        System.out.println();
+        i++;
+        System.out.println(text[i] + " ".repeat(target-text[i].length()) + gameOvers + " times");
+        System.out.println();
+        i++;
+        System.out.println(text[i] + " ".repeat(target-text[i].length()) + goldSpent + " gp");
+        System.out.println();
+
+        System.out.println("\nPress Enter to return...");
+        s.nextLine();
     }
 
     /**
@@ -373,20 +438,6 @@ public class Game {
         } catch (NullPointerException e) {
             System.out.println("Item on Hand: N/A");
         }
-    }
-
-    /**
-     * Renders a placeholder block notification layout alerting that attribute inspections 
-     * are still undergoing engineering developments.
-     */
-    public static void displayStatus(){
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-
-        System.out.println("\nStatus not implemented yet\n");
-
-        System.out.println("\nPress Enter to return...");
-        s.nextLine();
     }
 
     /**

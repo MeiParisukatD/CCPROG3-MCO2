@@ -1,6 +1,5 @@
 //NPChar subclass
 package Character_Classes;
-import Item_Classes.*;
 
 /**
  * Represents a non-playable character (NPC) in the game world.
@@ -12,36 +11,24 @@ import Item_Classes.*;
  */
 public class NPChar extends GameCharacter {
     //attributes
-    /** The item held or rewarded by this NPC. */
-    private Item item;
     /** Flag tracking whether the NPC has been rescued or completed their objective. */
     private boolean saved;
+    private int Times_Saved;
 
     //constructor
     /**
-     * Constructs an NPC with a specific name, dialogue text, and a reward item.
+     * Constructs an NPC with a specific name, and a reward item.
      * Sets their default state as not yet saved.
-     *
      * @param name     the name of the NPC
-     * @param dialogue the conversation text associated with this NPC
      * @param item     the item associated with or gifted by the NPC
      */
-    public NPChar(String name, String dialogue, Item item) {
-        super(name, dialogue);
-        this.item = item;
+    public NPChar(String name) {
+        super(name);
         this.saved = false;
+        this.Times_Saved = 0;
     }
 
     //getters/setters
-    /**
-     * Retrieves the specific item currently carried or held by this NPC.
-     * 
-     * @return the item held by this NPC
-     */
-    public Item getItem() {
-        return this.item;
-    }
-
     /**
      * Checks the rescue status of the NPC to see if they are out of danger.
      * 
@@ -58,5 +45,13 @@ public class NPChar extends GameCharacter {
      */
     public void isSaved(boolean saved) {
         this.saved = saved;
+    }
+
+    public int getTimesSaved() {
+        return this.Times_Saved;
+    }
+
+    public void incrementTimesSaved() {
+        this.Times_Saved++;
     }
 }

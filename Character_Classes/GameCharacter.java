@@ -17,8 +17,6 @@ public class GameCharacter {
     protected float health;
     /** The attack power used to deal damage to opponents. */
     protected float attack;
-    /** The dialogue spoken by the character during world interactions. */
-    protected String dialogue;
     /** The X and Y coordinates mapping the position on the 2D dungeon grid. */
     protected int x, y; //coordinates
 
@@ -31,13 +29,12 @@ public class GameCharacter {
      * @param attack the base attack power
      * @param dialogue the text lines spoken by the character
      */
-    public GameCharacter(String name, float health, float attack, String dialogue) {
+    public GameCharacter(String name, float health, float attack) {
         this.name = name;
         this.health = health;
         this.attack = attack;
         this.x = 0;
         this.y = 0;
-        this.dialogue = dialogue;
     }
 
     /**
@@ -55,21 +52,19 @@ public class GameCharacter {
         this.attack = attack;
         this.x = x;
         this.y = y;
-        this.dialogue = null;
     }
 
     /**
-     * Constructs a non-combatant character (e.g., Shopkeeper) with dialogue at (0,0).
+     * Constructs a non-combatant character (e.g., Shopkeeper) at (0,0).
      *
      * @param name the name of the character
      * @param dialogue the text lines spoken by the character
      */
-    public GameCharacter(String name, String dialogue) {
+    public GameCharacter(String name) {
         this.name = name;
         this.health = this.attack = 0;
         this.x = 0;
         this.y = 0;
-        this.dialogue = dialogue;
     }
 
     //getters/setters
@@ -163,24 +158,6 @@ public class GameCharacter {
         this.y = y;
     }
     
-    /**
-     * Retrieves the text line spoken or triggered when interacting with this character.
-     * 
-     * @return the character's dialogue text, or null if none
-     */
-    public String getDialogue() {
-        return this.dialogue;
-    }
-
-    /**
-     * Assigns a new text string or conversation sequence to the character.
-     * 
-     * @param dialogue the new dialogue string
-     */
-    public void setDialogue(String dialogue) {
-        this.dialogue = dialogue;
-    }  
-
     //additional methods
     /**
      * Checks if the character's health has reached 0 or less.
