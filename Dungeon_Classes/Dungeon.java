@@ -58,15 +58,6 @@ public class Dungeon {
     }
 
     /**
-     * Updates the identity text name of the dungeon.
-     *
-     * @param name the updated identity text name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Retrieves the sequential dungeon number index.
      *
      * @return the sequential dungeon number index
@@ -76,30 +67,12 @@ public class Dungeon {
     }
 
     /**
-     * Updates the identification index number of the dungeon.
-     *
-     * @param dungeonNum the new identification index number
-     */
-    public void setDungeonNum(int dungeonNum) {
-        this.dungeonNum = dungeonNum;
-    }
-
-    /**
      * Retrieves the total capacity boundary count of floors.
      *
      * @return the total capacity boundary count of floors
      */
     public int getNumFloors() {
         return this.numFloors;
-    }
-
-    /**
-     * Updates the upper count of contained floors.
-     *
-     * @param numFloors the new upper count of contained floors
-     */
-    public void setNumFloors(int numFloors) {
-        this.numFloors = numFloors;
     }
 
     /**
@@ -129,15 +102,6 @@ public class Dungeon {
         return this.floors;
     }
 
-    /**
-     * Updates the replacement array structure of floor nodes.
-     *
-     * @param floors the replacement array structure of floor nodes
-     */
-    public void setFloors(Floor[] floors) {
-        this.floors = floors;
-    }
-
      /**
      * Retrieves the associated member.
      *
@@ -150,15 +114,6 @@ public class Dungeon {
 
     //additional methods
     /**
-     * Assigns a series of floor structures matching a specific map index catalogue.
-     *
-     * @param catalogue the input array mapping available layout references
-     */
-    public void assignFloors(Floor[] catalogue) {
-        //TODO: WILL IMPLEMENT IN MCO2
-    }
-
-    /**
      * Evaluates dungeon completion by checking the termination status of 
      * the final floor within the array stack.
      *
@@ -166,16 +121,8 @@ public class Dungeon {
      * @return true if the final map floor conditions are cleared, false otherwise
      */
     public boolean isCompleted(PlayableChar entity) {
+        //complete when final floor is complete and current floor = final floor
         this.completion = this.floors[numFloors-1].completeFloor(entity) && this.curFloor == numFloors;
-        String YELLOW, RESET;
-        YELLOW = "\u001B[38;5;227m";
-        RESET = "\u001B[0m";
-
-        if (this.completion) {
-            System.out.println(YELLOW + this.name + " completed!" + RESET);
-            this.member.isSaved(true);
-            this.member.incrementTimesSaved();
-        }
         return this.completion;
     }
 
