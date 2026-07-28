@@ -34,7 +34,7 @@ public class NPChar extends GameCharacter {
      * 
      * @return true if the NPC has been saved, false otherwise
      */
-    public boolean getSaved() {
+    public boolean isSaved() {
         return this.saved;
     }
 
@@ -43,7 +43,7 @@ public class NPChar extends GameCharacter {
      * 
      * @param saved the new status indicating whether the NPC is saved
      */
-    public void isSaved(boolean saved) {
+    public void setSaved(boolean saved) {
         this.saved = saved;
     }
 
