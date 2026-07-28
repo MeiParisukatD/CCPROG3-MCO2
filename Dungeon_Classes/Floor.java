@@ -18,16 +18,17 @@ import Character_Classes.*;
 public class Floor {
     //attributes
     /** The 2D grid matrix of Tile items making up the map landscape. */
-    private Tile[][] map;
-    private String file;
+    protected Tile[][] map;
+    protected String file;
     /** The active tracking collection storing hostile NPCs on this floor layer. */
-    private ArrayList<EnemyChar> enemies;
+    protected ArrayList<EnemyChar> enemies;
     /** The overall row boundary limit capacity of the current map matrix grid. */
-    private int rowLen;
+    protected int rowLen;
     /** The overall column boundary limit capacity of the current map matrix grid. */
-    private int colLen;
+    protected int colLen;
     /** The designation or layout index track level number of this floor. */
-    private int floorNum;
+    protected int floorNum;
+    protected boolean complete;
 
     //constructor
     /**
@@ -36,15 +37,6 @@ public class Floor {
      *
      * @param floorNum the unique level index tracking identifier for this map
      */
-    public Floor(int floorNum) {
-        enemies = new ArrayList<>();
-        this.floorNum = floorNum;
-        this.assignFile();
-        this.generateFloor();
-        rowLen = map.length;
-        colLen = map[0].length;
-    }  
-
     public Floor(int floorNum, String file) {
         enemies = new ArrayList<>();
         this.floorNum = floorNum;
@@ -52,6 +44,7 @@ public class Floor {
         this.generateFloor();
         rowLen = map.length;
         colLen = map[0].length;
+        this.complete = false;
     } 
 
     //getters/setters
@@ -105,6 +98,15 @@ public class Floor {
     }
 
     /**
+     * Retrieves a collection of all active opponents currently present on this floor.
+     * 
+     * @return the list reference containing spawned enemies
+     */
+    public void addEnemy(EnemyChar enemy) {
+        this.enemies.add(enemy);
+    }
+
+    /**
      * Gets the maximum number of rows (horizontal height) defining the map boundaries.
      * 
      * @return the row maximum size metric
@@ -141,23 +143,12 @@ public class Floor {
     }
     
     //additional methods
-    public void assignFile() {
-        //temporary string to hold incomplete file name
-        this.file = "map";
-
-        //minimum 1, maximum 8
-        int num = (int)(Math.random() * 8) + 1;
-        this.file += num;
-
-        //appends .txt
-        this.file += ".txt";
-    }
-
     /**
      * Parses the flat document matrix file stream to initialize structural symbols, 
      * allocating destructible elements and forwarding enemy spawn definitions seamlessly.
      */
     public void generateFloor() {
+        ArrayList<Tile> enemyPositions = new ArrayList<>();
         int row, col, ROW, COL;
         String line;
         ROW = 12; //standard row count across all maps
@@ -176,26 +167,23 @@ public class Floor {
                     //col is y value
                     char symbol = line.charAt(col);
 
-                    switch (symbol) {
-                    case 'b': // bat spawn
+                    if (symbol == 'b') {
                         this.map[row][col] = new Tile(row, col, '.'); // floor tile
-                        generateEnemy('b', row, col);
-                        break;
-                    case 'S': // siren spawn
-                        this.map[row][col] = new Tile(row, col, '.');
-                        generateEnemy('S', row, col);
-                        break;
-                    default:
+                        enemyPositions.add(new Tile(row, col, 'b'));
+                    } else if (symbol == 'S') {
+                        this.map[row][col] = new Tile(row, col, '.'); // floor tile
+                        enemyPositions.add(new Tile(row, col, 'S'));
+                    } else {
                         this.map[row][col] = new Tile(row, col, symbol);
                         if (this.map[row][col].isDestructible()) {
                             this.map[row][col] = new DestructibleTile(this.map[row][col]);
                         }
-                        break;
+                    }
                 }
-                }
-
                 row++; //row is x value
             }
+            //generate enemies from collected positions
+            this.generateEnemies(enemyPositions);
         }
         catch (FileNotFoundException e) {
             System.out.println("[!] File not found. Map could not be generated.");
@@ -210,35 +198,47 @@ public class Floor {
      * @param row the target X coordinate destination
      * @param col the target Y coordinate destination
      */
-    private void generateEnemy(char symbol, int row, int col) {
-        switch (symbol) {
-            case 'b': //spawns Bat and assigns to corresponding tile
-                int moves = this.floorNum == 1 ? 2 : 1;
+    private void generateEnemies(ArrayList<Tile> positions) {
+        int i, size;
+        size = positions.size();
 
-                EnemyChar bat = new EnemyChar(
-                    "Bat",
-                    1.0f,               // HP
-                    0.5f * this.floorNum,      // Attack
-                    5 * this.floorNum,         // Gold Drop
-                    moves,                     // Moves every 2 turns
-                    1,         // Detection Range
-                    this.floorNum != 1,       // diagonal movement if NOT floor 1
-                    row, col                  //coordinates
-                );
-                this.enemies.add(bat);
-                break;
-            case 'S': //spawns Siren and assigns to corresponding tile
-                EnemyChar siren = new EnemyChar(
-                    "Siren",
-                    1.0f,                // HP
-                    10.0f,               // Attack
-                    750,               // Gold Drop
-                    1,             // Moves every turn
-                    rowLen,                     // Detection Range
-                    true,             // diagonal movement true
-                    row, col                   //coordinates
-                );
-                this.enemies.add(siren);
+        for (i = 0; i < size; i++) {
+            char symbol = positions.get(i).getSymbol();
+            int x = positions.get(i).getX();
+            int y = positions.get(i).getY();
+
+            switch (symbol) {
+                case 'b': //bat position
+                    //decides number of moves per turn for bat
+                    int moves = (this.floorNum == 1) ? 2 : 1;
+                    float detection;
+
+                    //create bat
+                    EnemyChar bat = new Bat(
+                        0.5f * this.floorNum,      // Attack
+                        5 * this.floorNum,         // Gold Drop
+                        moves,                     // Moves every 1-2 turns
+                        detection = (this.floorNum == 3) ? 1.5f : 1.0f,
+                        this.floorNum != 1,       // diagonal movement if NOT floor 1
+                        x, y                    //coordinates                     
+                    );
+
+                    //add bat to enemy arraylist
+                    this.enemies.add(bat);
+                    break;
+                case 'S': //siren position
+                    //create siren
+                    EnemyChar siren = new Siren(x, y);
+
+                    //add siren to enemy arraylist
+                    this.enemies.add(siren);
+                    break;
+            }
+        }
+
+        //once all enemies are generated, attach current to each
+        for (EnemyChar enemy: this.enemies) {
+            enemy.setFloor(this);
         }
     }
 
@@ -271,7 +271,7 @@ public class Floor {
                 } 
 
                 // 2. Check Lailaps
-                else if (companion != null && companion.getX() == i && companion.getY() == j) {
+                if (companion != null && companion.getX() == i && companion.getY() == j) {
                     COLOR = "\u001B[38;5;153m"; // Light Blue
                     System.out.print(COLOR + 'L' + RESET);
                     occupied = true;
@@ -322,7 +322,7 @@ public class Floor {
         x = dest.getX();
         y = dest.getY();
 
-        //check #1: if the destinatino tile is within map bounds
+        //check #1: if the destination tile is within map bounds
         if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
             //check #2: if the destination tile is passable
             if (map[x][y].isPassable()) {
@@ -356,23 +356,21 @@ public class Floor {
      * @return true if escape condition requirements are reached, false otherwise
      */
     public boolean completeFloor(PlayableChar entity) {
-        boolean complete;
         int i, j, x, y;
 
         x = entity.getX();
         y = entity.getY();
-        complete = false;
 
         //find Exit tile
         for (i = 0; i < this.rowLen; i++) {
             for (j = 0; j < this.colLen; j++) {
                 if (map[i][j].getSymbol() == 'E' && x == map[i][j].getX() && y == map[i][j].getY()) {
-                    complete = true;
+                    this.complete = true;
                 }
             }
         }
 
-        return complete;
+        return this.complete;
     }
 
     /**
@@ -384,6 +382,7 @@ public class Floor {
      * @return the matching EnemyChar instance found at that position, or null if none exist
      */
     public EnemyChar findEnemy(int x, int y) {
+        //check if enemy exists on parameter coordinates
         for (EnemyChar enemy : enemies) {
             if (enemy.getX() == x &&
                 enemy.getY() == y) {
@@ -391,5 +390,18 @@ public class Floor {
             }
         }
         return null;
+    }
+
+    public boolean tileTaken(int x, int y) {
+        //check for enemy
+        EnemyChar enemy = this.findEnemy(x, y);
+
+        //if enemy found at that position, tile is taken
+        if (enemy != null && enemy.getX() == x && enemy.getY() == y) {
+            return true;
+        } 
+
+        //otherwise, tile is not taken
+        return false;
     }
 }
