@@ -19,15 +19,15 @@ public class GameCharacter {
     protected float attack;
     /** The X and Y coordinates mapping the position on the 2D dungeon grid. */
     protected int x, y; //coordinates
+    protected Floor floor; //floor that the character is a part of
 
     //constructor
     /**
-     * Constructs a character with base stats, dialogue, and sets position to (0,0).
+     * Constructs a character with base stats, dialogue, and sets position to (0,0). Optimized for PlayableChar.
      *
      * @param name the name of the character
      * @param health the initial health points
      * @param attack the base attack power
-     * @param dialogue the text lines spoken by the character
      */
     public GameCharacter(String name, float health, float attack) {
         this.name = name;
@@ -35,10 +35,11 @@ public class GameCharacter {
         this.attack = attack;
         this.x = 0;
         this.y = 0;
+        this.floor = null;
     }
 
     /**
-     * Constructs a character at a specified grid position with no dialogue.
+     * Constructs a character at a specified grid position. Optimized for EnemyChar.
      *
      * @param name the name of the character
      * @param health the initial health points
@@ -52,10 +53,11 @@ public class GameCharacter {
         this.attack = attack;
         this.x = x;
         this.y = y;
+        this.floor = null;
     }
 
     /**
-     * Constructs a non-combatant character (e.g., Shopkeeper) at (0,0).
+     * Constructs a non-combatant character (e.g., Shopkeeper) at (0,0). Optimized for NPChar.
      *
      * @param name the name of the character
      * @param dialogue the text lines spoken by the character
@@ -65,6 +67,7 @@ public class GameCharacter {
         this.health = this.attack = 0;
         this.x = 0;
         this.y = 0;
+        this.floor = null;
     }
 
     //getters/setters
@@ -157,6 +160,14 @@ public class GameCharacter {
     public void setY(int y) {
         this.y = y;
     }
+
+    public void setFloor(Floor floor) {
+        this.floor = floor;
+    }
+
+    public Floor getFloor() {
+        return this.floor;
+    }
     
     //additional methods
     /**
@@ -203,7 +214,7 @@ public class GameCharacter {
      * @param floor     the current Floor grid context
      * @return the destination Tile target
      */
-    protected Tile nextTile(int direction, Floor floor) {
+    protected Tile nextTile(int direction) {
         int next_x, next_y;
         Tile next;
 
@@ -237,17 +248,22 @@ public class GameCharacter {
         return next;
     }
 
+    protected Tile nextTile(int x, int y) {
+        return this.floor.getMap()[x][y];
+    }
+
+
     /**
      * Moves the character to the next tile if valid. 
      * If blocked by a breakable wall, this action handles the digging logic instead.
      *
-     * @param direction movement direction index (0 to 3)
-     * @param floor     the current Floor map structure
+     * @param direction movement direction index (0 to 7)
+     * @param override  if the movement must be overriden for any reason
      */
-    public void move(int direction, Floor floor) {
-        Tile next = this.nextTile(direction, floor);
+    public void move(int direction, boolean override) {
+        Tile next = this.nextTile(direction);
 
-        if (floor.validateMove(next)) {
+        if (floor.validateMove(next) || override) {
             this.x = next.getX();
             this.y = next.getY();
         }
