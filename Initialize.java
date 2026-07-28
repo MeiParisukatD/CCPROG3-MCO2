@@ -14,15 +14,24 @@ public class Initialize {
 
     public Initialize() {
         this.Yohane = new PlayableChar("Yohane", 3, 1);
-        this.Lailaps = new PlayableChar("Lailaps", 1, 0);
+        this.Lailaps = new PlayableChar("Lailaps", 4, 0);
         this.taken = new ArrayList<>(); //helper attribute for dungeon-making
 
-        this.initializeItems();
-        this.initializeNPCs();
-        this.initializeDungeons();
+        //to facilitate new game+ logic, NPCs and items are not regenerated after the first time
+        if (this.NPCs == null) initializeNPCs();
+        if (this.items == null) initializeItems();
+        initializeDungeons();
     }
 
     //Getters
+    public void setItems(Item[] items) {
+        this.items = items;
+    }
+
+    public void setNPCs(NPChar[] NPCs) {
+        this.NPCs = NPCs;
+    }
+
     public Item[] getItems() {
         return this.items;
     }
@@ -47,15 +56,15 @@ public class Initialize {
     private void initializeItems() {
         //all game items
         this.items = new Item[] {
-            new ConsumableItem("Tears of a fallen angel", 30, 0.5f),
-            new ConsumableItem("Noppo Bread", 100, 0.5f),
-            new PassiveItem("Shovel Upgrade", 300, "Spike Immunity"),
-            new PassiveItem("Bat Tamer", 400, "Bat Damage Reduction"),
-            new PassiveItem("Air Shoes", 500, "Water & Heat Immunity"),
-            new UpgradeItem("Stewshine", 1000, "Max Health", 1.0f),
-            new UpgradeItem("Mikan Mochi", 1000, "Max Health", 1.0f),
-            new UpgradeItem("Kurosawa Matcha", 1000, "Max Health", 1.0f),
-            new ConsumableItem("Choco-Mint Ice Cream", 2000, 0.0f)
+            new ConsumableItem("Tears of a fallen angel", 30, 0.5f, null),
+            new ConsumableItem("Noppo Bread", 100, 0.5f, null),
+            new PassiveItem("Shovel Upgrade", 300, "Spike Immunity", this.NPCs[0]),
+            new PassiveItem("Bat Tamer", 400, "Bat Damage Reduction", this.NPCs[6]),
+            new PassiveItem("Air Shoes", 500, "Water & Heat Immunity", this.NPCs[5]),
+            new UpgradeItem("Stewshine", 1000, "Max Health", 1.0f, this.NPCs[7]),
+            new UpgradeItem("Mikan Mochi", 1000, "Max Health", 1.0f, this.NPCs[4]),
+            new UpgradeItem("Kurosawa Matcha", 1000, "Max Health", 1.0f, this.NPCs[3]),
+            new ConsumableItem("Choco-Mint Ice Cream", 2000, 0.0f, this.NPCs[2])
         };
     }
 
@@ -108,7 +117,7 @@ public class Initialize {
                 Floor[] floors = assignFloors(NumFloor);
                 this.dungeons[i] = new Dungeon(name, i+1, NumFloor, floors, assignNPC(name));
             } else { //if final floor, boss map
-                Floor[] boss = new Floor[] {new Floor(1, "map_boss.txt")};
+                Floor[] boss = new BossFloor[] {new BossFloor(1)};
                 this.dungeons[i] = new Dungeon("Siren of Numazu", i+1, 1, boss, null);
             }
         }
@@ -116,16 +125,19 @@ public class Initialize {
 
     private Floor[] assignFloors(int amount) {
         Floor[] floors = new Floor[amount];
+        String file;
         int i;
 
         //assigns for every member of local variable floors[]
         for (i = 0; i < amount; i++) {
-            floors[i] = new Floor(i+1);
             //if floor file is already taken by randomizer, reroll
             do {
-                floors[i].assignFile();
-            } while(taken.contains(floors[i].getFile()));
-            this.taken.add(floors[i].getFile());
+                int num = (int)(Math.random() * 8) + 1;
+                file = "map" + num + ".txt";
+            } while(taken.contains(file));
+            this.taken.add(file);
+
+            floors[i] = new Floor(i+1, file);
         }
 
         return floors;
