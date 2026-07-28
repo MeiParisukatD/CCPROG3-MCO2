@@ -13,25 +13,11 @@ public class Shop {
     /** The catalog of items available in the shop. */
     private Item[] items;
 
-    /** Flag indicating whether the store is open and accessible. */
-    private boolean available;
-
     /**
      * Constructs Hanamaru's Shop and initializes the item catalog with default inventory.
      */
-    public Shop() {
-        this.available = true;
-        this.items = new Item[] {
-            new ConsumableItem("Tears of a fallen angel", 30, 0.5f),
-            new ConsumableItem("Noppo Bread", 100, 0.5f),
-            new PassiveItem("Shovel Upgrade", 300, "Spike Immunity"),
-            new PassiveItem("Bat Tamer", 400, "Bat Damage Reduction"),
-            new PassiveItem("Air Shoes", 500, "Water & Heat Immunity"),
-            new UpgradeItem("Stewshine", 1000, "Max Health", 1.0f),
-            new UpgradeItem("Mikan Mochi", 1000, "Max Health", 1.0f),
-            new UpgradeItem("Kurosawa Matcha", 1000, "Max Health", 1.0f),
-            new ConsumableItem("Choco-Mint Ice Cream", 2000, 0.0f)
-        };
+    public Shop(Item[] items) {
+        this.items = items;
     }
 
     /**
@@ -49,7 +35,7 @@ public class Shop {
      * @param player      the active PlayableChar accessing the shop
      * @param lastMessage status message from the previous purchase attempt
      */
-    public void displayItems(NPChar[] savedIdols, PlayableChar player, String lastMessage) {
+    public void displayItems(NPChar[] idols, PlayableChar player, String lastMessage) {
         System.out.println("\n************************************************************");
         System.out.println("                     Hanamaru's Store                      ");
         System.out.println("************************************************************");
@@ -57,7 +43,9 @@ public class Shop {
 
         // 1. Display Current Gold Balance
         int currentGold = (player != null) ? player.getGoldOwned() : 0;
-        System.out.println("Total Gold: " + currentGold + " GP\n");
+        String YELLOW = "\u001B[38;5;227m";
+        String RESET = "\u001B[0m";
+        System.out.println("Total Gold: " + YELLOW + currentGold + " GP\n" + RESET);
 
         // 2. Display Feedback Message from previous transaction (if any)
         if (lastMessage != null && !lastMessage.isEmpty()) {
@@ -68,45 +56,13 @@ public class Shop {
         int displayIndex = 1;
         for (int i = 0; i < items.length; i++) {
             Item item = items[i];
-            boolean isUnlocked = false;
-
-            if (i == 0 || i == 1) {
-                isUnlocked = itemAvailability(null);
-            } else if (savedIdols != null) {
-                for (NPChar idol : savedIdols) {
-                    if (idol != null) {
-                        String name = idol.getName();
-                        if (i == 2 && name.equalsIgnoreCase("Kanan Matsuura")) isUnlocked = itemAvailability(idol);
-                        if (i == 3 && name.equalsIgnoreCase("Riko Sakurauchi")) isUnlocked = itemAvailability(idol);
-                        if (i == 4 && name.equalsIgnoreCase("You Watanabe")) isUnlocked = itemAvailability(idol);
-                        if (i == 5 && name.equalsIgnoreCase("Mari Ohara")) isUnlocked = itemAvailability(idol);
-                        if (i == 6 && name.equalsIgnoreCase("Chika Takami")) isUnlocked = itemAvailability(idol);
-                        if (i == 7 && name.equalsIgnoreCase("Dia Kurosawa")) isUnlocked = itemAvailability(idol);
-                        if (i == 8 && name.equalsIgnoreCase("Ruby Kurosawa")) isUnlocked = itemAvailability(idol);
-                    }
-                }
-            }
-
-            if (isUnlocked) {
+            if(item.isUnlocked()) {
                 System.out.printf("[%d] %-25s %d GP%n", displayIndex++, item.getName(), item.getPrice());
             }
         }
 
         System.out.println("\n[R]eturn");
         System.out.print("\nChoice: ");
-    }
-
-    /**
-     * Checks if a specific shop offering is available based on store state and 
-     * the rescue status of the associated NPC idol.
-     *
-     * @param entity the NPChar required to unlock an item, or null for base items
-     * @return true if the store is open and the NPC is saved (or null); false otherwise
-     */
-    public boolean itemAvailability(NPChar entity) {
-        if (!this.available) return false;
-        if (entity == null) return true;
-        return entity.getSaved();
     }
 
     /**
@@ -129,12 +85,13 @@ public class Shop {
             return false;
         }
 
-        if (!item.getName().equals("Noppo Bread")) {
-            for (Item invItem : player.getInventory()) {
-                if (invItem.getName().equalsIgnoreCase(item.getName())) {
-                    return false;
-                }
-            }
+        if (!item.isAvailable()) {
+            return false;
+        }
+
+        if (!(item.getName().equalsIgnoreCase("Tears of a fallen angel") ||
+            item.getName().equalsIgnoreCase("Noppo Bread"))) {
+            item.setAvailable(false);
         }
 
         return player.buyItem(item);
