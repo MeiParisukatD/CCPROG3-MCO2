@@ -132,7 +132,7 @@ public class DestructibleTile extends Tile {
             case 'T': //treasure tiles
                 this.treasure = true;
                 this.goldDrop = (int)(Math.random() * 91 + 10); //random gold drop between 10 and 100
-                this.itemDrop = new ConsumableItem("Noppo Bread", 0.5f);
+                this.itemDrop = new ConsumableItem("Noppo Bread", 0.5f, null);
                 break;
             default:
                 this.treasure = false;
