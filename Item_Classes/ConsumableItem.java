@@ -1,5 +1,6 @@
 package Item_Classes;
 
+import Character_Classes.NPChar;
 import Character_Classes.PlayableChar;
 
 /**
@@ -21,8 +22,8 @@ public class ConsumableItem extends Item {
      * @param name the descriptive name of the item
      * @param healAmount the quantity of health points this item recovers
      */
-    public ConsumableItem(String name, float healAmount) {
-        super(name);
+    public ConsumableItem(String name, float healAmount, NPChar condition) {
+        super(name, condition);
         this.healAmount = healAmount;
     }
     
@@ -34,8 +35,8 @@ public class ConsumableItem extends Item {
      * @param price the gold buy or sell value of the item
      * @param healAmount the quantity of health points this item recovers
      */
-    public ConsumableItem(String name, int price, float healAmount) {
-        super(name, price);
+    public ConsumableItem(String name, int price, float healAmount, NPChar condition) {
+        super(name, price, condition);
         this.healAmount = healAmount;
     }
 

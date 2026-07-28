@@ -1,5 +1,6 @@
 package Item_Classes;
 
+import Character_Classes.NPChar;
 import Character_Classes.PlayableChar;
 
 /**
@@ -24,8 +25,8 @@ public class UpgradeItem extends Item {
      * @param targetStat the attribute stat targeted by this upgrade
      * @param upgradeAmt the magnitude of stat adjustment applied by this item
      */
-    public UpgradeItem(String name, int price, String targetStat, float upgradeAmt) {
-        super(name, price);
+    public UpgradeItem(String name, int price, String targetStat, float upgradeAmt, NPChar condition) {
+        super(name, price, condition);
         this.targetStat = targetStat;
         this.upgradeAmt = upgradeAmt;
     }

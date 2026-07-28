@@ -1,5 +1,6 @@
 package Item_Classes;
 
+import Character_Classes.NPChar;
 import Character_Classes.PlayableChar;
 
 /**
@@ -21,8 +22,8 @@ public class PassiveItem extends Item {
      * @param price   the cost in gold (GP) to purchase the item
      * @param ability the passive effect or immunity conferred by the item
      */
-    public PassiveItem(String name, int price, String ability) {
-        super(name, price);
+    public PassiveItem(String name, int price, String ability, NPChar condition) {
+        super(name, price, condition);
         this.ability = ability;
     }
 
@@ -42,22 +43,11 @@ public class PassiveItem extends Item {
      */
     public void activate(PlayableChar Yohane) {
         if (Yohane != null) {
-            Yohane.addItem(this);
+            //add item ability for Yohane to use
+            Yohane.addAbility(this.ability);
         }
     }
-
-    /**
-     * Deactivates the passive item by removing it from the player's inventory.
-     *
-     * @param Yohane the playable character losing the passive item
-     */
-    public void deactivate(PlayableChar Yohane) {
-        if (Yohane != null && Yohane.getInventory().contains(this)) {
-            int index = Yohane.getInventory().indexOf(this);
-            Yohane.discardItem(index);
-        }
-    }
-
+    
     /**
      * Overrides the item activation behavior. Passive items are non-consumable
      * persistent effects, so manually using them returns false.
