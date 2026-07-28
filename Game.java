@@ -19,7 +19,12 @@ public class Game {
 
     /** Shared reader utility scanning string tokens input stream values from standard system consoles. */
     public static Scanner s = new Scanner(System.in);
+    private static boolean ongoingGame = false;
     private static boolean shopUnlocked = false;
+    private static boolean bossUnlocked = false;
+    private static boolean bossOngoing = false;
+    private static boolean completed = false;
+    private static boolean gameOver = false;
     private static int goldSpent = 0;
     private static int sirenDefeated = 0;
     private static int gameOvers = 0;
@@ -47,17 +52,59 @@ public class Game {
      */
     public static void main(String[] args) {
         // Run initializer once
-        init = new Initialize();
-
-        // Grab references
-        Yohane = init.getYohane();
-        Lailaps = init.getLailaps();
-        dungeons = init.getDungeons();
-        items = init.getItems();
-        npcs = init.getNPCs();
+        initialize();
 
         // Start game loop
         displayMainMenu();
+    }
+
+    public static void initialize() {
+        int gold = 0;
+        ongoingGame = false;
+
+        //if first playthrough, fresh initialization
+        if (init == null) {
+            init = new Initialize();
+            npcs = init.getNPCs();
+            items = init.getItems();
+        } else {
+            //indicative of new game+ or character death
+            if (completed || gameOver) {
+                gold = Yohane.getGoldOwned();
+            } //preserve Yohane's previous gold
+
+            //reuse existing idols and items
+            Initialize newInit = new Initialize();
+            newInit.setNPCs(npcs);
+            newInit.setItems(items);
+            init = newInit;
+        }
+
+        //refresh Yohane
+        Yohane = init.getYohane();
+        Yohane.setGoldOwned(gold);
+
+        //clears all items except noppo bread and tears of a fallen angel if gameOver
+        if (gameOver) {
+            Iterator<Item> it = Yohane.getInventory().iterator();
+            while (it.hasNext()){
+                Item item = it.next();
+                if (!(item.getName().equalsIgnoreCase("Noppo Bread") || 
+                item.getName().equalsIgnoreCase("Tears of a fallen angel"))) {
+                    it.remove();
+                }
+            }
+        } else { //if normal new game or new game+, clears all items
+            Yohane.getInventory().clear();
+        }
+        //in all cases, set all (shop) availability back to true
+        for(Item item: items) {
+            item.setAvailable(true);
+        }
+
+        //refresh Lailaps and dungeons
+        Lailaps = init.getLailaps();
+        dungeons = init.getDungeons();
     }
 
     /**
@@ -70,21 +117,29 @@ public class Game {
         do {
             System.out.print("\033[H\033[2J");
             System.out.flush();
+            String plus = (completed) ? "+" : "";
 
             System.out.println("\n************************************************");
             System.out.println("*             Yohane The Parhelion!            *");
             System.out.println("*        The Siren in the Mirror World!        *");
             System.out.println("************************************************");
-            System.out.println("        [N]ew Game");
+            if (ongoingGame) {
+                System.out.println("        [C]ontinue");
+            }
+            System.out.println("        [N]ew Game" + plus);
             System.out.println("        [S]tatus");
             System.out.println("        [Q]uit");
             System.out.print("\nYour choice: ");
 
-            choice = Character.toLowerCase(
-                    s.nextLine().charAt(0));
+            choice = Character.toLowerCase(s.nextLine().charAt(0));
 
             switch(choice) {
+                case 'c':
+                    startGame();
+                    break;
                 case 'n':
+                    ongoingGame = true;
+                    initialize(); //re-initialize to start new game
                     startGame();
                     break;
                 case 's':
@@ -121,18 +176,22 @@ public class Game {
         System.out.println("\n************************************************************");
         System.out.println("                       Overall Status");
         System.out.println("************************************************************");
+        //displays number of times idols have been saved
         for (i = 0; i < text.length-3; i++) {
             System.out.println(text[i] + " ".repeat(target-text[i].length()) + npcs[i].getTimesSaved() + " times");
         }
         
         System.out.println();
+        //displays number of times siren has been defeated
         System.out.println(text[i] + " ".repeat(target-text[i].length()) + sirenDefeated + " times");
         System.out.println();
-        i++;
+        i++; //display number of game overs
         System.out.println(text[i] + " ".repeat(target-text[i].length()) + gameOvers + " times");
         System.out.println();
-        i++;
-        System.out.println(text[i] + " ".repeat(target-text[i].length()) + goldSpent + " gp");
+        i++; //display total gold spent
+        String YELLOW = "\u001B[38;5;227m";
+        String RESET = "\u001B[0m";
+        System.out.println(text[i] + " ".repeat(target-text[i].length()) + YELLOW + goldSpent + " gp" + RESET);
         System.out.println();
 
         System.out.println("\nPress Enter to return...");
@@ -144,64 +203,80 @@ public class Game {
      * and sets up the test exploration loop scenario.
      */
     public static void startGame(){
-        Yohane = new PlayableChar("Yohane", 3, 1, null);
-        
-        Floor[] floors = new Floor[1];
-        floors[0] = new Floor(1);
-
-        NPChar hanamaru = new NPChar("Hanamaru Kunikida", null, null);
-        
-        Dungeon dungeon = new Dungeon("Shougetsu Confectionary", 1, 1, floors, hanamaru);
-
-        displayGameMenu(Yohane, dungeon);
+        ongoingGame = true;
+        displayGameMenu();
     }
 
     /**
      * Loops choices allowing the character to transition into physical environments, 
      * check collected storage structures, or yield activities.
-     *
-     * @param Yohane  the user character instance model tracking state parameters
-     * @param dungeon the active complex mapping level configurations
      */
-    public static void displayGameMenu(PlayableChar Yohane, Dungeon dungeon){
+    public static void displayGameMenu(){
         char choice;
+        gameOver = false;
 
         do {
-
             System.out.print("\033[H\033[2J");
             System.out.flush();
             System.out.println("\nLailaps: Yohane! Where should we go now?\n");
 
-            displayStats(Yohane);
-
+            displayStats();
             System.out.println();
-            String avail = dungeon.getMember().getSaved() ? "X" : "1";
-            System.out.println("[" + avail + "] Visit " + dungeon.getName());
+
+            int i, size = dungeons.length;
+            bossUnlocked = dungeons[0].isCompleted(Yohane) && dungeons[1].isCompleted(Yohane) && dungeons[2].isCompleted(Yohane);
+            bossOngoing = false;
+
+            //if all three dungeons have been completed, show boss
+            if (bossUnlocked) {
+                System.out.println("[1] Face the " + dungeons[size-1].getName());
+            } 
+            //if dungeons are incomplete, display dungeon menu choices
+            else {
+                for (i = 0; i < size-1; i++) {
+                    String avail = dungeons[i].getMember().isSaved() ? "X" : Integer.toString(i+1);
+                    System.out.println("[" + avail + "] Visit " + dungeons[i].getName());
+                }
+            }
             System.out.println("[I] Inventory");
             System.out.println("[Q] Quit");
+            //if shop is unlocked, display shop option
             if (shopUnlocked) {
                 System.out.println("[H] Hanamaru's Store");
             }
+
             System.out.print("\nChoice: ");
 
             try {
                 choice = Character.toLowerCase(
-                        s.nextLine().charAt(0));
+                s.nextLine().charAt(0));
             } catch (StringIndexOutOfBoundsException e) {
+                //error catching
                 choice = 'x';
             }
 
             switch (choice) {
                 case '1':
-                    if (!dungeon.isCompleted(Yohane)) {
-                        runDungeon(Yohane, dungeon);
+                    if (!dungeons[0].isCompleted(Yohane) && !bossUnlocked) {
+                        runDungeon(dungeons[0]);
+                    }
+                    if (bossUnlocked) {
+                        bossOngoing = true;
+                        runFinalBoss(dungeons[3]);
+                    }
+                    break;
+                case '2':
+                    if (!dungeons[1].isCompleted(Yohane)) {
+                        runDungeon(dungeons[1]);
+                    }
+                    break;
+                case '3':
+                    if (!dungeons[2].isCompleted(Yohane)) {
+                        runDungeon(dungeons[2]);
                     }
                     break;
                 case 'i':
                     displayInventory(Yohane);
-                    break;
-                case 'b': // TEMPORARY TESTING KEY FOR BOSS BATTLE
-                    runFinalBoss(Yohane, dungeon);
                     break;
                 case 'h':
                     if (shopUnlocked) {
@@ -209,7 +284,7 @@ public class Game {
                     }
                     break;
             }
-        } while (choice != 'q');
+        } while (choice != 'q' && !gameOver && ongoingGame);
     }
 
     /**
@@ -222,18 +297,20 @@ public class Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("\nViewing Inventory");
+        System.out.println("Lailaps: These are the items you have, Yohane!");
+        System.out.println();
 
-        displayStats(Yohane);
+        displayStats();
 
-        System.out.println("\nItems:");
+        System.out.println("\nItems available");
 
         if (Yohane.getInventory().isEmpty()) {
             System.out.println("No items.");
         } else {
-            for (Item item : Yohane.getInventory()) {
-                System.out.println("- " + item.getName());
-            }
+            System.out.println("No items.");
+            System.out.println("1. Tears of a fallen angel         x        " + Collections.frequency(Yohane.getInventory(), items[0]));
+            System.out.println("2. Noppo bread                     x        " + Collections.frequency(Yohane.getInventory(), items[1]));
+            System.out.println("3. Choco-mint ice cream            x        " + Collections.frequency(Yohane.getInventory(), items[8]));
         }
 
         System.out.println();
@@ -248,27 +325,31 @@ public class Game {
      * @param Yohane  the player character traversing the dungeon environment
      * @param dungeon the dungeon container hosting the exploration map levels
      */
-    public static void runDungeon(PlayableChar Yohane, Dungeon dungeon){
+    public static void runDungeon(Dungeon dungeon){
         boolean firstMove = true;
         char input;
 
         do {
             int index = dungeon.getCurFloor() - 1;
             Floor currentFloor = dungeon.getFloors()[index];
+            Yohane.setFloor(dungeon.getFloors()[index]);
+            System.out.println("Current position: " + Yohane.getX() + " " + Yohane.getY());
 
             //spawn Yohane on the first move
             if (firstMove) {
                 int x, y;
-                Yohane.findCharTile(currentFloor.getMap());
                 //assigns coordinates to Yohane
+                Yohane.findCharTile(currentFloor.getMap());
+
                 x = Yohane.getX();
                 y = Yohane.getY();
+
                 //sets underlying tile to passable tile
                 currentFloor.getMap()[x][y] = new Tile(x, y, '.');
                 firstMove = false;
             }
 
-            Game.displayDungeonMenu(dungeon, index, Yohane);
+            displayDungeonMenu(dungeon, index);
 
             try { //in case user returns without input
                 input = s.nextLine().charAt(0);
@@ -278,57 +359,111 @@ public class Game {
             };
 
             Yohane.incrementTurn(); //all actions are counted as a 'turn'
-
-            if ("wasd".contains(Character.toString(input))) {
-                Yohane.move(input, currentFloor);
-            } //if valid direction, moves Yohane
-            else if (input == ' ') {
-                Yohane.useItem();
-            }
-            else if (input == '[') {
-                Yohane.prevItem();
-            }
-            else if (input == ']') {
-                Yohane.nextItem();
-            }
-
-            //prompts action from enemy characters
-            Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
-            while (it.hasNext()){
-                EnemyChar enemy = it.next();
-                if (enemy.charDeath()) { //if enemy is dead
-                    enemy.dropGold(currentFloor);
-                    it.remove();
-                } else { //if enemy is alive
-                    enemy.move(currentFloor, Yohane);
-                }
-            }
+            characterMoves(input);
+            enemyMoves(currentFloor);
 
             //check if floor is complete
             if (currentFloor.completeFloor(Yohane)) {
                 dungeon.incrementCurFloor();
+                firstMove = true;
+                Yohane.setTurnCount(0);
             }
 
             if (dungeon.isCompleted(Yohane)) {
+                //saves idol member attached to dungeon
+                dungeon.getMember().setSaved(true);
+
+                //increment npc objects
+                int i, size = npcs.length;
+                boolean found = false;
+                for (i = 0; i < size && !found; i++) {
+                    if(npcs[i].getName().equalsIgnoreCase(dungeon.getMember().getName())) {
+                        dungeon.getMember().incrementTimesSaved();
+
+                        //defends against mismatched references from initialization
+                        if (dungeon.getMember().getTimesSaved() != npcs[i].getTimesSaved()) {
+                            npcs[i].incrementTimesSaved();
+                            npcs[i].setSaved(true);
+                        }
+                    }
+                }
+
+                //if member is Hanamaru, unlock item shop
+                if (dungeon.getMember().getName().equalsIgnoreCase("Hanamaru Kunikida")) {
+                    shopUnlocked = true;
+                }
+
                 displayDungeonClearScene(dungeon);
-                shopUnlocked = true;
                 break;
             }
         } while (!dungeon.gameOver(Yohane) && !dungeon.isCompleted(Yohane));
 
         //resets Yohane's health if dungeon ends in death
-        //resets Yohane's health if dungeon ends in death
         if (dungeon.gameOver(Yohane)) {
-            String RED, RESET;
-            RED = "\u001B[38;5;196m";
-            RESET = "\u001B[0m";
+            gameOverScreen(dungeon);
+        }
+    }
 
-            System.out.println(RED + "You Died!" + RESET );
-            System.out.println("Killed by " + RED + Yohane.getCauseOfDeath() + RESET);
+    public static void gameOverScreen(Dungeon dungeon) {
+        String RED = "\u001B[38;5;196m";
+        String RESET = "\u001B[0m";
 
-            Yohane.setHealth(3);
-            //regen floor
-            dungeon.getFloors()[dungeon.getCurFloor()-1].generateFloor();
+        String dead = (Lailaps.charDeath()) ? "Lailaps" : "You";
+        System.out.println(RED + dead + " Died!" + RESET);
+        String killer = (Lailaps.charDeath()) ? Lailaps.getCauseOfDeath() : Yohane.getCauseOfDeath();
+        System.out.println("Killed by " + RED + killer + RESET);
+
+        //system updates
+        gameOvers++;
+        gameOver = true;
+        initialize(); //initialize
+
+        if (bossUnlocked) {
+            Lailaps.setHealth(Lailaps.getMaxHealth());
+            Lailaps.setTurnCount(0);
+        }
+        //regen floor
+        dungeon.getFloors()[dungeon.getCurFloor()-1].generateFloor();
+
+        System.out.println("\nPress Enter to return...");
+        s.nextLine();
+    }
+
+    public static void characterMoves(char input) {
+        //if valid direction, moves characters
+        if ("wasd".contains(Character.toString(input))) {
+            Yohane.move(input, Lailaps.getX(), Lailaps.getY());
+            if (bossUnlocked) { //if boss level, move lailaps as well
+                Lailaps.move(input, Yohane.getX(), Yohane.getY());
+            }
+        }
+        //item logic for Yohane
+        else if (input == ' ') {
+            Yohane.useItem();
+        }
+        else if (input == '[') {
+            Yohane.prevItem();
+        }
+        else if (input == ']') {
+            Yohane.nextItem();
+        }
+    }
+
+    public static void enemyMoves(Floor currentFloor) {
+        //prompts action from enemy characters
+        Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
+        while (it.hasNext()){
+            EnemyChar enemy = it.next();
+            if (enemy.charDeath()) { //if enemy is dead
+                enemy.dropGold(currentFloor);
+                it.remove();
+            } else if (enemy instanceof Bat) { //if enemy is alive and a bat
+                Bat bat = (Bat)enemy;
+                bat.move(Yohane);
+            } else if (!enemy.charDeath() && enemy instanceof Siren) { //if enemy is alive and a siren
+                Siren siren = (Siren)enemy;
+                siren.move(Yohane, Lailaps);
+            }
         }
     }
 
@@ -340,18 +475,26 @@ public class Game {
      * @param index the calculated internal floor lookup pointer
      * @param Yohane the entity character to render contextually
      */
-    public static void displayDungeonMenu(Dungeon dungeon, int index, PlayableChar Yohane) {
+    public static void displayDungeonMenu(Dungeon dungeon, int index) {
         System.out.print("\033[H\033[2J");
         System.out.flush();
 
-        System.out.println("\nDungeon #" + dungeon.getDungeonNum() + ": " + dungeon.getName());
-        System.out.println("Floor " + dungeon.getCurFloor() + " of " + dungeon.getNumFloors());
+        if (bossUnlocked) {
+            System.out.println("\nFinal Battle: Siren of the Mirror world!");
+        } else {
+            System.out.println("\nDungeon #" + dungeon.getDungeonNum() + ": " + dungeon.getName());
+            System.out.println("Floor " + dungeon.getCurFloor() + " of " + dungeon.getNumFloors());
+        }
 
         System.out.println();
-        Game.displayStats(Yohane);
+        displayStats();
 
         System.out.println();
-        dungeon.getFloors()[index].displayMap(Yohane, null);
+        if (bossUnlocked) {
+            dungeon.getFloors()[index].displayMap(Yohane, Lailaps);    
+        } else {
+            dungeon.getFloors()[index].displayMap(Yohane, null);
+        }
 
         System.out.println();
         System.out.println("Turn Counter: " + Yohane.getTurnCount());
@@ -368,72 +511,85 @@ public class Game {
         System.out.flush();
 
         System.out.println("\n************************************************************");
-        System.out.println("                      Dungeon Cleared!                      ");
-        System.out.println("              "+dungeon.getName()+" Completed!            ");
-        System.out.println("                 "+dungeon.getMember().getName()+" rescued!                 ");
-        System.out.println("\nUnlocked: Hanamaru's Store Now Available!\n");
+        System.out.println("                        Dungeon Cleared!");
+        System.out.println("              "+dungeon.getName()+" Completed!");
+        if(dungeon.getMember() != null) { //if the dungeon contains an NPC member
+            System.out.println("                 "+dungeon.getMember().getName()+" rescued!");
+            //if the member character is Hanamaru, unlocks shop dialogue
+            if(dungeon.getMember().getName().equalsIgnoreCase("Hanamaru Kunikida")) {
+                System.out.println("\nUnlocked: Hanamaru's Store Now Available!\n");
+                System.out.println("************************************************************\n");
+                System.out.println("Hanamaru: Yohane-chan, zura! You're here!");
+                System.out.println("Yohane: Hanamaru! We have to get out of here quickly!");
+                System.out.println("Hanamaru: Oh? I was wondering what this place was and why there \nare bats everywhere, zura!");
+                System.out.println("Yohane: Seems like there's a Siren that wants to take your voices \nand is holding you in this dimension so that your \ncounterparts in the real world can't sing!");
+                System.out.println("Hanamaru: Really? That sounds terrifying, zura. What have we \ngot to do?");
+                System.out.println("Yohane: First, we have to get out of here, Zuramaru! I know the \nway out.");
+                System.out.println("Hanamaru: Lead the way, zura!");
+            }
+        }
         System.out.println("************************************************************\n");
-        System.out.println("Hanamaru: Yohane-chan, zura! You're here!");
-        System.out.println("Yohane: Hanamaru! We have to get out of here quickly!");
-        System.out.println("Hanamaru: Oh? I was wondering what this place was and why there \nare bats everywhere, zura!");
-        System.out.println("Yohane: Seems like there's a Siren that wants to take your voices \nand is holding you in this dimension so that your \ncounterparts in the real world can't sing!");
-        System.out.println("Hanamaru: Really? That sounds terrifying, zura. What have we \ngot to do?");
-        System.out.println("Yohane: First, we have to get out of here, Zuramaru! I know the \nway out.");
-        System.out.println("Hanamaru: Lead the way, zura!");
         System.out.println("\nPress Enter to return...");
         s.nextLine();
     }
 
     public static void displayShop() {
-    Shop shop = new Shop();
-    String input;
-    String statusMessage = "";
+        Shop shop = new Shop(items);
+        String input;
+        String statusMessage = "";
 
-    do {
-        // Clear terminal screen
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+        do {
+            // Clear terminal screen
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
 
-        // 1. Display shop items along with player's gold and last transaction message
-        shop.displayItems(null, Yohane, statusMessage);
+            // 1. Display shop items along with player's gold and last transaction message
+            shop.displayItems(npcs, Yohane, statusMessage);
 
-        // 2. Read user choice
-        input = s.nextLine().trim();
+            // 2. Read user choice
+            input = s.nextLine().trim();
 
-        // Check if user wants to return/exit shop
-        if (input.equalsIgnoreCase("r") || input.equalsIgnoreCase("0")) {
-            break;
-        }
-
-        try {
-            int choice = Integer.parseInt(input);
-            
-            // 3. Process purchase
-            boolean success = shop.sellItem(choice, Yohane);
-
-            if (success) {
-                statusMessage = "Successfully purchased item!";
-            } else {
-                statusMessage = "Purchase failed! Check your gold balance or duplicate items.";
+            // Check if user wants to return/exit shop
+            if (input.equalsIgnoreCase("r") || input.equalsIgnoreCase("0")) {
+                break;
             }
 
-        } catch (NumberFormatException e) {
-            statusMessage = "Invalid selection. Please enter a valid number or 'R'.";
-        }
+            try {
+                int choice = Integer.parseInt(input);
+                
+                // 3. Process purchase
+                boolean success = shop.sellItem(choice, Yohane);
 
-    } while (true);
-}
+                if (success) {
+                    Item purchased = items[choice - 1]; // direct reference
+                    goldSpent += purchased.getPrice();
+                    statusMessage = "Successfully purchased " + purchased.getName() + "!";
+                } else {
+                    statusMessage = "Purchase failed! Check your gold balance or duplicate items.";
+                }
 
-    public static void displayStats(PlayableChar Yohane) {
+            } catch (NumberFormatException e) {
+                statusMessage = "Invalid selection. Please enter a valid number or 'R'.";
+            }
+
+        } while (true);
+    }
+
+    public static void displayStats() {
         System.out.print("HP: " + Yohane.getHealth() + "/" + Yohane.getMaxHealth());
-        System.out.println("\t\tTotal Gold: " + Yohane.getGoldOwned() + " GP");
+        if (bossOngoing && bossUnlocked) { //if boss level, display lailaps hp
+            System.out.println("\tLailaps HP: " + Lailaps.getHealth() + "/" + Lailaps.getMaxHealth());
+        }
+        String YELLOW = "\u001B[38;5;227m";
+        String RESET = "\u001B[0m";
+        System.out.println("\t\tTotal Gold: " + YELLOW + Yohane.getGoldOwned() + " GP" + RESET);
 
         int quantity;
         String displayQuantity;
 
         try {
-            quantity = Collections.frequency(Yohane.getInventory(), Yohane.getCurItem().getName());
-            displayQuantity = (quantity > 0) ?  "(" + quantity + ")" : "";
+            quantity = Collections.frequency(Yohane.getInventory(), Yohane.getCurItem());
+            displayQuantity = (quantity > 1) ?  "(" + quantity + ")" : "";
             System.out.println("Item on Hand: " + Yohane.getCurItem().getName() + displayQuantity);
         } catch (NullPointerException e) {
             System.out.println("Item on Hand: N/A");
@@ -448,43 +604,40 @@ public class Game {
      * @param yohane  the primary user-controlled character
      * @param dungeon the active final dungeon structure
      */
-    public static void runFinalBoss(PlayableChar yohane, Dungeon dungeon) {
-        dungeon.getFloors()[dungeon.getCurFloor() - 1] = new Floor(dungeon.getCurFloor(), "map_boss.txt");
-        
-        int index = dungeon.getCurFloor() - 1;
-        Floor bossFloor = dungeon.getFloors()[index];
+    public static void runFinalBoss(Dungeon dungeon) {
+        // int index = dungeon.getCurFloor() - 1;
+        BossFloor bossFloor = (BossFloor)dungeon.getFloors()[0];
+        Yohane.setFloor(dungeon.getFloors()[0]);
+        Lailaps.setFloor(dungeon.getFloors()[0]);
 
-        // 1. Initialize Lailaps & locate starting tiles on map ('Y' and 'L')
-        PlayableChar lailaps = new PlayableChar("Lailaps", 4.0f, 0.0f, null);
-        
-        yohane.findCharTile(bossFloor.getMap());
-        lailaps.findCharTile(bossFloor.getMap());
+        // 1. Locate starting tiles on map ('Y' and 'L')
+        int x, y;
+        Yohane.findCharTile(bossFloor.getMap());
+        Lailaps.findCharTile(bossFloor.getMap());
 
         // Clear initial spawn tiles to passable floor
-        bossFloor.getMap()[yohane.getX()][yohane.getY()] = new Tile(yohane.getX(), yohane.getY(), '.');
-        bossFloor.getMap()[lailaps.getX()][lailaps.getY()] = new Tile(lailaps.getX(), lailaps.getY(), '.');
+        x = Yohane.getX();
+        y = Yohane.getY();
+        bossFloor.getMap()[x][y] = new Tile(x, y, '.');
+        x = Lailaps.getX();
+        y = Lailaps.getY();
+        bossFloor.getMap()[x][y] = new Tile(x, y, '.');
 
-        // 2. Fetch Siren created by Floor.generateFloor()
-        EnemyChar siren = null;
-        for (EnemyChar enemy : bossFloor.getEnemies()) {
-            if (enemy.getName().equalsIgnoreCase("Siren")) {
-                siren = enemy;
-                break;
-            }
-        }
+        // 2. variable
+        Siren siren = (Siren)bossFloor.getEnemies().get(0);
+        //TESTING
+        //System.out.println("enemyMoves Siren@" + System.identityHashCode(siren));
 
-        // 3. State Tracking Variables
-        int switchTriggersCount = 0;
-        boolean sirenPhase = false;
         char input;
-        
         // Spawn initial pair of switches ('0')
-        Tile[] activeSwitches = spawnSwitchPair(bossFloor);
+        Tile[] activeSwitches = bossFloor.spawnSwitchPair();
 
         // Main Boss Stage Loop
         do {
             // Render HUD & Boss Map with both characters
-            displayBossMenu(dungeon, index, yohane, lailaps);
+            displayDungeonMenu(dungeon, 0);
+            //TESTING
+            //System.out.println("TRIGGERS " + bossFloor.getTriggers());
 
             // Process User Input
             try {
@@ -494,257 +647,61 @@ public class Game {
                 input = 'x';
             }
 
-            yohane.incrementTurn(); // Turn engine step
-
-            // Save position prior to move to evaluate attack step
-            int prevYohaneX = yohane.getX();
-            int prevYohaneY = yohane.getY();
-
-            // Handle Input & Item Commands or Synchronized Dual Movement
-            if ("wasd".contains(Character.toString(input))) {
-                moveDualCharacters(input, yohane, lailaps, bossFloor);
-            } else if (input == ' ') {
-                yohane.useItem();
-            } else if (input == '[') {
-                yohane.prevItem();
-            } else if (input == ']') {
-                yohane.nextItem();
+            Yohane.incrementTurn(); 
+            //every 8 moves from Yohane, summon a bat
+            if (Yohane.getTurnCount() % 8 == 0 && !siren.charDeath()) {
+                siren.summonBat(Yohane.getX(), Yohane.getY(), Lailaps.getX(), Lailaps.getY());
             }
+            //character and enemy moves
+            characterMoves(input);
+            enemyMoves(bossFloor);
 
             // --- PHASE 1: SWITCH ACTIVATION MECHANIC ---
-            if (!sirenPhase) {
-                boolean yOnS1 = (yohane.getX() == activeSwitches[0].getX() && yohane.getY() == activeSwitches[0].getY());
-                boolean lOnS2 = (lailaps.getX() == activeSwitches[1].getX() && lailaps.getY() == activeSwitches[1].getY());
+            if (!siren.isReleased()) {
+                boolean yOnS1 = (Yohane.getX() == activeSwitches[0].getX() && Yohane.getY() == activeSwitches[0].getY());
+                boolean lOnS2 = (Lailaps.getX() == activeSwitches[1].getX() && Lailaps.getY() == activeSwitches[1].getY());
 
-                boolean yOnS2 = (yohane.getX() == activeSwitches[1].getX() && yohane.getY() == activeSwitches[1].getY());
-                boolean lOnS1 = (lailaps.getX() == activeSwitches[0].getX() && lailaps.getY() == activeSwitches[0].getY());
+                boolean yOnS2 = (Yohane.getX() == activeSwitches[1].getX() && Yohane.getY() == activeSwitches[1].getY());
+                boolean lOnS1 = (Lailaps.getX() == activeSwitches[0].getX() && Lailaps.getY() == activeSwitches[0].getY());
 
                 // Check if BOTH stand on switches simultaneously
                 if ((yOnS1 && lOnS2) || (yOnS2 && lOnS1)) {
-                    switchTriggersCount++;
+                    bossFloor.incrementTriggers();
 
                     // Clear current switches
                     bossFloor.destroyTile(activeSwitches[0]);
                     bossFloor.destroyTile(activeSwitches[1]);
 
-                    if (switchTriggersCount < 3) {
-                        activeSwitches = spawnSwitchPair(bossFloor);
+                    if (bossFloor.getTriggers() < 3) {
+                        activeSwitches = bossFloor.spawnSwitchPair();
                     } else {
                         // Trigger Phase 2: Break Siren's barriers
-                        sirenPhase = true;
-                        breakSirenBarriers(bossFloor, siren);
+                        siren.release();
+                        bossFloor.releaseSiren();
                     }
-                }
-
-                // Bat Spawning Engine (Every 8 turns)
-                if (yohane.getTurnCount() % 8 == 0) {
-                    spawnBossBat(bossFloor, switchTriggersCount);
                 }
             }
 
-            // --- ENEMY ACTIONS (BATS) ---
-            Iterator<EnemyChar> it = bossFloor.getEnemies().iterator();
-            while (it.hasNext()) {
-                EnemyChar enemy = it.next();
-                
-                // Skip Siren here as she uses custom phase movement
-                if (enemy.getName().equalsIgnoreCase("Siren")) continue;
-
-                if (enemy.charDeath()) {
-                    enemy.dropGold(bossFloor);
-                    it.remove();
-                } else {
-                    enemy.move(bossFloor, yohane);
-                }
-            }
-
-            // --- PHASE 2: SIREN PURSUIT & COMBAT ---
-            if (sirenPhase && siren != null && !siren.charDeath()) {
-                // Check if Yohane stepped into Siren's tile to ATTACK
-                if (yohane.getX() == siren.getX() && yohane.getY() == siren.getY()) {
-                    // Defeat Siren
-                    yohane.dealDmg(siren);
-                    siren.dropGold(bossFloor);
-                    
-                    // Revert Yohane to pre-move tile so Exit 'E' spawns cleanly at Siren's spot
-                    yohane.setX(prevYohaneX);
-                    yohane.setY(prevYohaneY);
-                    bossFloor.getMap()[siren.getX()][siren.getY()] = new Tile(siren.getX(), siren.getY(), 'E');
-                } else {
-                    // Siren pursues closest target
-                    moveSiren(siren, yohane, lailaps, bossFloor);
-
-                    // Attack Evaluation
-                    if (isAdjacent(siren, lailaps)) {
-                        lailaps.takeDmg(siren); // Game Over for Lailaps
-                    } else if (isAdjacent(siren, yohane)) {
-                        yohane.takeDmg(siren); // Triggers Choco-Mint Ice Cream or Death
-                    }
-                }
+            if (siren.charDeath()) {
+                bossFloor.killBats();
+                bossFloor.spawnExit();
             }
 
             // Check Stage Clear (Stepping on Exit 'E')
-            if (bossFloor.completeFloor(yohane)) {
+            if (bossFloor.completeFloor(Yohane)) {
+                sirenDefeated++;
+                completed = true; //prepare for new game+ display
+                ongoingGame = false; //no more ongoing game
+                bossUnlocked = false; //resets boss unlock
                 displayDungeonClearScene(dungeon);
                 break;
             }
-
-        } while (!yohane.charDeath() && !lailaps.charDeath() && !dungeon.gameOver(yohane));
+        } while (!Yohane.charDeath() && !Lailaps.charDeath() && !dungeon.isCompleted(Lailaps));
 
         // Game Over Handler
-        if (yohane.charDeath() || lailaps.charDeath()) {
-            String RED = "\u001B[38;5;196m";
-            String RESET = "\u001B[0m";
-
-            System.out.println(RED + "You Died!" + RESET);
-            String killer = lailaps.charDeath() ? "Siren (Lailaps Defeated)" : yohane.getCauseOfDeath();
-            System.out.println("Killed by " + RED + killer + RESET);
-
-            yohane.setHealth(3);
-            bossFloor.generateFloor(); // Regenerate stage map
+        if (Yohane.charDeath() || Lailaps.charDeath()) {
+            dungeons[3].getFloors()[0] = new BossFloor(1);
+            gameOverScreen(dungeon);
         }
-    }
-
-    // =========================================================================
-    // HELPER METHODS
-    // =========================================================================
-
-    /**
-     * Spawns 2 switches ('0') within row distance <= 2 and col distance <= 5.
-     */
-    private static Tile[] spawnSwitchPair(Floor floor) {
-        Tile[][] map = floor.getMap();
-        Tile[] switches = new Tile[2];
-        int r1, c1, r2, c2;
-        boolean valid = false;
-
-        do {
-            r1 = (int)(Math.random() * (floor.getRowLen() - 2)) + 1;
-            c1 = (int)(Math.random() * (floor.getColLen() - 2)) + 1;
-
-            int rMin = Math.max(1, r1 - 2);
-            int rMax = Math.min(floor.getRowLen() - 2, r1 + 2);
-            int cMin = Math.max(1, c1 - 5);
-            int cMax = Math.min(floor.getColLen() - 2, c1 + 5);
-
-            r2 = (int)(Math.random() * (rMax - rMin + 1)) + rMin;
-            c2 = (int)(Math.random() * (cMax - cMin + 1)) + cMin;
-
-            if ((r1 != r2 || c1 != c2) && 
-                map[r1][c1].getSymbol() == '.' && 
-                map[r2][c2].getSymbol() == '.') {
-                valid = true;
-            }
-        } while (!valid);
-
-        switches[0] = new Tile(r1, c1, '0');
-        switches[1] = new Tile(r2, c2, '0');
-        map[r1][c1] = switches[0];
-        map[r2][c2] = switches[1];
-
-        return switches;
-    }
-
-    /**
-     * Moves Yohane and Lailaps simultaneously, evaluating individual tile collisions.
-     */
-    private static void moveDualCharacters(char input, PlayableChar yohane, PlayableChar lailaps, Floor floor) {
-        if ("wasd".contains(Character.toString(input))) {
-            yohane.move(input, floor);
-            lailaps.move(input, floor);
-        }
-    }
-
-    /**
-     * Spawns a Bat with tiered difficulty based on switch triggers.
-     */
-    private static void spawnBossBat(Floor floor, int switchTriggers) {
-        int tier = switchTriggers + 1; // Tier 1, 2, or 3
-        int r, c;
-        
-        do {
-            r = (int)(Math.random() * floor.getRowLen());
-            c = (int)(Math.random() * floor.getColLen());
-        } while (floor.getMap()[r][c].getSymbol() != '.');
-
-        EnemyChar bat = new EnemyChar(
-            "Bat",
-            1.0f,
-            0.5f * tier,
-            5 * tier,
-            tier == 1 ? 2 : 1, // Tier 1 moves every 2 turns; Tier 2/3 move every turn
-            1,
-            tier == 3, // Diagonal allowed on Tier 3
-            r, c
-        );
-        floor.getEnemies().add(bat);
-    }
-
-    /**
-     * Clears barrier walls ('*') surrounding Siren when Phase 2 starts.
-     */
-    private static void breakSirenBarriers(Floor floor, EnemyChar siren) {
-        Tile[][] map = floor.getMap();
-        int sx = siren.getX();
-        int sy = siren.getY();
-
-        for (int i = sx - 2; i <= sx + 2; i++) {
-            for (int j = sy - 2; j <= sy + 2; j++) {
-                if (i >= 0 && i < floor.getRowLen() && j >= 0 && j < floor.getColLen()) {
-                    if (map[i][j].getSymbol() == '*') {
-                        floor.destroyTile(map[i][j]);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Moves the Siren towards the closest target (Yohane or Lailaps).
-     */
-    private static void moveSiren(EnemyChar siren, PlayableChar yohane, PlayableChar lailaps, Floor floor) {
-        int distY = Math.abs(siren.getX() - yohane.getX()) + Math.abs(siren.getY() - yohane.getY());
-        int distL = Math.abs(siren.getX() - lailaps.getX()) + Math.abs(siren.getY() - lailaps.getY());
-        
-        PlayableChar target = (distY <= distL) ? yohane : lailaps;
-
-        int dx = Integer.compare(target.getX(), siren.getX());
-        int dy = Integer.compare(target.getY(), siren.getY());
-
-        int newX = siren.getX() + dx;
-        int newY = siren.getY() + dy;
-
-        if (floor.getMap()[newX][newY].isPassable()) {
-            siren.setX(newX);
-            siren.setY(newY);
-        }
-    }
-
-    /**
-     * Checks if an enemy and player are adjacent (orthogonally or diagonally).
-     */
-    private static boolean isAdjacent(EnemyChar enemy, PlayableChar player) {
-        int dx = Math.abs(enemy.getX() - player.getX());
-        int dy = Math.abs(enemy.getY() - player.getY());
-        return dx <= 1 && dy <= 1;
-    }
-
-    /**
-     * Boss HUD Display renderer.
-     */
-    private static void displayBossMenu(Dungeon dungeon, int index, PlayableChar yohane, PlayableChar lailaps) {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-
-        System.out.println("\nFinal Battle: Siren of the Mirror world!");
-        System.out.print("HP: " + yohane.getHealth() + "/" + yohane.getMaxHealth());
-        System.out.println("\tLailaps HP: " + lailaps.getHealth() + "/" + lailaps.getMaxHealth());
-        System.out.println("Total Gold: " + yohane.getGoldOwned() + " GP");
-
-        System.out.println();
-        dungeon.getFloors()[index].displayMap(yohane, lailaps);
-
-        System.out.println("\nTurn Counter: " + yohane.getTurnCount());
-        System.out.print("Where to, Yohane? ");
     }
 }
