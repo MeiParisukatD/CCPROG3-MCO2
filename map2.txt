@@ -4,7 +4,7 @@
 *...xw..xh..h..xx..xxx........vxx..h.xx.xx..xh...wx...*
 *b..xw..xh..h..xx.xxx..xxwwwx..xxx.h.xx.ww..xh...wx...*
 *...xw..xh..h..xx.xxxx..x.E.wx..xx.h.xx.ww..xh...wx...*
-*...xw...xh..h.xx..xxxx...xxxx.xxx.h.xx.ww..xh.b.wx...*
+*...xw...xh..h.xx..xxxx...xxxx.xxx.h.xx.ww..xh...wx...*
 *....xw..xh..h..xx...xxwwwxxx..xx..h.xx.ww..xh...wx...*
 *x....xw..xh..h..xxx..........xx..h..xx.ww..xh...wx...*
 *xxb...xw..xh..h...xx...b....xx..h..xx..w..xh...wx.b.x*
