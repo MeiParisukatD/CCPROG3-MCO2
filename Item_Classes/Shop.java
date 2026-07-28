@@ -56,7 +56,7 @@ public class Shop {
         int displayIndex = 1;
         for (int i = 0; i < items.length; i++) {
             Item item = items[i];
-            if(item.isUnlocked()) {
+            if(item.isUnlocked() && item.isAvailable()) {
                 System.out.printf("[%d] %-25s %d GP%n", displayIndex++, item.getName(), item.getPrice());
             }
         }
@@ -89,11 +89,31 @@ public class Shop {
             return false;
         }
 
+        if (item.getName().equalsIgnoreCase("Tears of a fallen angel")) {
+            boolean alreadyOwned = false;
+            for (Item ownedItem : player.getInventory()) {
+                if (ownedItem.getName().equalsIgnoreCase(item.getName())) {
+                    alreadyOwned = true;
+                    break;
+                }
+            }
+
+            if (alreadyOwned) {
+                System.out.println("You already own this item.");
+                return false;
+            }
+        }
+
         if (!(item.getName().equalsIgnoreCase("Tears of a fallen angel") ||
             item.getName().equalsIgnoreCase("Noppo Bread"))) {
             item.setAvailable(false);
         }
 
-        return player.buyItem(item);
+        boolean success = player.buyItem(item);
+        if (success && item.getName().equalsIgnoreCase("Tears of a fallen angel")) {
+            item.setAvailable(false);
+        }
+
+        return success;
     }
 }
