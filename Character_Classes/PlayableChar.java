@@ -23,6 +23,7 @@ public class PlayableChar extends GameCharacter {
     private int turnCount;
     /** The storage bag of items currently held by the character. */
     private ArrayList<Item> inventory;
+    private ArrayList<String> abilities;
     /** The item currently selected or equipped from the inventory layout. */
     private Item curItem;
     /** The source of damage or hazard that caused the character to lose all health. */
@@ -44,6 +45,7 @@ public class PlayableChar extends GameCharacter {
         this.turnCount = 0;
         this.maxHealth = health;
         this.inventory = new ArrayList<Item>();
+        this.abilities = new ArrayList<String>();
         this.curItem = null;
         this.causeOfDeath = null;
         this.justDamaged = false;
@@ -110,6 +112,14 @@ public class PlayableChar extends GameCharacter {
         return this.inventory;
     }
 
+    public void addAbility(String ability) {
+        this.abilities.add(ability);
+    }
+
+    public boolean hasAbility(String ability) {
+        return this.abilities.contains(ability);
+    }
+
     /**
      * Gets the item that is currently selected or focused for the character's next action.
      * 
@@ -161,14 +171,23 @@ public class PlayableChar extends GameCharacter {
      */
     @Override
     public void takeDmg(GameCharacter entity) {
-        this.health -= entity.getAttack();
-        this.justDamaged = true;
+        float attack;
+        //if character has bat tamer and attacking entity is a bat
+        if (entity instanceof Bat && this.abilities.contains("Bat Damage Reduction")) {
+            attack = 0.5f;
+        } else { //else, entity damage acts normally
+            attack = entity.getAttack();
+        }
+
+        this.health -= attack; //reduces health
+        this.justDamaged = true; //for map display purposes
 
         //if character dies from taking damage
         if (this.charDeath()) {
             this.causeOfDeath = entity.getName();
         }
 
+        //if character dies but has choco mint ice cream
         if (health <= 0 &&
             curItem != null &&
             curItem.getName().equals("Choco-Mint Ice Cream")) {
@@ -186,20 +205,28 @@ public class PlayableChar extends GameCharacter {
      * @return true if selection changed successfully, false if structure is too small
      */
     public boolean prevItem() {
+        //if inventory size is <= 1, there is no previous item to switch to
         if (inventory.size() <= 1) {
             return false;
         }
 
+        //get index of previous item
         int index = inventory.indexOf(curItem);
+        int startIndex = index;
+        do { //if previous item is duplicate, skip
+            index--;
+            if (index < 0) {
+                index = inventory.size() - 1; // point to last item
+            }
 
-        index--;
+            // If we've come full circle, no different item exists
+            if (index == startIndex) {
+                return false;
+            }
+        } while (inventory.get(index).getName().equalsIgnoreCase(curItem.getName()));
 
-        if (index < 0) {
-            index = inventory.size() - 1;
-        }
-
+        //get item pointed to
         curItem = inventory.get(index);
-
         return true;
     }
 
@@ -209,20 +236,28 @@ public class PlayableChar extends GameCharacter {
      * @return true if selection changed successfully, false if structure is too small
      */
     public boolean nextItem() {
+        //if inventory size is <= 1, there is no next item to switch to
         if (inventory.size() <= 1) {
             return false;
         }
 
+        //get index of next item
         int index = inventory.indexOf(curItem);
+        int startIndex = index;
+        do { //if next item is duplicate, skip
+            index++;
+            if (index >= inventory.size()) {
+                index = 0; // point to first item
+            }
 
-        index++;
+            // If we've come full circle, no different item exists
+            if (index == startIndex) {
+                return false;
+            }
+        } while (inventory.get(index).getName().equalsIgnoreCase(curItem.getName()));
 
-        if (index >= inventory.size()) {
-            index = 0;
-        }
-
+        //get item pointed to
         curItem = inventory.get(index);
-
         return true;
     }
 
@@ -240,16 +275,18 @@ public class PlayableChar extends GameCharacter {
         boolean used = curItem.use(this);
 
         if (used) {
-            inventory.remove(curItem);
+            this.inventory.remove(curItem);
 
-            if (inventory.isEmpty()) {
+            //if inventory is now empty, curItem is null
+            if (this.inventory.isEmpty()) {
                 curItem = null;
-            }
-            else {
+            } //if copies of the item still exist, reference that copy
+            else if (this.inventory.indexOf(curItem) != -1){
+                int index = this.inventory.indexOf(curItem);
+                curItem = inventory.get(index);
+            } else { //if no copies exist, switch to next item
                 curItem = inventory.get(0);
             }
-
-            incrementTurn();
         }
 
         return used;
@@ -262,12 +299,15 @@ public class PlayableChar extends GameCharacter {
      * @return true if bought successfully, false otherwise
      */
     public boolean buyItem(Item purchase) {
+        //if lacking funds or purchase is null
         if (purchase == null || this.goldOwned < purchase.getPrice()) {
             return false;
         }
 
+        //reduce item price from goldOwned
         this.goldOwned -= purchase.getPrice();
 
+        //uses item depending on item type/class
         if (purchase instanceof UpgradeItem) {
             ((UpgradeItem) purchase).applyUpgrade(this);
         } else if (purchase instanceof PassiveItem) {
@@ -283,24 +323,6 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
-     * Discards an item asset out of the active list using an explicit collection index.
-     *
-     * @param index the coordinate index of the target object node
-     * @return true if dropped successfully, false otherwise
-     */
-    public boolean discardItem(int index) {
-        if (index < 0 || index >= inventory.size()) {
-            return false;
-        }
-
-        Item removed = inventory.remove(index);
-        if (curItem == removed) {
-            curItem = inventory.isEmpty() ? null : inventory.get(0);
-        }
-        return true;
-    }
-
-    /**
      * Applies restorative values to the active health variable pool without 
      * surpassing the defined maximum capability limit.
      *
@@ -308,18 +330,19 @@ public class PlayableChar extends GameCharacter {
      * @return true if recovery processes successfully, false if value is invalid
      */
     public boolean heal(float amount) {
+        //if amount to be healed is <= 0, abandon action
         if (amount <= 0) {
             return false;
         }
 
+        //add amount to health
         float newHealth = this.health + amount;
-
+        //if over max health, set to max health
         if (newHealth > maxHealth) {
             newHealth = maxHealth;
         }
-
+        //set new health
         this.health = newHealth;
-
         return true;
     }
 
@@ -371,7 +394,7 @@ public class PlayableChar extends GameCharacter {
      * @param direction the character character layout input indicating path target
      * @param floor the target Floor system execution reference
      */
-    public void move(char direction, Floor floor) {
+    public void move(char direction, int cX, int cY) {
         int d = -1; //assigned sentinel value to accomodate compilation
         Tile next;
 
@@ -383,17 +406,23 @@ public class PlayableChar extends GameCharacter {
             case 'd': d = 3; break;
         }
 
-        next = nextTile(d, floor);
+        next = nextTile(d);
 
         //check for enemy
         EnemyChar enemy = floor.findEnemy(next.getX(), next.getY());
         if (enemy != null && enemy.getX() == next.getX() && enemy.getY() == next.getY()) {
             this.dealDmg(enemy);
-        } 
-        //if next tile is not an entity
+        }
+        //if next tile is not an entity or playable character
         else {
-            super.move(d, floor);
-            this.takeDmg(next.getDamage()); //receives damage from tile
+            boolean waterWalk = this.abilities.contains("Water & Heat Immunity") && next.getSymbol() == 'w';
+            super.move(d, waterWalk);
+
+            //checks for immunity before taking damage from next tile
+            if (!((this.abilities.contains("Spike Immunity") && next.getSymbol() == 'x') ||
+                (this.abilities.contains("Water & Heat Immunity") && next.getSymbol() == 'h'))) {
+                this.takeDmg(next.getDamage()); //receives damage from tile
+            }
 
             //if character dies from tile damage 
             if (this.charDeath()) {
@@ -430,15 +459,15 @@ public class PlayableChar extends GameCharacter {
     public void findCharTile(Tile[][] map) {
         int i, j;
         char key;
-
-        switch (this.name) {
+        
+        switch (this.name) { //key depends on character name
             case "Yohane": key = 'Y'; break;
             case "Lailaps": key = 'L'; break;
             case "Bat": key = 'b'; break;
             case "Siren": key = 'S'; break;
             default: key = ' '; break;
         }
-
+        //scan map for key symbol
         for (i = 0; i < map.length; i++) {
             for (j = 0; j < map[i].length; j++) {
                 if (map[i][j].getSymbol() == key) {
