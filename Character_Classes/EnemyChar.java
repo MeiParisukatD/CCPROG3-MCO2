@@ -14,12 +14,12 @@ import Dungeon_Classes.*;
 public class EnemyChar extends GameCharacter {
     //attributes
     /** The amount of gold dropped when this enemy is defeated. */
-    private int goldDrop;
+    protected int goldDrop;
     /** The turn interval required before this enemy can take an action. */
-    private int turnsPerMove;
+    protected int turnsPerMove;
     /** The Manhattan distance radius within which the enemy can detect the player. */
-    private int detectionRange;
-    private boolean diagonal;
+    protected float detectionRange;
+    protected boolean diagonal;
 
     //constructor
     /**
@@ -34,12 +34,13 @@ public class EnemyChar extends GameCharacter {
      * @param x the starting X grid coordinate
      * @param y the starting Y grid coordinate
      */
-    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, int detectionRange, boolean diagonal, int x, int y) {
+    public EnemyChar(String name, float health, float attack, int goldDrop, int turnsPerMove, float detectionRange, boolean diagonal, int x, int y) {
         super(name, health, attack, x, y);
         this.goldDrop = goldDrop;
         this.turnsPerMove = turnsPerMove;
         this.detectionRange = detectionRange;
         this.diagonal = diagonal;
+        this.floor = null;
     }
 
     //getters/setters
@@ -84,7 +85,7 @@ public class EnemyChar extends GameCharacter {
      * 
      * @return the player detection radius
      */
-    public int getDetectionRange() {
+    public float getDetectionRange() {
         return this.detectionRange;
     }
 
@@ -93,7 +94,7 @@ public class EnemyChar extends GameCharacter {
      * 
      * @param detectionRange the new player detection radius
      */
-    public void setDetectionRange(int detectionRange) {
+    public void setDetectionRange(float detectionRange) {
         this.detectionRange = detectionRange;
     }
 
@@ -104,89 +105,42 @@ public class EnemyChar extends GameCharacter {
      *
      * @param floor the current Floor map context where the tile is placed
      */
-    public void dropGold(Floor floor) {
-        int x = this.getX();
-        int y = this.getY();
+    public void dropGold(Floor f) {
+        int x = this.x;
+        int y = this.y;
 
-        floor.getMap()[x][y] = new DestructibleTile(
-            this.getX(), 
-            this.getY(),
+        f.getMap()[x][y] = new DestructibleTile(
+            this.x, this.y,
             'g', this.goldDrop,
             null, true);
     }
 
+    protected double calcDistance(double x1, double y1, double x2, double y2) {
+        double xPow, yPow, distance;
+
+        xPow = Math.pow((x2-x1), 2);
+        yPow = Math.pow((y2-y1), 2);
+        distance = Math.sqrt(xPow + yPow);
+
+        return distance;
+    }
+
     /**
      * Calculates whether the player character is within the enemy's detection range 
-     * using Manhattan distance calculation.
+     * using the distance formula.
      *
      * @param map the 2D grid matrix of the current floor
      * @param Yohane the playable character instance to track
      * @return true if the player is within range, false otherwise
      */
-    public boolean detectPlayer(Tile[][] map, PlayableChar Yohane) {
-        int dx, dy;
+    public boolean detectPlayer(Tile[][] map, PlayableChar entity) {
+        double distance;
+        distance = calcDistance(this.x, this.y, entity.getX(), entity.getY());
 
-        dx = this.getX() - Yohane.getX();
-        dy = this.getY() - Yohane.getY();
-
-        if (dx < 0) {
-            dx = dx * -1;
-        }
-
-        if (dy < 0) {
-            dy = dy * -1;
-        }
-
-        if (dx + dy <= detectionRange) {
+        if (distance <= detectionRange) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * Manages the enemy's turn execution. Checks turn intervals to either 
-     * attack the player if detected, or pick a random direction that avoids 
-     * heat ('h') tiles.
-     *
-     * @param floor the current Floor context
-     * @param entity the playable character acting as the turn and target reference
-     */
-    public void move(Floor floor, PlayableChar entity) {
-        //determines if it is currently a turn for the enemy
-        boolean move = entity.getTurnCount() % turnsPerMove == 0;
-
-        if (move) {
-            if (detectPlayer(floor.getMap(), entity)) {
-                this.dealDmg(entity); //attack Yohane if detected
-            } else { //if Yohane is not detected
-                int direction, max;
-                boolean enemy;
-                Tile next = null;
-
-                //makes diagonal moves available if diagonal = true
-                max = (diagonal) ? 8 : 4;
-
-                //enemies are not mentioned to be able to move over heat tiles
-                //this is exclusive to enemies, thus is checked uniquely in this method
-                do {
-                    //checks if another enemy is already at that position
-                    enemy = false;
-
-                    //generate random direction
-                    direction = (int)(Math.random() * max);
-                    next = nextTile(direction, floor);
-
-                    for (EnemyChar e: floor.getEnemies()) {
-                        if (e.getX() == next.getX() && e.getY() == next.getY()) {
-                            enemy = true;
-                            break;
-                        }
-                    }
-                } while (next.getSymbol() == 'h' || enemy);
-
-                super.move(direction, floor);
-            }
-        }
     }
 }
