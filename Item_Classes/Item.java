@@ -1,7 +1,7 @@
 //temp item class
 package Item_Classes;
 
-import Character_Classes.PlayableChar;
+import Character_Classes.*;
 
 /**
  * Represents the base blueprint for all inventory items within the game.
@@ -17,15 +17,19 @@ public class Item {
     protected String name;
     /** The basic gold value or purchase cost assigned to the item. */
     protected int price;
+    protected NPChar condition;
+    protected boolean available;
 
     /**
      * Constructs a baseline item with a name, defaulting its currency price tracking to zero.
      *
      * @param name the unique text name to identify the item
      */
-    public Item(String name) {
+    public Item(String name, NPChar condition) {
         this.name = name;
         this.price = 0;
+        this.condition = condition;
+        this.available = true;
     }
 
     /**
@@ -34,9 +38,11 @@ public class Item {
      * @param name  the unique text name to identify the item
      * @param price the monetary cost or evaluation of the item in gold points
      */
-    public Item(String name, int price) {
+    public Item(String name, int price, NPChar condition) {
         this.name = name;
         this.price = price;
+        this.condition = condition;
+        this.available = true;
     }
 
     /**
@@ -57,6 +63,14 @@ public class Item {
         return price;
     }
 
+    public boolean isAvailable() {
+        return this.available;
+    }
+
+    public void setAvailable(boolean status) {
+        this.available = status;
+    }
+
     /**
      * Triggers the inherent game mechanic behavior tied to item consumption or equipment.
      * This baseline implementation returns false and is intended to be overridden by specialized subclasses.
@@ -67,5 +81,9 @@ public class Item {
     public boolean use(PlayableChar player){
         //override
         return false; 
+    }
+
+    public boolean isUnlocked() {
+        return condition == null || condition.isSaved();
     }
 }
