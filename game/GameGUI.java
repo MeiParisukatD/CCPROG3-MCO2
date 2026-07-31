@@ -1,3 +1,5 @@
+package game;
+
 //Playable file
 import Character_Classes.*;
 import Dungeon_Classes.*;
@@ -15,7 +17,7 @@ import java.util.Scanner;
  * @author Katigbak and Porciuncula
  * @version 1.0
  */
-public class Game {
+public class GameGUI {
 
     /** Shared reader utility scanning string tokens input stream values from standard system consoles. */
     public static Scanner s = new Scanner(System.in);
@@ -39,10 +41,14 @@ public class Game {
     private static Item[] items;
     private static NPChar[] npcs;
 
+    //gui 
+    private static Dungeon currentDungeon;
+    private static Floor currentFloor;
+    
     /**
      * Private constructor to prevent instantiation of utility main runner class.
      */
-    private Game() { /* Utility class */ }
+    private GameGUI() { /* Utility class */ }
 
     /**
      * Entry programmatic hook establishing execution boundaries and forwarding flow controls 
@@ -54,8 +60,9 @@ public class Game {
         // Run initializer once
         initialize();
 
-        // Start game loop
-        displayMainMenu();
+        java.awt.EventQueue.invokeLater(() -> {
+            new GUI.MainFrame().setVisible(true);
+        });
     }
 
     public static void initialize() {
@@ -105,6 +112,23 @@ public class Game {
         //refresh Lailaps and dungeons
         Lailaps = init.getLailaps();
         dungeons = init.getDungeons();
+        
+        currentDungeon = dungeons[0];
+        currentFloor = currentDungeon.getFloors()[0];
+    
+        Yohane.setFloor(currentFloor);
+        Lailaps.setFloor(currentFloor);
+        
+        Yohane.findCharTile(currentFloor.getMap());
+
+        System.out.println("Yohane spawned at: "
+        + Yohane.getX() + ", "
+        + Yohane.getY());
+        
+        int x = Yohane.getX();
+        int y = Yohane.getY();
+
+        currentFloor.getMap()[x][y] = new Tile(x, y, '.');
     }
 
     /**
@@ -448,6 +472,45 @@ public class Game {
             Yohane.nextItem();
         }
     }
+    
+    public static boolean processTurn(char input) {
+
+    Yohane.incrementTurn();
+
+    characterMoves(input);
+
+    if (currentFloor != null) {
+        enemyMoves(currentFloor);
+    }
+
+    if (currentFloor.completeFloor(Yohane)) {
+
+        // Last floor in dungeon
+        if (currentDungeon.getCurFloor() == currentDungeon.getNumFloors()) {
+
+            currentDungeon.getMember().setSaved(true);
+
+            // Unlock shop later
+
+            return true;
+        }
+
+        // Go to next floor
+        currentDungeon.incrementCurFloor();
+
+        currentFloor = currentDungeon.getFloors()[currentDungeon.getCurFloor() - 1];
+
+        Yohane.setFloor(currentFloor);
+        Yohane.findCharTile(currentFloor.getMap());
+
+        int x = Yohane.getX();
+        int y = Yohane.getY();
+
+        currentFloor.getMap()[x][y] = new Tile(x, y, '.');
+    }
+
+    return false;
+}
 
     public static void enemyMoves(Floor currentFloor) {
         //prompts action from enemy characters
@@ -703,5 +766,69 @@ public class Game {
             dungeons[3].getFloors()[0] = new BossFloor(1);
             gameOverScreen(dungeon);
         }
+    }
+    
+    public static PlayableChar getYohane() {
+        return Yohane;
+    }
+
+    public static Dungeon[] getDungeons() {
+        return dungeons;
+    }
+
+    public static boolean isOngoingGame() {
+        return ongoingGame;
+    }
+    
+    public static PlayableChar getLailaps() {
+        return Lailaps;
+    }
+
+    public static Floor getCurrentFloor() {
+        if (currentDungeon != null && currentDungeon.getFloors() != null) {
+            int index = currentDungeon.getCurFloor() - 1;
+            if (index >= 0 && index < currentDungeon.getFloors().length) {
+                return currentDungeon.getFloors()[index];
+            }
+        }
+        // Fallback search across all dungeons
+        if (dungeons != null) {
+            for (Dungeon d : dungeons) {
+                if (!d.isCompleted(Yohane)) {
+                    return d.getFloors()[d.getCurFloor() - 1];
+                }
+            }
+        }
+        return null;
+    }
+    
+    public static Dungeon getCurrentDungeon() {
+        return currentDungeon;
+    }
+    
+    private static void updateCurrentFloor() {
+
+        currentFloor = currentDungeon.getFloors()[currentDungeon.getCurFloor() - 1];
+
+        Yohane.setFloor(currentFloor);
+
+        if (Lailaps != null)
+            Lailaps.setFloor(currentFloor);
+    }
+    
+    public static void startDungeon(Dungeon dungeon) {
+
+        currentDungeon = dungeon;
+
+        currentFloor = dungeon.getFloors()[0];
+
+        Yohane.setFloor(currentFloor);
+
+        Yohane.findCharTile(currentFloor.getMap());
+
+        int x = Yohane.getX();
+        int y = Yohane.getY();
+
+        currentFloor.getMap()[x][y] = new Tile(x, y, '.');
     }
 }

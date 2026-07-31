@@ -1,3 +1,5 @@
+package game;
+
 //class for initializing variables
 import java.util.ArrayList; // Import the ArrayList class
 import Character_Classes.*;

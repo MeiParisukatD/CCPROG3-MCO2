@@ -2,8 +2,8 @@
 package Dungeon_Classes;
 
 import java.util.ArrayList;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import java.util.Scanner;
 import Character_Classes.*;
 
@@ -156,10 +156,16 @@ public class Floor {
         row = col = 0;
 
         this.map = new Tile[ROW][COL];
-        File file = new File(this.file);
-        this.enemies.clear();
+InputStream stream = getClass().getResourceAsStream("/" + this.file);
 
-        try (Scanner reader = new Scanner(file)) {
+if (stream == null) {
+    System.out.println("[!] File not found: " + this.file);
+    return;
+}
+
+this.enemies.clear();
+
+try (Scanner reader = new Scanner(stream)) {
             while (reader.hasNextLine()){
                 line = reader.nextLine();
 
@@ -185,9 +191,9 @@ public class Floor {
             //generate enemies from collected positions
             this.generateEnemies(enemyPositions);
         }
-        catch (FileNotFoundException e) {
-            System.out.println("[!] File not found. Map could not be generated.");
-        };
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
