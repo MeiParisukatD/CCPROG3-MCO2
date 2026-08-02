@@ -29,6 +29,7 @@ public class PlayableChar extends GameCharacter {
     /** The source of damage or hazard that caused the character to lose all health. */
     private String causeOfDeath;
     private boolean justDamaged;
+    private boolean attackedThisTurn;
 
     //constructor
     /**
@@ -49,6 +50,7 @@ public class PlayableChar extends GameCharacter {
         this.curItem = null;
         this.causeOfDeath = null;
         this.justDamaged = false;
+        this.attackedThisTurn = false;
     }
 
     //getters/setters
@@ -153,6 +155,14 @@ public class PlayableChar extends GameCharacter {
 
     public void setJustDamaged(boolean status) {
         this.justDamaged = status;
+    }
+    
+    public boolean isAttackedThisTurn() {
+        return this.attackedThisTurn;
+    }
+
+    public void setAttackedThisTurn(boolean status) {
+        this.attackedThisTurn = status;
     }
 
     //additional methods

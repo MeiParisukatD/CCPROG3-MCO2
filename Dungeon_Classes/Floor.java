@@ -225,7 +225,7 @@ try (Scanner reader = new Scanner(stream)) {
                         5 * this.floorNum,         // Gold Drop
                         moves,                     // Moves every 1-2 turns
                         detection = (this.floorNum == 3) ? 1.5f : 1.0f,
-                        this.floorNum != 1,       // diagonal movement if NOT floor 1
+                        this.floorNum == 3,       // diagonal movement if floor 3
                         x, y                    //coordinates                     
                     );
 

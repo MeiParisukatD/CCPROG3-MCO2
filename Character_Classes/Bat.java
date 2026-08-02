@@ -21,7 +21,10 @@ public class Bat extends EnemyChar {
 
         if (move) {
             if (detectPlayer(this.floor.getMap(), entity)) {
-                this.dealDmg(entity); //attack player if detected
+                if (!entity.isAttackedThisTurn()) {
+                    this.dealDmg(entity); //attack player if detected
+                    entity.setAttackedThisTurn(true);
+                }
             } else { //if player is not detected
                 int direction, max;
                 boolean taken;

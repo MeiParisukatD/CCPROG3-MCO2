@@ -178,9 +178,14 @@ public class GameGUI {
 
         Yohane.incrementTurn();
 
+        int prevX = Yohane.getX();
+        int prevY = Yohane.getY();
+
         characterMoves(input);
+        Yohane.checkHeatDamage(prevX, prevY);
 
         if (currentFloor != null) {
+            Yohane.setAttackedThisTurn(false);
             enemyMoves(currentFloor);
         }
 
@@ -237,16 +242,28 @@ public class GameGUI {
      * @return true if the Siren has just been defeated and the exit reached
      */
     private static boolean processBossTurn(char input, BossFloor bossFloor) {
-        Siren siren = bossFloor.getSiren(); 
+        Siren siren = bossFloor.getSiren();
 
         Yohane.incrementTurn();
 
-        // Every 8 moves, the Siren summons another bat (unless already defeated)
+        // Every 8 moves, the Siren summons another bat (unless already defeated or released)
         if (Yohane.getTurnCount() % 8 == 0 && !siren.charDeath() && !siren.isReleased()) {
             siren.summonBat(Yohane.getX(), Yohane.getY(), Lailaps.getX(), Lailaps.getY());
         }
 
+        int prevXY = Yohane.getX();
+        int prevYY = Yohane.getY();
+        int prevXL = Lailaps.getX();
+        int prevYL = Lailaps.getY();
+
         characterMoves(input);
+
+        Yohane.checkHeatDamage(prevXY, prevYY);
+        Lailaps.checkHeatDamage(prevXL, prevYL);
+        
+        Yohane.setAttackedThisTurn(false);
+        Lailaps.setAttackedThisTurn(false);
+
         enemyMoves(bossFloor);
 
         // --- Phase 1: switch activation ---
