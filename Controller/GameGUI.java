@@ -48,9 +48,9 @@ public class GameGUI {
     /** The set of dungeons for the current run. */
     private static Dungeon[] dungeons;
     /** The catalog of purchasable items for the current run. */
-    private static Item[] items;
+    private static Item[] items = new Item[0];
     /** The roster of rescuable idol NPCs for the current run. */
-    private static NPChar[] npcs;
+    private static NPChar[] npcs = new NPChar[0];
 
     // Which dungeon/floor the player is currently exploring (null until startDungeon() runs)
     /** The dungeon the player is currently exploring, or null if none has been entered yet. */
@@ -465,6 +465,52 @@ public class GameGUI {
      */
     public static Item[] getItems() {
         return items;
+    }
+        
+        /**
+     * Retrieves the roster of rescuable idol NPCs for the current run.
+     *
+     * @return the array of NPChar instances
+     */
+    public static NPChar[] getNPCs() {
+        return npcs;
+    }
+
+    /**
+     * Retrieves the running total of gold spent across the current run.
+     *
+     * @return the total gold spent
+     */
+    public static int getGoldSpent() {
+        return goldSpent;
+    }
+
+    /**
+     * Adds to the running total of gold spent across the current run.
+     * Called whenever a purchase successfully goes through.
+     *
+     * @param amount the gold amount just spent
+     */
+    public static void incrementGoldSpent(int amount) {
+        goldSpent += amount;
+    }
+
+    /**
+     * Retrieves the running count of game overs suffered across all runs.
+     *
+     * @return the total number of game overs
+     */
+    public static int getGameOvers() {
+        return gameOvers;
+    }
+
+    /**
+     * Retrieves the running count of times the Siren has been defeated across all runs.
+     *
+     * @return the total number of Siren defeats
+     */
+    public static int getSirenDefeated() {
+        return sirenDefeated;
     }
 
     /**

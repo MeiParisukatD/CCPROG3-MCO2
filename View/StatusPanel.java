@@ -2,13 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package GUI;
+package View;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import Character_Classes.*;
-import game.*;
+import View.MainFrame;
+import Controller.*;
 
 /**
  *
@@ -65,10 +66,10 @@ public class StatusPanel extends JPanel {
         npcPanel.removeAll();
         bottomPanel.removeAll();
 
-        NPChar[] npcs = game.GameGUI.getNPCs();
-        int goldSpent = game.GameGUI.getGoldSpent();
-        int gameOvers = game.GameGUI.getGameOvers();
-        int sirenDefeats = game.GameGUI.getSirenDefeated();
+        NPChar[] npcs = Controller.GameGUI.getNPCs();
+        int goldSpent = Controller.GameGUI.getGoldSpent();
+        int gameOvers = Controller.GameGUI.getGameOvers();
+        int sirenDefeats = Controller.GameGUI.getSirenDefeated();
 
         this.NPCLabels(npcs);
         this.bottomLabels(goldSpent, gameOvers, sirenDefeats);
@@ -127,15 +128,19 @@ public class StatusPanel extends JPanel {
     }
 
     private void NPCLabels(NPChar[] npcs) {
-        int i, size = npcs.length;
+        if (npcs == null) {
+            return; 
+        }
 
-        for (i = 0; i < size; i++) {
-            //creates new box for each NPC display
+        int size = npcs.length;
+
+        for (int i = 0; i < size; i++) {
+            // creates new box for each NPC display
             JPanel box = new JPanel(new BorderLayout());
             box.setBackground(darkPink);
             box.setPreferredSize(new Dimension(1000, 20));
 
-            //sets up label text
+            // sets up label text
             JLabel name = new JLabel("Time " + npcs[i].getName() + " was saved");
             JLabel stat = new JLabel(npcs[i].getTimesSaved() + " times");
             name.setFont(new Font("SansSerif", Font.PLAIN, 14));

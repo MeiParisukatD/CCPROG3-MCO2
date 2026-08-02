@@ -56,6 +56,7 @@ public class GamePanel extends javax.swing.JPanel {
         tileIcons.put('b', loadIcon("/resources/bat.png"));
         tileIcons.put('B', loadIcon("/resources/bat_attack.png")); // the capital-B fix from before
         tileIcons.put('S', loadIcon("/resources/siren.png"));
+        tileIcons.put('I', loadIcon("/resources/NOPPO_BREAD.png"));
     }
 
     private ImageIcon loadIcon(String path) {

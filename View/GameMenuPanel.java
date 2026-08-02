@@ -35,6 +35,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
         this.frame = frame;
         btnInventory.addActionListener(this::btnInventoryActionPerformed);
         btnQuit.addActionListener(this::btnQuitActionPerformed);
+        btnShop.addActionListener(this::btnShopActionPerformed);
     }
 
     /**
@@ -119,6 +120,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
         btnEnter.addActionListener(this::btnEnterActionPerformed);
 
         btnShop.setText("Shop");
+        btnShop.addActionListener(this::btnShopActionPerformed);
 
         btnInventory.setText("Inventory");
         btnInventory.addActionListener(this::btnInventoryActionPerformed);
@@ -238,6 +240,11 @@ public class GameMenuPanel extends javax.swing.JPanel {
     private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
         frame.showCard("MENU");
     }//GEN-LAST:event_btnQuitActionPerformed
+
+    private void btnShopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShopActionPerformed
+        frame.getShopPanel().refresh();
+        frame.showCard("SHOP");
+    }//GEN-LAST:event_btnShopActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

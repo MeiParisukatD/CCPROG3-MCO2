@@ -48,7 +48,7 @@ public class MainFrame extends javax.swing.JFrame {
         cardPanel.add(gamePanel, "GAME");
         cardPanel.add(inventoryPanel, "INVENTORY");
         cardPanel.add(statusPanel, "STATUS");
-        cardPanel.add(statusPanel, "SHOP");
+        cardPanel.add(shopPanel, "SHOP");
 
         showCard("MENU");
     }
@@ -111,6 +111,19 @@ public class MainFrame extends javax.swing.JFrame {
         return inventoryPanel;
     }
 
+    /**
+     * @return the shop panel instance
+     */ 
+    public ShopPanel getShopPanel() {
+        return shopPanel;
+    }
+    
+    /**
+     * @return the status panel instance
+     */ 
+    public StatusPanel getStatusPanel() {
+        return statusPanel;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

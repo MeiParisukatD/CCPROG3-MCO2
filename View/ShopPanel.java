@@ -2,15 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package GUI;
+package View;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 import Character_Classes.PlayableChar;
+import View.MainFrame;
 import Item_Classes.*;
-import game.*;
+import Controller.*;
 /**
  *
  * @author rhian
@@ -53,7 +54,7 @@ public class ShopPanel extends JPanel {
         btnReturn.addActionListener(this::btnReturnActionPerformed);
 
         //scroll button actions
-        Item[] items = game.GameGUI.getItems();
+        Item[] items = Controller.GameGUI.getItems();
         this.left.addActionListener(e -> {
             if (pageIndex > 0) {
                 pageIndex--;
@@ -76,8 +77,12 @@ public class ShopPanel extends JPanel {
         header.setFont(new Font("SansSerif", Font.PLAIN, 20));
         header.setForeground(purple);
         this.topPanel.add(header, BorderLayout.CENTER);
-        //gold tracker
-        JLabel gold = new JLabel("Total Gold: " + game.GameGUI.getYohane().getGoldOwned(), SwingConstants.CENTER);
+        // gold tracker
+        int initialGold = (Controller.GameGUI.getYohane() != null) 
+                          ? Controller.GameGUI.getYohane().getGoldOwned() 
+                          : 0;
+
+        JLabel gold = new JLabel("Total Gold: " + initialGold, SwingConstants.CENTER);
         gold.setFont(new Font("SansSerif", Font.PLAIN, 14));
         gold.setForeground(purple);
         this.topPanel.add(gold, BorderLayout.SOUTH);
@@ -112,7 +117,7 @@ public class ShopPanel extends JPanel {
     public void refresh() {
         //refresh components
         this.refreshMessage("Yohane-chan, zura! What can I do for you today");
-        this.itemDisplay(0, game.GameGUI.getItems());
+        this.itemDisplay(0, Controller.GameGUI.getItems());
         this.refreshGold();
     }
 
@@ -143,7 +148,7 @@ public class ShopPanel extends JPanel {
         }
 
         //update new gold
-        JLabel gold = new JLabel("Total Gold: " + game.GameGUI.getYohane().getGoldOwned());
+        JLabel gold = new JLabel("Total Gold: " + Controller.GameGUI.getYohane().getGoldOwned());
         gold.setFont(new Font("SansSerif", Font.PLAIN, 14));
         gold.setForeground(purple);
         this.topPanel.add(gold, BorderLayout.SOUTH);
@@ -153,6 +158,9 @@ public class ShopPanel extends JPanel {
     }
 
     private void itemDisplay(int index, Item[] items) {
+        if(items==null){
+            return;
+        }
         this.itemGrid.removeAll();
         int i, j, k, size = items.length;
 
@@ -217,7 +225,7 @@ public class ShopPanel extends JPanel {
             final int buttonIndex = x;
             itemButtons[x].addActionListener(e -> {
                 if (visible[buttonIndex] != null) {
-                    sellItem(visible[buttonIndex], game.GameGUI.getYohane());
+                    sellItem(visible[buttonIndex], Controller.GameGUI.getYohane());
                 }
             });
         }
@@ -253,33 +261,31 @@ public class ShopPanel extends JPanel {
         if (success) {
             this.refreshGold();
             this.refreshMessage("Successfuly bought " + item.getName() + "!");
-            this.itemDisplay(this.pageIndex, game.GameGUI.getItems());
+            this.itemDisplay(this.pageIndex, Controller.GameGUI.getItems());
         }
         return success;
     }
 
-    private void initializeIcons() {
-        ImageIcon tearsOfAngel = new ImageIcon("resources/TEARS_OF_A_FALLEN_ANGEL.png");
-        ImageIcon noppoBread = new ImageIcon("resources/NOPPO_BREAD.png");
-        ImageIcon shovelUpg = new ImageIcon("resources/SHOVEL_UPGRADE.png");
-        ImageIcon batTamer = new ImageIcon("resources/BAT_TAMER.png");
-        ImageIcon airShoes = new ImageIcon("resources/AIR_SHOES.png");
-        ImageIcon mikanMochi = new ImageIcon("resources/MIKAN_MOCHI.png");
-        ImageIcon stewshine = new ImageIcon("resources/STEWSHINE.png");
-        ImageIcon kurosawaMatcha = new ImageIcon("resources/KUROSAWA_MATCHA.png");
-        ImageIcon chocoMint = new ImageIcon("resources/CHOCO_MINT_ICE_CREAM.png");
+    private ImageIcon loadShopIcon(String path) {
+        java.net.URL url = getClass().getResource(path);
+        if (url == null) {
+            System.out.println("[!] Missing image: " + path);
+            return new ImageIcon(); // return empty icon as fallback
+        }
+        return new ImageIcon(url);
+    }
 
-        //initialize the icons attribute
+    private void initializeIcons() {
         this.icons = new ImageIcon[] {
-                tearsOfAngel,
-                noppoBread,
-                shovelUpg,
-                batTamer,
-                airShoes,
-                stewshine,
-                mikanMochi,
-                kurosawaMatcha,
-                chocoMint
+            loadShopIcon("/resources/TEARS_OF_A_FALLEN_ANGEL.png"),
+            loadShopIcon("/resources/NOPPO_BREAD.png"),
+            loadShopIcon("/resources/SHOVEL_UPGRADE.png"),
+            loadShopIcon("/resources/BAT_TAMER.png"),
+            loadShopIcon("/resources/AIR_SHOES.png"),
+            loadShopIcon("/resources/STEWSHINE.png"),
+            loadShopIcon("/resources/MIKAN_MOCHI.png"),
+            loadShopIcon("/resources/KUROSAWA_MATCHA.png"),
+            loadShopIcon("/resources/CHOCO_MINT_ICE_CREAM.png")
         };
     }
 
