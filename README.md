@@ -1,5 +1,5 @@
-# CCPROG3-MCO1
+# CCPROG3-MCO2
 
-A terminal-based dungeon simulator titled "Yohane The Parhelion! The Siren in the Mirror World! FULL SONG EDITION".
+A GUI-based dungeon simulator titled "Yohane The Parhelion! The Siren in the Mirror World! FULL SONG EDITION".
 
-To use, compile with: ```javac Game.java```
+To use, compile with: ```javac View/MainFrame.java```
