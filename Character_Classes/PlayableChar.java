@@ -418,15 +418,16 @@ public class PlayableChar extends GameCharacter {
             boolean waterWalk = this.abilities.contains("Water & Heat Immunity") && next.getSymbol() == 'w';
             super.move(d, waterWalk);
 
-            //checks for immunity before taking damage from next tile
-            if (!((this.abilities.contains("Spike Immunity") && next.getSymbol() == 'x') ||
-                (this.abilities.contains("Water & Heat Immunity") && next.getSymbol() == 'h'))) {
-                this.takeDmg(next.getDamage()); //receives damage from tile
+            if (next.getSymbol() == 'x' && !this.abilities.contains("Spike Immunity")) {
+                this.takeDmg(next.getDamage());
+                if (this.charDeath()) {
+                    this.causeOfDeath = "Spike Walls";
+                }
             }
 
             //if character dies from tile damage 
             if (this.charDeath()) {
-                this.causeOfDeath = (next.getSymbol() == 'h') ? "Heat Tiles" : "Spike Walls";
+                this.causeOfDeath = "Spike Walls";
             } 
             else {
                 //if the destination tile is destructible, 
@@ -449,6 +450,21 @@ public class PlayableChar extends GameCharacter {
             }
         }
     }
+    
+        public void checkHeatDamage(int prevX, int prevY) {
+        if (this.floor == null) return;
+        if (this.x == prevX && this.y == prevY) {
+            Tile current = this.floor.getMap()[this.x][this.y];
+            if (current.getSymbol() == 'h' && !this.abilities.contains("Water & Heat Immunity")) {
+                this.takeDmg(current.getDamage());
+                this.justDamaged = true;
+                if (this.charDeath()) {
+                    this.causeOfDeath = "Heat Tiles";
+                }
+            }
+        }
+    }
+    
 
     /**
      * Scans the 2D layout grid structure looking for explicitly matching unique character keys 
