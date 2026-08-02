@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"Character_Classes"},{"l":"Controller"},{"l":"Dungeon_Classes"},{"l":"Item_Classes"},{"l":"View"}];updateSearchResults();
