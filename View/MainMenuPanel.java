@@ -127,7 +127,8 @@ public class MainMenuPanel extends javax.swing.JPanel {
      * @param evt the button click event
      */   
     private void btnStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStatusActionPerformed
-        // TODO add your handling code here:
+        frame.getStatusPanel().refresh();
+        frame.showCard("STATUS");
     }//GEN-LAST:event_btnStatusActionPerformed
 
     /**
@@ -138,9 +139,7 @@ public class MainMenuPanel extends javax.swing.JPanel {
      */   
     private void btnNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewGameActionPerformed
         GameGUI.beginNewRun();
-
         frame.getGameMenuPanel().refresh();
-
         frame.showCard("GAMEMENU");
     }//GEN-LAST:event_btnNewGameActionPerformed
 
