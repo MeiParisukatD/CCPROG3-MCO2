@@ -24,9 +24,10 @@ public class BossFloor extends Floor {
      * spawned during map generation.
      *
      * @param floorNum the unique level index tracking identifier for this map
+     * @param dungeonNum the number of the dungeon (1st/2nd/3rd/Siren's) this floor belongs to
      */
-    public BossFloor(int floorNum) {
-        super(floorNum, "map_boss.txt");
+    public BossFloor(int floorNum, int dungeonNum) {
+        super(floorNum, dungeonNum, "map_boss.txt");
         this.triggers = 0;
         this.siren = (Siren) this.enemies.get(0);
         this.siren.setFloor(this);
@@ -39,7 +40,7 @@ public class BossFloor extends Floor {
      * @param floor the source Floor whose level index and map file are reused
      */
     public BossFloor(Floor floor) {
-        super(floor.getFloorNum(), floor.getFile());
+        super(floor.getFloorNum(), floor.getDungeonNum(), floor.getFile());
         this.triggers = 0;
         this.siren = (Siren) this.enemies.get(0);
         this.siren.setFloor(this);
@@ -201,4 +202,4 @@ public class BossFloor extends Floor {
 
         return exclusionZone;
     }
-}   
+}

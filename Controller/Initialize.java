@@ -184,10 +184,10 @@ public class Initialize {
             }
 
             if (i != 3) { //if not final floor, generate normally
-                Floor[] floors = assignFloors(NumFloor);
+                Floor[] floors = assignFloors(NumFloor, i+1);
                 this.dungeons[i] = new Dungeon(name, i+1, NumFloor, floors, assignNPC(name));
             } else { //if final floor, boss map
-                Floor[] boss = new BossFloor[] {new BossFloor(1)};
+                Floor[] boss = new BossFloor[] {new BossFloor(1, i+1)};
                 this.dungeons[i] = new Dungeon("Siren of Numazu", i+1, 1, boss, null);
             }
         }
@@ -198,9 +198,11 @@ public class Initialize {
      * assigning a distinct, not-yet-used map file to each floor.
      *
      * @param amount the number of floors to generate
+     * @param dungeonNum the number of the dungeon (1st/2nd/3rd) these floors belong to,
+     *                    used to scale enemy difficulty correctly
      * @return the array of generated Floor instances
      */
-    private Floor[] assignFloors(int amount) {
+    private Floor[] assignFloors(int amount, int dungeonNum) {
         Floor[] floors = new Floor[amount];
         String file;
         int i;
@@ -214,7 +216,7 @@ public class Initialize {
             } while(taken.contains(file));
             this.taken.add(file);
 
-            floors[i] = new Floor(i+1, file);
+            floors[i] = new Floor(i+1, dungeonNum, file);
         }
 
         return floors;

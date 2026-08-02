@@ -29,6 +29,8 @@ public class Floor {
     protected int colLen;
     /** The designation or layout index track level number of this floor. */
     protected int floorNum;
+    /** The number of the dungeon (1st/2nd/3rd) this floor belongs to; used to scale enemy difficulty. */
+    protected int dungeonNum;
     /** Flag tracking whether this floor has been cleared (the player has reached its exit). */
     protected boolean complete;
 
@@ -38,11 +40,15 @@ public class Floor {
      * structural elements via dynamic tile generations.
      *
      * @param floorNum the unique level index tracking identifier for this map
+     * @param dungeonNum the number of the dungeon (1st/2nd/3rd) this floor belongs to;
+     *                    must be set before generateFloor() runs since that call spawns
+     *                    enemies using this value
      * @param file the name of the text map file to generate this floor's layout from
      */
-    public Floor(int floorNum, String file) {
+    public Floor(int floorNum, int dungeonNum, String file) {
         enemies = new ArrayList<>();
         this.floorNum = floorNum;
+        this.dungeonNum = dungeonNum;
         this.file = file;
         this.generateFloor();
         rowLen = map.length;
@@ -94,6 +100,25 @@ public class Floor {
      */
     public void setFloorNum(int floorNum) {
         this.floorNum = floorNum;
+    }
+
+    /**
+     * Gets the number of the dungeon (1st/2nd/3rd) this floor belongs to.
+     *
+     * @return the dungeon number this floor belongs to
+     */
+    public int getDungeonNum() {
+        return this.dungeonNum;
+    }
+
+    /**
+     * Sets the number of the dungeon (1st/2nd/3rd) this floor belongs to.
+     * Used to scale enemy difficulty independently of the floor's position within the dungeon.
+     *
+     * @param dungeonNum the dungeon number to record
+     */
+    public void setDungeonNum(int dungeonNum) {
+        this.dungeonNum = dungeonNum;
     }
 
     /**
@@ -222,17 +247,17 @@ public class Floor {
 
             switch (symbol) {
                 case 'b': //bat position
-                    //decides number of moves per turn for bat
-                    int moves = (this.floorNum == 1) ? 2 : 1;
+                    //decides number of moves per turn for bat, scaled by which dungeon this is
+                    int moves = (this.dungeonNum == 1) ? 2 : 1;
                     float detection;
 
                     //create bat
                     EnemyChar bat = new Bat(
-                        0.5f * this.floorNum,      // Attack
-                        5 * this.floorNum,         // Gold Drop
-                        moves,                     // Moves every 1-2 turns
-                        detection = (this.floorNum == 3) ? 1.5f : 1.0f,
-                        this.floorNum == 3,       // diagonal movement if floor 3
+                        0.5f * this.dungeonNum,      // Attack
+                        5 * this.dungeonNum,         // Gold Drop
+                        moves,                       // Moves every 1-2 turns
+                        detection = (this.dungeonNum == 3) ? 1.5f : 1.0f,
+                        this.dungeonNum == 3,       // diagonal movement if 3rd dungeon
                         x, y                    //coordinates
                     );
 
