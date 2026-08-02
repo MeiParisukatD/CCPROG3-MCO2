@@ -233,8 +233,6 @@ public class Tile {
             case 'S': //Siren tile
                 break;
             default:
-                System.out.println("[!] Invalid tile symbol.");
-                System.out.println("Row " + x + ": " + y);
                 break;
         }
     }

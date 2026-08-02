@@ -77,7 +77,6 @@ public class Shop {
      */
     public boolean sellItem(int choice, PlayableChar player) {
         if (choice < 1 || choice > items.length) {
-            System.out.println("Invalid selection.");
             return false;
         }
 
@@ -101,7 +100,6 @@ public class Shop {
             }
 
             if (alreadyOwned) {
-                System.out.println("You already own this item.");
                 return false;
             }
         }

@@ -122,9 +122,6 @@ public class BossFloor extends Floor {
      * Clears barrier walls ('*') surrounding Siren when Phase 2 starts.
      */
     public void releaseSiren() {
-        Siren siren = this.siren;
-        System.out.println("BossFloor.releaseSiren called, Siren@" + System.identityHashCode(siren));
-        System.out.println("Before: released=" + siren.isReleased());
         int sx = this.enemies.get(0).getX();
         int sy = this.enemies.get(0).getY();
 
@@ -143,7 +140,6 @@ public class BossFloor extends Floor {
                 }
             }
         }
-        System.out.println("After: released=" + siren.isReleased());
     }
 
     /**

@@ -59,10 +59,15 @@ public class GamePanel extends javax.swing.JPanel {
         tileIcons.put('I', loadIcon("/resources/NOPPO_BREAD.png"));
     }
 
+    /**
+     * Loads and scales an icon image from the given classpath resource.
+     *
+     * @param path the classpath-relative resource path to load
+     * @return the scaled icon, or null if the resource could not be found
+     */
     private ImageIcon loadIcon(String path) {
         java.net.URL url = getClass().getResource(path);
         if (url == null) {
-            System.out.println("[!] Missing image: " + path);
             return null;
         }
         Image scaled = new ImageIcon(url).getImage()
@@ -251,6 +256,13 @@ public class GamePanel extends javax.swing.JPanel {
                 if (memberName.equalsIgnoreCase("Hanamaru Kunikida")) {
                     msg.append("\n\nUnlocked: Hanamaru's Store Now Available!");
                 }
+                
+
+                // Show the idol's rescue-scene dialogue in the same box, if one has been written
+                String story = GameGUI.getRescueDialogue(memberName);
+                if (story != null) {
+                    msg.append("\n\n").append(story);
+                }                
             }
 
             JOptionPane.showMessageDialog(this,

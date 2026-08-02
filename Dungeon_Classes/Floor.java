@@ -192,8 +192,7 @@ public class Floor {
         InputStream stream = getClass().getResourceAsStream("/" + this.file);
 
         if (stream == null) {
-            System.out.println("[!] File not found: " + this.file);
-            return;
+            return; // map file not found on classpath - floor is left uninitialized
         }
 
         this.enemies.clear();

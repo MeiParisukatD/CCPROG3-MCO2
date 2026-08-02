@@ -46,9 +46,7 @@ public class Siren extends EnemyChar {
      * Releases the Siren, activating its movement and attack behavior.
      */    
     public void release() {
-        System.out.println("RELEASE SUCCESSFUL");
         this.released = true;
-        System.out.println("release() set released=" + this.released + " on Siren@" + System.identityHashCode(this));
     }
 
     /**
@@ -106,7 +104,6 @@ public class Siren extends EnemyChar {
      */    
     public void move(PlayableChar Yohane, PlayableChar Lailaps) {
         BossFloor bossFloor = (BossFloor)this.floor;
-        System.out.println("RELEASED " + this.released);
 
         //Siren should only move when released
         if (this.released) {
@@ -115,13 +112,10 @@ public class Siren extends EnemyChar {
             double distL = calcDistance(this.x, this.y, Lailaps.getX(), Lailaps.getY());
 
             if (distL <= 1.5) { //if lailaps is adjacent
-                System.out.println("DAMAGING LAILAPS");
                 dealDmg(Lailaps);
             } else if (distY <= 1.5) { //if yohane is adjacent
-                System.out.println("DAMAGING YOHANE");
                 dealDmg(Yohane);
             } else { //if neither character is adjacent
-                System.out.println("MOVEMENT");
                 //target the playable character which is nearer
                 PlayableChar target = (distY <= distL) ? Yohane : Lailaps;
 

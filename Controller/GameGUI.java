@@ -245,12 +245,9 @@ public class GameGUI {
                     shopUnlocked = true;
                 }
 
-                // Announce the rescue and play the idol's story dialogue
-                printRescueDialogue(
-                    currentDungeon.getName(),
-                    currentDungeon.getMember(),
-                    unlockedShopNow ? "Unlocked: Hanamaru's Store Now Available!" : null
-                );
+                // The dungeon-cleared dialog (including this idol's rescue story,
+                // via getRescueDialogue()) is shown by GamePanel as a JOptionPane -
+                // no console output needed here.
 
                 // Recheck whether all 3 non-boss dungeons are now cleared
                 refreshBossUnlockStatus();
@@ -409,38 +406,27 @@ public class GameGUI {
     }
 
     /**
-     * Prints the "Dungeon Cleared" banner and story dialogue for a newly rescued
-     * idol. Each idol's dialogue is keyed by name below; idols without a written
-     * scene yet fall through to the default case and only show the banner.
+     * Retrieves the idol-specific rescue dialogue to show in the dungeon-cleared
+     * dialog box. Each idol's dialogue is keyed by name below; idols without a
+     * written scene yet return null, and the caller (GamePanel) simply omits
+     * that section of the dialog rather than showing anything.
      *
-     * @param dungeonName   the name of the dungeon that was just cleared
-     * @param member        the NPC idol who was just rescued
-     * @param unlockMessage an optional extra "Unlocked: ..." line shown under the
-     *                      banner (e.g. for Hanamaru's shop), or null if none applies
+     * @param memberName the name of the idol who was just rescued
+     * @return the multi-line dialogue text for this idol, or null if none has been written yet
      */
-    private static void printRescueDialogue(String dungeonName, NPChar member, String unlockMessage) {
-        System.out.println("\n************************************************************");
-        System.out.println("Dungeon Cleared!");
-        System.out.println(dungeonName + " Completed!");
-        System.out.println(member.getName() + " rescued!");
-        if (unlockMessage != null) {
-            System.out.println(unlockMessage);
-        }
-        System.out.println("************************************************************\n");
-
-        switch (member.getName()) {
+    public static String getRescueDialogue(String memberName) {
+        switch (memberName) {
             case "Hanamaru Kunikida":
-                System.out.println("Hanamaru: Yohane-chan, zura! You're here!");
-                System.out.println("Yohane: Hanamaru! We have to get out of here quickly!");
-                System.out.println("Hanamaru: Oh? I was wondering what this place was and why there are bats everywhere, zura!");
-                System.out.println("Yohane: Seems like there's a Siren that wants to take your voices and is holding you in this dimension so that your counterparts in the real world can't sing!");
-                System.out.println("Hanamaru: Really? That sounds terrifying, zura. What have we got to do?");
-                System.out.println("Yohane: First, we have to get out of here, Zuramaru! I know the way out.");
-                System.out.println("Hanamaru: Lead the way, zura!");
-                break;
+                return "Hanamaru: Yohane-chan, zura! You're here!\n"
+                     + "Yohane: Hanamaru! We have to get out of here quickly!\n"
+                     + "Hanamaru: Oh? I was wondering what this place was and why there are bats everywhere, zura!\n"
+                     + "Yohane: Seems like there's a Siren that wants to take your voices and is holding you in this dimension so that your counterparts in the real world can't sing!\n"
+                     + "Hanamaru: Really? That sounds terrifying, zura. What have we got to do?\n"
+                     + "Yohane: First, we have to get out of here, Zuramaru! I know the way out.\n"
+                     + "Hanamaru: Lead the way, zura!";
             default:
                 // TODO: add rescue dialogue for the remaining idols
-                break;
+                return null;
         }
     }
 
