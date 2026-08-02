@@ -6,11 +6,13 @@ package GUI;
 
 import game.GameGUI;
 import Character_Classes.*;
-import Dungeon_Classes.Floor;
+import Dungeon_Classes.*;
 import java.awt.GridLayout;
 import Dungeon_Classes.Tile;
+import Item_Classes.Item;
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Collections;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
@@ -50,16 +52,44 @@ public class GamePanel extends javax.swing.JPanel {
         lblTurn.setText("Turn: " + player.getTurnCount());
 
         Floor floor = GameGUI.getCurrentFloor();
-        lblFloor.setText("Floor: " + floor.getFloorNum());
+        boolean isBossFight = floor instanceof BossFloor;
+
+        lblFloor.setText(isBossFight
+                ? "Final Battle: Siren of the Mirror World!"
+                : "Floor: " + floor.getFloorNum());
+
+        StringBuilder log = new StringBuilder();
+
+        Item curItem = player.getCurItem();
+        if (curItem != null) {
+            int qty = Collections.frequency(player.getInventory(), curItem);
+            log.append("Item on hand: ").append(curItem.getName());
+            if (qty > 1) {
+                log.append(" (").append(qty).append(")");
+            }
+        } else {
+            log.append("Item on hand: N/A");
+        }
+
+        if (isBossFight) {
+            PlayableChar lailaps = GameGUI.getLailaps();
+            log.append("\nLailaps HP: ").append(String.format("%.1f / %.1f",
+                    lailaps.getHealth(), lailaps.getMaxHealth()));
+        }
+
+        txtLog.setText(log.toString());
     }
     
     public void refreshMap() {
         PlayableChar player = GameGUI.getYohane();
-        
+
         mapPanel.removeAll();
         
         Floor floor = GameGUI.getCurrentFloor();
         if (floor == null) return;
+
+        boolean isBossFight = floor instanceof BossFloor;
+        PlayableChar lailaps = isBossFight ? GameGUI.getLailaps() : null;
 
         Tile[][] map = floor.getMap();
         mapPanel.setLayout(new GridLayout(map.length, map[0].length));
@@ -70,17 +100,30 @@ public class GamePanel extends javax.swing.JPanel {
                 
                 for (EnemyChar enemy : floor.getEnemies()) {
                     if (enemy.getX() == i && enemy.getY() == j) {
-                        symbol = (enemy instanceof Siren) ? 'S' : 'b';
+                        if (enemy instanceof Siren) {
+                            symbol = 'S';
+                        } else {
+                            symbol = 'b';
+                            if (player != null
+                                    && enemy.detectPlayer(map, player)
+                                    && player.getTurnCount() % enemy.getTurnsPerMove() == 0) {
+                                symbol = 'B';
+                            }
+                        }
                         break;
                     }
                 }
-                
+
+                if (lailaps != null && lailaps.getX() == i && lailaps.getY() == j) {
+                    symbol = 'L';
+                }
+
                 if (player != null && player.getX() == i && player.getY() == j) {
                     symbol = 'Y';
                 }
             
                 JLabel tile = new JLabel(String.valueOf(symbol), SwingConstants.CENTER);
-                if (symbol == 'Y')
+                if (symbol == 'Y' || symbol == 'L')
                     tile.setForeground(Color.BLUE);
                 else if (symbol == 'b' || symbol == 'B' || symbol == 'S')
                     tile.setForeground(Color.RED);
@@ -103,17 +146,23 @@ public class GamePanel extends javax.swing.JPanel {
         boolean dungeonCleared = GameGUI.processTurn(input);
 
         PlayableChar player = GameGUI.getYohane();
+        PlayableChar lailaps = GameGUI.getLailaps();
+        boolean isBossFight = GameGUI.getCurrentFloor() instanceof BossFloor;
 
-        // --- Game Over ---
-        if (player != null && player.charDeath()) {
-            String killer = player.getCauseOfDeath();
+        // --- Game Over --- (Yohane's death, or Lailaps' during the boss fight)
+        boolean yohaneDied = player != null && player.charDeath();
+        boolean lailapsDied = isBossFight && lailaps != null && lailaps.charDeath();
+
+        if (yohaneDied || lailapsDied) {
+            String dead = lailapsDied ? "Lailaps" : "You";
+            String killer = lailapsDied ? lailaps.getCauseOfDeath() : player.getCauseOfDeath();
 
             // Reads/records the death BEFORE calling handleGameOver(), which
             // replaces Yohane with a fresh PlayableChar via initialize().
             GameGUI.handleGameOver();
 
             JOptionPane.showMessageDialog(this,
-                    "You Died!\nKilled by: " + killer,
+                    dead + " Died!\nKilled by: " + killer,
                     "Game Over",
                     JOptionPane.ERROR_MESSAGE);
 
@@ -124,27 +173,40 @@ public class GamePanel extends javax.swing.JPanel {
         refreshStats();
         refreshMap();
 
-        // --- Dungeon Cleared ---
+        // --- Dungeon Cleared (or Siren defeated) ---
         if (dungeonCleared) {
-            Dungeon_Classes.Dungeon dungeon = GameGUI.getCurrentDungeon();
-            String memberName = dungeon.getMember().getName();
+            Dungeon dungeon = GameGUI.getCurrentDungeon();
+            Dungeon[] allDungeons = GameGUI.getDungeons();
+            boolean bossVictory = (dungeon == allDungeons[allDungeons.length - 1]);
 
             StringBuilder msg = new StringBuilder();
-            msg.append("Dungeon Cleared!\n");
-            msg.append(dungeon.getName()).append(" Completed!\n");
-            msg.append(memberName).append(" rescued!");
 
-            if (memberName.equalsIgnoreCase("Hanamaru Kunikida")) {
-                msg.append("\n\nUnlocked: Hanamaru's Store Now Available!");
+            if (bossVictory) {
+                msg.append("The Siren of the Mirror World has been defeated!\n");
+                msg.append(dungeon.getName()).append(" Cleared!\n");
+                msg.append("You have completed the game!");
+            } else {
+                String memberName = dungeon.getMember().getName();
+                msg.append("Dungeon Cleared!\n");
+                msg.append(dungeon.getName()).append(" Completed!\n");
+                msg.append(memberName).append(" rescued!");
+
+                if (memberName.equalsIgnoreCase("Hanamaru Kunikida")) {
+                    msg.append("\n\nUnlocked: Hanamaru's Store Now Available!");
+                }
             }
 
             JOptionPane.showMessageDialog(this,
                     msg.toString(),
-                    "Dungeon Cleared!",
+                    bossVictory ? "Victory!" : "Dungeon Cleared!",
                     JOptionPane.INFORMATION_MESSAGE);
 
-            frame.getGameMenuPanel().refresh();
-            frame.showCard("GAMEMENU");
+            if (bossVictory) {
+                frame.showCard("MENU");
+            } else {
+                frame.getGameMenuPanel().refresh();
+                frame.showCard("GAMEMENU");
+            }
         }
     }
     
@@ -157,6 +219,9 @@ public class GamePanel extends javax.swing.JPanel {
         im.put(javax.swing.KeyStroke.getKeyStroke('s'), "moveDown");
         im.put(javax.swing.KeyStroke.getKeyStroke('d'), "moveRight");
         im.put(javax.swing.KeyStroke.getKeyStroke(' '), "useItem");
+        im.put(javax.swing.KeyStroke.getKeyStroke('['), "prevItem");
+        im.put(javax.swing.KeyStroke.getKeyStroke(']'), "nextItem");
+        im.put(javax.swing.KeyStroke.getKeyStroke('x'), "stayStill");
 
         am.put("moveUp", new javax.swing.AbstractAction() {
             @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('w'); }
@@ -173,7 +238,16 @@ public class GamePanel extends javax.swing.JPanel {
         am.put("useItem", new javax.swing.AbstractAction() {
             @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn(' '); }
         });
-}
+        am.put("prevItem", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('['); }
+        });
+        am.put("nextItem", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn(']'); }
+        });
+        am.put("stayStill", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('x'); }
+        });
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.

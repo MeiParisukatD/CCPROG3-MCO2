@@ -59,6 +59,7 @@ public class MainMenuPanel extends javax.swing.JPanel {
         btnStatus.addActionListener(this::btnStatusActionPerformed);
 
         btnQuit.setText("Quit");
+        btnQuit.addActionListener(this::btnQuitActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -111,6 +112,10 @@ public class MainMenuPanel extends javax.swing.JPanel {
 
         frame.showCard("GAMEMENU");
     }//GEN-LAST:event_btnNewGameActionPerformed
+
+    private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_btnQuitActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

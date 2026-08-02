@@ -40,6 +40,9 @@ public class GameGUI {
     private static Dungeon currentDungeon;
     private static Floor currentFloor;
 
+    // Currently active switch pair during the Siren boss fight (null outside of it)
+    private static Tile[] activeSwitches;
+
     /**
      * Private constructor to prevent instantiation of utility main runner class.
      */
@@ -100,15 +103,50 @@ public class GameGUI {
 
         currentDungeon = null;
         currentFloor = null;
+
+        // boss fight state is only valid mid-fight - clear it on every (re)initialize
+        bossUnlocked = false;
+        activeSwitches = null;
     }
 
     /**
      * Enters a dungeon for the first time: sets it as current, places Yohane on its
      * first floor, and clears the underlying 'Y' tile so it's not drawn twice.
+     * If the dungeon's first floor is the BossFloor, sets up the Siren fight instead
+     * (spawning Lailaps too and dealing out the first pair of switches).
      */
     public static void startDungeon(Dungeon dungeon) {
         currentDungeon = dungeon;
-        spawnYohaneOnFloor(dungeon.getFloors()[0]);
+        Floor floor = dungeon.getFloors()[0];
+
+        if (floor instanceof BossFloor) {
+            startBossFloor((BossFloor) floor);
+        } else {
+            spawnYohaneOnFloor(floor);
+        }
+    }
+
+    /**
+     * Places both Yohane and Lailaps on the boss floor (clearing their spawn tiles),
+     * and spawns the first pair of switches to kick off Phase 1 of the fight.
+     */
+    private static void startBossFloor(BossFloor bossFloor) {
+        currentFloor = bossFloor;
+        Yohane.setFloor(bossFloor);
+        Lailaps.setFloor(bossFloor);
+
+        Yohane.findCharTile(bossFloor.getMap());
+        Lailaps.findCharTile(bossFloor.getMap());
+
+        int x = Yohane.getX();
+        int y = Yohane.getY();
+        bossFloor.getMap()[x][y] = new Tile(x, y, '.');
+
+        x = Lailaps.getX();
+        y = Lailaps.getY();
+        bossFloor.getMap()[x][y] = new Tile(x, y, '.');
+
+        activeSwitches = bossFloor.spawnSwitchPair();
     }
 
     /**
@@ -133,6 +171,11 @@ public class GameGUI {
      * @return true if the dungeon has just been fully cleared, false otherwise
      */
     public static boolean processTurn(char input) {
+        // Delegate to the boss-fight turn loop while Yohane is on the Siren's floor
+        if (currentFloor instanceof BossFloor) {
+            return processBossTurn(input, (BossFloor) currentFloor);
+        }
+
         Yohane.incrementTurn();
 
         characterMoves(input);
@@ -175,7 +218,75 @@ public class GameGUI {
 
             // Go to next floor
             currentDungeon.incrementCurFloor();
+            Yohane.setTurnCount(0);
             spawnYohaneOnFloor(currentDungeon.getFloors()[currentDungeon.getCurFloor() - 1]);
+        }
+
+        return false;
+    }
+
+    /**
+     * Executes one turn of the Siren boss fight: summons a bat every 8 turns, moves
+     * both Yohane and Lailaps, runs enemy AI (bats + Siren), checks whether the pair
+     * has just triggered a switch pair (advancing to the next pair, or releasing the
+     * Siren once all 3 have been triggered), and checks whether the Siren has been
+     * defeated and the exit reached.
+     *
+     * @param input the key pressed
+     * @param bossFloor the Siren's boss floor
+     * @return true if the Siren has just been defeated and the exit reached
+     */
+    private static boolean processBossTurn(char input, BossFloor bossFloor) {
+        Siren siren = (Siren) bossFloor.getEnemies().get(0);
+
+        Yohane.incrementTurn();
+
+        // Every 8 moves, the Siren summons another bat (unless already defeated)
+        if (Yohane.getTurnCount() % 8 == 0 && !siren.charDeath()) {
+            siren.summonBat(Yohane.getX(), Yohane.getY(), Lailaps.getX(), Lailaps.getY());
+        }
+
+        characterMoves(input);
+        enemyMoves(bossFloor);
+
+        // --- Phase 1: switch activation ---
+        if (!siren.isReleased()) {
+            boolean yOnS1 = (Yohane.getX() == activeSwitches[0].getX() && Yohane.getY() == activeSwitches[0].getY());
+            boolean lOnS2 = (Lailaps.getX() == activeSwitches[1].getX() && Lailaps.getY() == activeSwitches[1].getY());
+
+            boolean yOnS2 = (Yohane.getX() == activeSwitches[1].getX() && Yohane.getY() == activeSwitches[1].getY());
+            boolean lOnS1 = (Lailaps.getX() == activeSwitches[0].getX() && Lailaps.getY() == activeSwitches[0].getY());
+
+            // Both characters standing on the two switches at once = a successful trigger
+            if ((yOnS1 && lOnS2) || (yOnS2 && lOnS1)) {
+                bossFloor.incrementTriggers();
+
+                bossFloor.destroyTile(activeSwitches[0]);
+                bossFloor.destroyTile(activeSwitches[1]);
+
+                if (bossFloor.getTriggers() < 3) {
+                    activeSwitches = bossFloor.spawnSwitchPair();
+                } else {
+                    // Phase 2: release the Siren and drop her barriers
+                    siren.release();
+                    bossFloor.releaseSiren();
+                }
+            }
+        }
+
+        // Siren defeated: clear remaining bats and open the exit
+        if (siren.charDeath()) {
+            bossFloor.killBats();
+            bossFloor.spawnExit();
+        }
+
+        // Stage clear: Yohane reached the exit
+        if (bossFloor.completeFloor(Yohane)) {
+            sirenDefeated++;
+            completed = true;   //prepare for New Game+ display
+            ongoingGame = false; //no more ongoing game
+            bossUnlocked = false; //resets boss unlock
+            return true;
         }
 
         return false;
@@ -185,7 +296,7 @@ public class GameGUI {
         //if valid direction, moves characters
         if ("wasd".contains(Character.toString(input))) {
             Yohane.move(input, Lailaps.getX(), Lailaps.getY());
-            if (bossUnlocked) { //if boss level, move lailaps as well
+            if (currentFloor instanceof BossFloor) { //if on the boss floor, move lailaps as well
                 Lailaps.move(input, Yohane.getX(), Yohane.getY());
             }
         }
@@ -271,6 +382,12 @@ public class GameGUI {
     public static void handleGameOver() {
         gameOvers++;
         gameOver = true;
+
+        // Dying mid boss-fight resets the Siren's floor (fresh switches/triggers) for next time
+        if (currentFloor instanceof BossFloor) {
+            dungeons[dungeons.length - 1].getFloors()[0] = new BossFloor(1);
+        }
+
         initialize();
     }
 
