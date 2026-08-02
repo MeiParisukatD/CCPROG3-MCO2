@@ -259,15 +259,15 @@ public class ShopPanel extends JPanel {
     }
 
     private void initializeIcons() {
-        ImageIcon tearsOfAngel = new ImageIcon("sprites/TEARS_OF_A_FALLEN_ANGEL.png");
-        ImageIcon noppoBread = new ImageIcon("sprites/NOPPO_BREAD.png");
-        ImageIcon shovelUpg = new ImageIcon("sprites/SHOVEL_UPGRADE.png");
-        ImageIcon batTamer = new ImageIcon("sprites/BAT_TAMER.png");
-        ImageIcon airShoes = new ImageIcon("sprites/AIR_SHOES.png");
-        ImageIcon mikanMochi = new ImageIcon("sprites/MIKAN_MOCHI.png");
-        ImageIcon stewshine = new ImageIcon("sprites/STEWSHINE.png");
-        ImageIcon kurosawaMatcha = new ImageIcon("sprites/KUROSAWA_MATCHA.png");
-        ImageIcon chocoMint = new ImageIcon("sprites/CHOCO_MINT_ICE_CREAM.png");
+        ImageIcon tearsOfAngel = new ImageIcon("resources/TEARS_OF_A_FALLEN_ANGEL.png");
+        ImageIcon noppoBread = new ImageIcon("resources/NOPPO_BREAD.png");
+        ImageIcon shovelUpg = new ImageIcon("resources/SHOVEL_UPGRADE.png");
+        ImageIcon batTamer = new ImageIcon("resources/BAT_TAMER.png");
+        ImageIcon airShoes = new ImageIcon("resources/AIR_SHOES.png");
+        ImageIcon mikanMochi = new ImageIcon("resources/MIKAN_MOCHI.png");
+        ImageIcon stewshine = new ImageIcon("resources/STEWSHINE.png");
+        ImageIcon kurosawaMatcha = new ImageIcon("resources/KUROSAWA_MATCHA.png");
+        ImageIcon chocoMint = new ImageIcon("resources/CHOCO_MINT_ICE_CREAM.png");
 
         //initialize the icons attribute
         this.icons = new ImageIcon[] {
