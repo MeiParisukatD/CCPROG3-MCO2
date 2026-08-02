@@ -209,6 +209,26 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Re-points curItem after a held item has been removed from the inventory,
+     * so a stale reference to the removed object can't be mistaken for a still-held item.
+     * Falls back to a remaining copy of the same item if one exists, otherwise the
+     * first item in the inventory, otherwise null if the inventory is now empty.
+     *
+     * @param removedItem the item reference that was just removed from the inventory
+     */
+    private void reindexCurItem(Item removedItem) {
+        if (this.inventory.isEmpty()) {
+            curItem = null;
+        } //if copies of the item still exist, reference that copy
+        else if (this.inventory.indexOf(removedItem) != -1) {
+            int index = this.inventory.indexOf(removedItem);
+            curItem = inventory.get(index);
+        } else { //if no copies exist, switch to next item
+            curItem = inventory.get(0);
+        }
+    }
+
+    /**
      * Overrides standard damage reception to apply defensive subtraction and logging 
      * tracking enemy names if the strike results in a character defeat.
      *
@@ -239,6 +259,9 @@ public class PlayableChar extends GameCharacter {
 
             setHealth(getMaxHealth());
             inventory.remove(curItem);
+
+            //re-point curItem so the removed Ice Cream can't trigger the save again
+            reindexCurItem(curItem);
 
             System.out.println("Choco-Mint Ice Cream saved Yohane!");
         }
@@ -321,17 +344,7 @@ public class PlayableChar extends GameCharacter {
 
         if (used) {
             this.inventory.remove(curItem);
-
-            //if inventory is now empty, curItem is null
-            if (this.inventory.isEmpty()) {
-                curItem = null;
-            } //if copies of the item still exist, reference that copy
-            else if (this.inventory.indexOf(curItem) != -1){
-                int index = this.inventory.indexOf(curItem);
-                curItem = inventory.get(index);
-            } else { //if no copies exist, switch to next item
-                curItem = inventory.get(0);
-            }
+            reindexCurItem(curItem);
         }
 
         return used;
