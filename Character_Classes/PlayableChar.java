@@ -496,11 +496,16 @@ public class PlayableChar extends GameCharacter {
                 }
             }
 
-            //if character dies from tile damage 
-            if (this.charDeath()) {
-                this.causeOfDeath = "Spike Walls";
-            } 
-            else {
+            if (next.getSymbol() == 'h' && !this.abilities.contains("Water & Heat Immunity")){
+                this.takeDmg(next.getDamage());
+                this.justDamaged = true;
+                if (this.charDeath()) {
+                    this.causeOfDeath = "Heat Tiles";
+                }
+            }
+
+            //if character hasnt died yet from tile damage
+            if (!this.charDeath()) {
                 //if the destination tile is destructible, 
                 if(next.isDestructible()) {
                     DestructibleTile dTile = (DestructibleTile) next;
@@ -521,7 +526,7 @@ public class PlayableChar extends GameCharacter {
             }
         }
     }
-    
+
     /**
      * Checks whether the character is currently standing on a heat tile and,
      * if so and the character has not moved since the previous check, applies
@@ -543,7 +548,7 @@ public class PlayableChar extends GameCharacter {
             }
         }
     }
-    
+
 
     /**
      * Scans the 2D layout grid structure looking for explicitly matching unique character keys 

@@ -211,7 +211,6 @@ public class GameGUI {
         int prevY = Yohane.getY();
 
         characterMoves(input);
-        Yohane.checkHeatDamage(prevX, prevY);
 
         if (currentFloor != null) {
             Yohane.setAttackedThisTurn(false);
@@ -292,9 +291,6 @@ public class GameGUI {
 
         characterMoves(input);
 
-        Yohane.checkHeatDamage(prevXY, prevYY);
-        Lailaps.checkHeatDamage(prevXL, prevYL);
-
         Yohane.setAttackedThisTurn(false);
         Lailaps.setAttackedThisTurn(false);
 
@@ -367,6 +363,13 @@ public class GameGUI {
         }
         else if (input == ']') {
             Yohane.nextItem();
+        }
+        //if no move occurs
+        else {
+            Yohane.checkHeatDamage(Yohane.getX(), Yohane.getY());
+            if (currentFloor instanceof BossFloor) { //if on the boss floor, move lailaps as well
+                Lailaps.checkHeatDamage(Lailaps.getX(), Lailaps.getY());
+            }
         }
     }
 
@@ -561,13 +564,13 @@ public class GameGUI {
     }
 
     /**
-     * True once the player has ever completed a run or suffered a game over -
+     * True once the player has ever completed a run -
      * used to swap the main menu's "New Game" label to "New Game+".
      *
      * @return true if the player has a prior completed or ended run, false otherwise
      */
     public static boolean hasPriorRun() {
-        return completed || gameOver;
+        return completed;
     }
 
     /**
