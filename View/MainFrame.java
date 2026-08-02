@@ -85,6 +85,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     /**
+     * Returns the game panel instance owned by this frame.
+     *
      * @return the game panel instance
      */
     public GamePanel getGamePanel() {
@@ -92,6 +94,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     /**
+     * Returns the dungeon-select menu panel instance owned by this frame.
+     *
      * @return the dungeon-select menu panel instance
      */
     public GameMenuPanel getGameMenuPanel() {
@@ -99,6 +103,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     /**
+     * Returns the main menu panel instance owned by this frame.
+     *
      * @return the main menu panel instance
      */
     public MainMenuPanel getMainMenuPanel() {
@@ -106,6 +112,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     /**
+     * Returns the inventory panel instance owned by this frame.
+     *
      * @return the inventory panel instance
      */ 
     public InventoryPanel getInventoryPanel() {
@@ -113,13 +121,17 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     /**
+     * Returns the shop panel instance owned by this frame.
+     *
      * @return the shop panel instance
-     */ 
+     */
     public ShopPanel getShopPanel() {
         return shopPanel;
     }
     
     /**
+     * Returns the status panel instance owned by this frame.
+     *
      * @return the status panel instance
      */ 
     public StatusPanel getStatusPanel() {

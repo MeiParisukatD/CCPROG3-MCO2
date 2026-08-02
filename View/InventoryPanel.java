@@ -14,6 +14,7 @@ package View;
  */
 public class InventoryPanel extends javax.swing.JPanel {
 
+    /** The main application frame, used for card navigation. */    
     private MainFrame frame;
     /**
      * Constructs the inventory panel and applies the shared UI theme.

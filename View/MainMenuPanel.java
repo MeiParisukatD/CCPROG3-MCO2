@@ -14,6 +14,7 @@ import Controller.GameGUI;
  */
 public class MainMenuPanel extends javax.swing.JPanel {
 
+    /** The main application frame, used for card navigation. */
     private MainFrame frame;
     
     /**

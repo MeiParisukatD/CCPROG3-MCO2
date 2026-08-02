@@ -20,17 +20,28 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 /**
+ * View panel showing the active dungeon run: the tile map, the player's
+ * and enemies' positions, and live stats such as HP, gold, turn count,
+ * and item on hand. Reads all displayed state from {@link Controller.GameGUI}
+ * and handles the player's keyboard input for movement and item use.
  *
- * @author rhian
+ * @author Katigbak and Porciuncula
+ * @version 2.0
  */
 public class GamePanel extends javax.swing.JPanel {
 
+    /** The main application frame, used for card navigation. */
     private MainFrame frame;
+    /** The pixel width and height used to render each map tile. */
     private static final int CELL_SIZE = 18;
+    /** Maps each map symbol to its loaded, scaled icon for rendering. */
     private final java.util.Map<Character, ImageIcon> tileIcons = new java.util.HashMap<>();
     
     /**
-     * Creates new form GamePanel
+     * Constructs the game panel, loads tile icons, applies the shared UI
+     * theme, and sets up keyboard bindings for movement and item use.
+     *
+     * @param frame the main application frame, used for card navigation
      */
     public GamePanel(MainFrame frame) {
         initComponents();
@@ -75,6 +86,11 @@ public class GamePanel extends javax.swing.JPanel {
         return new ImageIcon(scaled);
     }
     
+    /**
+     * Refreshes the displayed HP, gold, turn count, floor label, item on
+     * hand, and (during the boss fight) Lailaps' HP to match the
+     * Controller's current game state. Does nothing if no player exists.
+     */    
     public void refreshStats() {
 
         PlayableChar player = GameGUI.getYohane();
@@ -119,6 +135,12 @@ public class GamePanel extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * Rebuilds the tile grid for the current floor, overlaying the
+     * player, Lailaps (during the boss fight), and any enemies onto
+     * their current positions, then repaints the map panel. Does
+     * nothing if there is no current floor.
+     */    
     public void refreshMap() {
         PlayableChar player = GameGUI.getYohane();
 

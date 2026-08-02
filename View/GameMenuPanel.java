@@ -22,6 +22,7 @@ import javax.swing.DefaultListModel;
  */
 public class GameMenuPanel extends javax.swing.JPanel {
 
+    /** The main application frame, used for card navigation. */    
     private MainFrame frame;
 
     /**

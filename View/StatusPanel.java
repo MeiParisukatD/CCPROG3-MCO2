@@ -12,22 +12,37 @@ import View.MainFrame;
 import Controller.*;
 
 /**
+ * View panel showing the player's run statistics: how many times each
+ * rescuable NPC has been saved, total gold spent, number of game overs,
+ * and how many times the Siren has been defeated. Reads all displayed
+ * values from {@link Controller.GameGUI} and formats them for display only.
  *
- * @author rhian
+ * @author Katigbak and Porciuncula
+ * @version 2.0
  */
 public class StatusPanel extends JPanel {
+    /** The main application frame, used for card navigation. */
     private MainFrame frame;
+    /** The header panel shown at the top of this panel. */
     private JPanel topPanel;
+    /** The panel holding one labeled row per rescuable NPC. */
     private JPanel npcPanel;
+    /** The panel holding the run-summary rows and the Return button. */
     private JPanel bottomPanel;
+    /** The button used to navigate back to the main menu. */
     private JButton btnReturn;
 
+    /** The light pink background color used throughout this panel. */
     private Color pink = Color.decode("#ffe6f4");
+    /** The slightly darker pink used for NPC row boxes. */
     private Color darkPink = Color.decode("#ffd5f2");
+    /** The purple used for text foreground throughout this panel. */
     private Color purple = Color.decode("#a23e8f");
 
     /**
-     * Creates new form StatusPanel
+     * Constructs the status panel and builds its layout.
+     *
+     * @param frame the main application frame, used for card navigation
      */
     public StatusPanel(MainFrame frame) {
         //initComponents();
@@ -62,6 +77,11 @@ public class StatusPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Refreshes every displayed statistic - NPC rescue counts, gold spent, game
+     * overs, and Siren defeats - to match the Controller's current game state.
+     * Call this immediately before showing this panel.
+     */    
     public void refresh() {
         npcPanel.removeAll();
         bottomPanel.removeAll();

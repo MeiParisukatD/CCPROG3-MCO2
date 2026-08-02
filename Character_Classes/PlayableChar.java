@@ -58,6 +58,8 @@ public class PlayableChar extends GameCharacter {
 
     //getters/setters
     /**
+     * Returns the total amount of gold owned by this character.
+     *
      * @return the total amount of gold owned
      */
     public int getGoldOwned() {
@@ -65,6 +67,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Sets the total amount of gold owned by this character.
+     *
      * @param goldOwned the updated gold value to assign
      */
     public void setGoldOwned(int goldOwned) {
@@ -72,6 +76,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Returns the upper limit ceiling of this character's health.
+     *
      * @return the upper limit ceiling of character health
      */
     public float getMaxHealth() {
@@ -79,6 +85,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Sets the upper limit ceiling of this character's health.
+     *
      * @param maxHealth the new upper threshold for health
      */
     public void setMaxHealth(float maxHealth) {
@@ -86,6 +94,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Returns the running record tracking total moves executed by this character.
+     *
      * @return the running record tracking total moves executed
      */
     public int getTurnCount() {
@@ -93,6 +103,8 @@ public class PlayableChar extends GameCharacter {
     }
 
     /**
+     * Sets the running record tracking total moves executed by this character.
+     *
      * @param turnCount the custom integer turn step index
      */
     public void setTurnCount(int turnCount) {

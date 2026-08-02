@@ -11,23 +11,51 @@ import Character_Classes.PlayableChar;
 import Item_Classes.*;
 import Controller.*;
 
+/**
+ * View panel for Hanamaru's Store, letting the player browse unlocked and
+ * available shop items page by page and purchase them with gold. Reads
+ * item and player state from {@link Controller.GameGUI} and forwards
+ * purchases back to {@link Character_Classes.PlayableChar}.
+ *
+ * @author Katigbak and Porciuncula
+ * @version 2.0
+ */
 public class ShopPanel extends JPanel {
+    /** The main application frame, used for card navigation. */
     private final MainFrame frame;
+    /** The light pink background color used throughout this panel. */
     private final Color pink = Color.decode("#ffe6f4");
+    /** The slightly darker pink used for item boxes. */
     private final Color darkPink = Color.decode("#ffd5f2");
+    /** The purple used for text foreground throughout this panel. */
     private final Color purple = Color.decode("#a23e8f");
 
+    /** The header panel shown at the top of this panel. */
     private final JPanel topPanel = new JPanel(new BorderLayout());
+    /** The panel holding the paging buttons and the item grid. */
     private final JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
+    /** The panel holding the status message and the Return button. */
     private final JPanel bottomPanel = new JPanel(new BorderLayout());
+    /** The grid displaying up to four items for the current page. */
     private final JPanel itemGrid = new JPanel(new GridLayout(2, 2, 10, 10));
+    /** The button used to navigate back to the dungeon-select menu. */
     private final JButton btnReturn = new JButton("Return");
+    /** The button used to move to the previous page of items. */
     private final JButton left = new JButton("<");
+    /** The button used to move to the next page of items. */
     private final JButton right = new JButton(">");
 
+    /** The loaded item icons, indexed by {@link #getIconIndex}. */
     private final ImageIcon[] icons = new ImageIcon[9];
+    /** The index of the currently displayed page of items. */
     private int pageIndex = 0;
 
+    /**
+     * Constructs the shop panel, loads item icons, builds the layout,
+     * and refreshes the displayed items and gold total.
+     *
+     * @param frame the main application frame, used for card navigation
+     */
     public ShopPanel(MainFrame frame) {
         this.frame = frame;
         setLayout(new BorderLayout(10, 10));
@@ -39,6 +67,10 @@ public class ShopPanel extends JPanel {
         refresh();
     }
 
+    /**
+     * Constructs the shop panel, loads item icons, builds the layout,
+     * and refreshes the displayed items and gold total.
+     */    
     public void refresh() {
         pageIndex = 0;
         refreshMessage("Yohane-chan, zura! What can I do for you today");
