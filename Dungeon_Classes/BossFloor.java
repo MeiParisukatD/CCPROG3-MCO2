@@ -108,7 +108,9 @@ public class BossFloor extends Floor {
     }
 
     public void spawnExit() {
-        this.map[1][25] = new Tile(1, 25, 'E');
+        int sx = this.siren.getX();
+        int sy = this.siren.getY();
+        this.map[sx][sy] = new Tile(sx, sy, 'E');
     }
 
     public boolean exclusionZone(int x, int y) {

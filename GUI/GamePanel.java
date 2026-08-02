@@ -90,26 +90,26 @@ public class GamePanel extends javax.swing.JPanel {
                 ? "Final Battle: Siren of the Mirror World!"
                 : "Floor: " + floor.getFloorNum());
 
-        StringBuilder log = new StringBuilder();
-
         Item curItem = player.getCurItem();
         if (curItem != null) {
             int qty = Collections.frequency(player.getInventory(), curItem);
-            log.append("Item on hand: ").append(curItem.getName());
+            String text = "Item on hand: " + curItem.getName();
             if (qty > 1) {
-                log.append(" (").append(qty).append(")");
+                text += " (" + qty + ")";
             }
+            lblItemOnHand.setText(text);
         } else {
-            log.append("Item on hand: N/A");
+            lblItemOnHand.setText("Item on hand: N/A");
         }
 
         if (isBossFight) {
             PlayableChar lailaps = GameGUI.getLailaps();
-            log.append("\nLailaps HP: ").append(String.format("%.1f / %.1f",
+            lblLailapsHP.setText(String.format("Lailaps HP: %.1f / %.1f",
                     lailaps.getHealth(), lailaps.getMaxHealth()));
+            lblLailapsHP.setVisible(true);
+        } else {
+            lblLailapsHP.setVisible(false);
         }
-
-        txtLog.setText(log.toString());
     }
     
     public void refreshMap() {
@@ -316,10 +316,10 @@ public class GamePanel extends javax.swing.JPanel {
         lblHP = new javax.swing.JLabel();
         lblGold = new javax.swing.JLabel();
         lblFloor = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtLog = new javax.swing.JTextArea();
         mapPanel = new javax.swing.JPanel();
         lblTurn = new javax.swing.JLabel();
+        lblItemOnHand = new javax.swing.JLabel();
+        lblLailapsHP = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1050, 420));
 
@@ -328,13 +328,6 @@ public class GamePanel extends javax.swing.JPanel {
         lblGold.setText("Gold: 67 GP");
 
         lblFloor.setText("Floor 1");
-
-        txtLog.setEditable(false);
-        txtLog.setColumns(20);
-        txtLog.setLineWrap(true);
-        txtLog.setRows(5);
-        txtLog.setWrapStyleWord(true);
-        jScrollPane1.setViewportView(txtLog);
 
         mapPanel.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
         mapPanel.setPreferredSize(new java.awt.Dimension(1024, 700));
@@ -352,6 +345,10 @@ public class GamePanel extends javax.swing.JPanel {
 
         lblTurn.setText("jLabel1");
 
+        lblItemOnHand.setText("jLabel1");
+
+        lblLailapsHP.setText("jLabel1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -361,19 +358,20 @@ public class GamePanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblGold)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(lblHP)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(lblTurn))
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblItemOnHand)
                             .addComponent(lblFloor)
                             .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblGold)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblHP)
+                                .addGap(52, 52, 52)
+                                .addComponent(lblLailapsHP)
+                                .addGap(55, 55, 55)
+                                .addComponent(lblTurn)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -381,12 +379,13 @@ public class GamePanel extends javax.swing.JPanel {
                 .addGap(40, 40, 40)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblHP)
-                    .addComponent(lblTurn))
+                    .addComponent(lblTurn)
+                    .addComponent(lblLailapsHP))
                 .addGap(18, 18, 18)
                 .addComponent(lblGold)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblItemOnHand)
+                .addGap(20, 20, 20)
                 .addComponent(lblFloor)
                 .addGap(18, 18, 18)
                 .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -396,12 +395,12 @@ public class GamePanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFloor;
     private javax.swing.JLabel lblGold;
     private javax.swing.JLabel lblHP;
+    private javax.swing.JLabel lblItemOnHand;
+    private javax.swing.JLabel lblLailapsHP;
     private javax.swing.JLabel lblTurn;
     private javax.swing.JPanel mapPanel;
-    private javax.swing.JTextArea txtLog;
     // End of variables declaration//GEN-END:variables
 }

@@ -6,6 +6,7 @@ package GUI;
 
 import Character_Classes.PlayableChar;
 import Dungeon_Classes.Dungeon;
+import Item_Classes.Item;
 import game.GameGUI;
 import javax.swing.DefaultListModel;
 
@@ -28,13 +29,27 @@ public class GameMenuPanel extends javax.swing.JPanel {
     }
 
     public void refresh() {
+        
+        PlayableChar yohane = GameGUI.getYohane();
 
-        lblGold.setText("Gold: " + GameGUI.getYohane().getGoldOwned());
-
+         lblHP.setText(String.format("HP: %.1f / %.1f", yohane.getHealth(), yohane.getMaxHealth()));
+        lblGold.setText("Gold: " + yohane.getGoldOwned());
+        
+        Item curItem = yohane.getCurItem();
+        if (curItem != null) {
+            int qty = java.util.Collections.frequency(yohane.getInventory(), curItem);
+            String text = "Item on hand: " + curItem.getName();
+            if (qty > 1) {
+                text += " (" + qty + ")";
+            }
+            lblItem.setText(text);
+        } else {
+            lblItem.setText("Item on hand: N/A");
+        }
+        
         DefaultListModel<String> model = new DefaultListModel<>();
         
         Dungeon[] dungeons = GameGUI.getDungeons();
-        PlayableChar yohane = GameGUI.getYohane();
 
         if (GameGUI.isBossUnlocked()) {
             // All 3 dungeons cleared - the only choice left is the final dungeon.
@@ -72,6 +87,8 @@ public class GameMenuPanel extends javax.swing.JPanel {
         btnShop = new javax.swing.JButton();
         btnInventory = new javax.swing.JButton();
         btnQuit = new javax.swing.JButton();
+        lblItem = new javax.swing.JLabel();
+        lblHP = new javax.swing.JLabel();
 
         lblGold.setText("jLabel1");
 
@@ -95,6 +112,10 @@ public class GameMenuPanel extends javax.swing.JPanel {
         btnQuit.setText("Save and Quit");
         btnQuit.addActionListener(this::btnQuitActionPerformed);
 
+        lblItem.setText("jLabel1");
+
+        lblHP.setText("jLabel1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -102,23 +123,34 @@ public class GameMenuPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(116, 116, 116)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblGold)
-                    .addComponent(lblTitle)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane1)
-                        .addComponent(btnEnter)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnInventory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(144, 144, 144))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTitle)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jScrollPane1)
+                                .addComponent(btnEnter)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnInventory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(144, 144, 144))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblGold)
+                        .addGap(45, 45, 45)
+                        .addComponent(lblItem)
+                        .addGap(55, 55, 55)
+                        .addComponent(lblHP)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addComponent(lblGold)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblGold)
+                    .addComponent(lblItem)
+                    .addComponent(lblHP))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -181,6 +213,8 @@ public class GameMenuPanel extends javax.swing.JPanel {
     private javax.swing.JButton btnShop;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblGold;
+    private javax.swing.JLabel lblHP;
+    private javax.swing.JLabel lblItem;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JList<String> lstDungeons;
     // End of variables declaration//GEN-END:variables
