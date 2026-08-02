@@ -90,6 +90,7 @@ public class Initialize {
             "Shougetsu Confectionary",
             "Nagahama Castle Ruins",
             "Numazugoyotei",
+            "Yasudaya Ryokan",
             "Izu-Mito Sea Paradise",
             "Numazu Deep Sea Aquarium",
             "Awashima Marine Park",
@@ -102,7 +103,7 @@ public class Initialize {
         for (i = 0; i < 4; i++) {
             //if dungeon name is already taken by randomizer, reroll
             do {
-                n = (int)(Math.random() * 7);
+                n = (int)(Math.random() * names.length);
                 name = names[n];
             } while(taken.contains(name));
             this.taken.add(name);

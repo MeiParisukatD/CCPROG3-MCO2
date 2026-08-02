@@ -5,21 +5,24 @@ import java.util.Iterator;
 
 public class BossFloor extends Floor {
     private int triggers;
+    private Siren siren;
 
     public BossFloor(int floorNum) {
         super(floorNum, "map_boss.txt");
         this.triggers = 0;
-
-        //set siren's floor to this
-        this.enemies.get(0).setFloor(this);
+        this.siren = (Siren) this.enemies.get(0);
+        this.siren.setFloor(this);
     }
 
     public BossFloor(Floor floor) {
         super(floor.getFloorNum(), floor.getFile());
         this.triggers = 0;
-
-        //set siren's floor to this
-        this.enemies.get(0).setFloor(this);
+        this.siren = (Siren) this.enemies.get(0);
+        this.siren.setFloor(this);
+    }
+    
+    public Siren getSiren() {
+        return this.siren;
     }
 
     public int getTriggers() {
@@ -69,7 +72,7 @@ public class BossFloor extends Floor {
      * Clears barrier walls ('*') surrounding Siren when Phase 2 starts.
      */
     public void releaseSiren() {
-        Siren siren = (Siren)this.enemies.get(0);
+        Siren siren = this.siren;
         System.out.println("BossFloor.releaseSiren called, Siren@" + System.identityHashCode(siren));
         System.out.println("Before: released=" + siren.isReleased());
         int sx = this.enemies.get(0).getX();
@@ -110,7 +113,7 @@ public class BossFloor extends Floor {
 
     public boolean exclusionZone(int x, int y) {
         boolean exclusionZone = false;
-        Siren siren = (Siren)this.enemies.get(0);
+        Siren siren = this.siren;
 
         //exclusion zone is only applicable if the Siren has yet to be released
         if (!siren.isReleased()) {

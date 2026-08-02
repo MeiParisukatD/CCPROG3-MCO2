@@ -37,8 +37,7 @@ public class MainFrame extends javax.swing.JFrame {
         cardPanel.add(gamePanel, "GAME");
         cardPanel.add(inventoryPanel, "INVENTORY");
 
-        CardLayout layout = (CardLayout) cardPanel.getLayout();
-        layout.show(cardPanel, "MENU");
+        showCard("MENU");
     }
     
     public void showCard(String cardName) {
@@ -87,10 +86,11 @@ public class MainFrame extends javax.swing.JFrame {
         cardPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(1024, 768));
-        setPreferredSize(new java.awt.Dimension(1024, 768));
+        setMinimumSize(new java.awt.Dimension(1060, 460));
+        setPreferredSize(new java.awt.Dimension(1060, 460));
+        setResizable(false);
 
-        cardPanel.setMinimumSize(new java.awt.Dimension(1024, 768));
+        cardPanel.setMinimumSize(new java.awt.Dimension(1060, 460));
         cardPanel.setLayout(new java.awt.CardLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -101,7 +101,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(cardPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(cardPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 323, Short.MAX_VALUE)
         );
 
         pack();
@@ -133,7 +133,6 @@ public class MainFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             MainFrame frame = new MainFrame();
-            frame.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
             frame.setVisible(true);
         });
     }

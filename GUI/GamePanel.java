@@ -35,7 +35,6 @@ public class GamePanel extends javax.swing.JPanel {
     public GamePanel(MainFrame frame) {
         initComponents();
         loadIcons();
-        mapPanel.setLayout(new GridLayout(12, 55));
         this.frame = frame;
         mapPanel.setFont(new Font("Monospaced", Font.PLAIN, 14));
         setupKeyBindings();
@@ -125,6 +124,7 @@ public class GamePanel extends javax.swing.JPanel {
         PlayableChar lailaps = isBossFight ? GameGUI.getLailaps() : null;
 
         Tile[][] map = floor.getMap();
+        mapPanel.setLayout(new GridLayout(map.length, map[0].length));
         mapPanel.setPreferredSize(new java.awt.Dimension(map[0].length * CELL_SIZE, map.length * CELL_SIZE));
 
         for (int i = 0; i < map.length; i++) {
@@ -321,7 +321,7 @@ public class GamePanel extends javax.swing.JPanel {
         mapPanel = new javax.swing.JPanel();
         lblTurn = new javax.swing.JLabel();
 
-        setPreferredSize(new java.awt.Dimension(1024, 700));
+        setPreferredSize(new java.awt.Dimension(1050, 420));
 
         lblHP.setText("HP: 20/20");
 

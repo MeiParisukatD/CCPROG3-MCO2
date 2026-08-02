@@ -17,6 +17,7 @@ public class MainMenuPanel extends javax.swing.JPanel {
      */
     public MainMenuPanel(MainFrame frame) {
         initComponents();
+        System.out.println("Icon loaded: " + (lblTitle.getIcon() != null));
         this.frame = frame;
     }
     
@@ -47,18 +48,30 @@ public class MainMenuPanel extends javax.swing.JPanel {
         btnStatus = new javax.swing.JButton();
         btnQuit = new javax.swing.JButton();
 
-        lblTitle.setText("jLabel1");
+        lblTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/title.png"))); // NOI18N
 
         btnNewGame.setText("New Game");
+        btnNewGame.setMaximumSize(null);
+        btnNewGame.setMinimumSize(new java.awt.Dimension(80, 25));
+        btnNewGame.setPreferredSize(new java.awt.Dimension(140, 30));
         btnNewGame.addActionListener(this::btnNewGameActionPerformed);
 
         btnContinue.setText("Continue");
+        btnContinue.setMaximumSize(null);
+        btnContinue.setMinimumSize(new java.awt.Dimension(80, 25));
+        btnContinue.setPreferredSize(new java.awt.Dimension(140, 30));
         btnContinue.addActionListener(this::btnContinueActionPerformed);
 
         btnStatus.setText("Status");
+        btnStatus.setMaximumSize(null);
+        btnStatus.setMinimumSize(new java.awt.Dimension(80, 25));
+        btnStatus.setPreferredSize(new java.awt.Dimension(140, 30));
         btnStatus.addActionListener(this::btnStatusActionPerformed);
 
         btnQuit.setText("Quit");
+        btnQuit.setMaximumSize(null);
+        btnQuit.setMinimumSize(new java.awt.Dimension(80, 25));
+        btnQuit.setPreferredSize(new java.awt.Dimension(140, 30));
         btnQuit.addActionListener(this::btnQuitActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -66,33 +79,29 @@ public class MainMenuPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(39, 39, 39)
-                        .addComponent(lblTitle))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnContinue)
-                            .addComponent(btnNewGame)
-                            .addComponent(btnStatus)
-                            .addComponent(btnQuit))))
-                .addContainerGap(282, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnNewGame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnContinue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTitle))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(34, 34, 34)
+                .addGap(20, 20, 20)
                 .addComponent(lblTitle)
+                .addGap(20, 20, 20)
+                .addComponent(btnContinue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnContinue)
-                .addGap(2, 2, 2)
-                .addComponent(btnNewGame)
+                .addComponent(btnNewGame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnStatus)
+                .addComponent(btnStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnQuit)
-                .addContainerGap(138, Short.MAX_VALUE))
+                .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

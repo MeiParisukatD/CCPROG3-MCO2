@@ -237,12 +237,12 @@ public class GameGUI {
      * @return true if the Siren has just been defeated and the exit reached
      */
     private static boolean processBossTurn(char input, BossFloor bossFloor) {
-        Siren siren = (Siren) bossFloor.getEnemies().get(0);
+        Siren siren = bossFloor.getSiren(); 
 
         Yohane.incrementTurn();
 
         // Every 8 moves, the Siren summons another bat (unless already defeated)
-        if (Yohane.getTurnCount() % 8 == 0 && !siren.charDeath()) {
+        if (Yohane.getTurnCount() % 8 == 0 && !siren.charDeath() && !siren.isReleased()) {
             siren.summonBat(Yohane.getX(), Yohane.getY(), Lailaps.getX(), Lailaps.getY());
         }
 
