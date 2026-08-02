@@ -16,6 +16,7 @@ public class MainFrame extends javax.swing.JFrame {
     private MainMenuPanel menuPanel;
     private GameMenuPanel gameMenuPanel;
     private GamePanel gamePanel;
+    private InventoryPanel inventoryPanel;
     
     /**
      * Creates new form MainFrame
@@ -26,10 +27,13 @@ public class MainFrame extends javax.swing.JFrame {
         menuPanel = new MainMenuPanel(this);
         gameMenuPanel = new GameMenuPanel(this);
         gamePanel = new GamePanel(this);
+        inventoryPanel = new InventoryPanel(this);
+
 
         cardPanel.add(menuPanel, "MENU");
         cardPanel.add(gameMenuPanel, "GAMEMENU");
         cardPanel.add(gamePanel, "GAME");
+        cardPanel.add(inventoryPanel, "INVENTORY");
 
         CardLayout layout = (CardLayout) cardPanel.getLayout();
         layout.show(cardPanel, "MENU");
@@ -60,6 +64,10 @@ public class MainFrame extends javax.swing.JFrame {
 
     public MainMenuPanel getMainMenuPanel() {
         return menuPanel;
+    }
+    
+    public InventoryPanel getInventoryPanel() {
+        return inventoryPanel;
     }
 
     /**

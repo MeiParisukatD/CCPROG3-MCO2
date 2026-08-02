@@ -23,6 +23,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
     public GameMenuPanel(MainFrame frame) {
         initComponents();
         this.frame = frame;
+        btnInventory.addActionListener(this::btnInventoryActionPerformed);
     }
 
     public void refresh() {
@@ -30,14 +31,28 @@ public class GameMenuPanel extends javax.swing.JPanel {
         lblGold.setText("Gold: " + GameGUI.getYohane().getGoldOwned());
 
         DefaultListModel<String> model = new DefaultListModel<>();
-
+        
         Dungeon[] dungeons = GameGUI.getDungeons();
+        PlayableChar yohane = GameGUI.getYohane();
 
-        for (Dungeon d : dungeons) {
-            model.addElement(d.getName());
+        if (GameGUI.isBossUnlocked()) {
+            // All 3 dungeons cleared - the only choice left is the final dungeon.
+            model.addElement("Face the " + dungeons[dungeons.length - 1].getName());
+        } else {
+            // dungeons[dungeons.length - 1] is the final/boss dungeon - don't
+            // list it until it's actually unlocked.
+            for (int i = 0; i < dungeons.length - 1; i++) {
+                Dungeon d = dungeons[i];
+                String label = d.isCompleted(yohane)
+                        ? "[Cleared] " + d.getName()
+                        : d.getName();
+                model.addElement(label);
+            }
         }
 
         lstDungeons.setModel(model);
+
+        btnShop.setEnabled(GameGUI.isShopUnlocked());
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -75,6 +90,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
         btnShop.setText("Shop");
 
         btnInventory.setText("Inventory");
+        btnInventory.addActionListener(this::btnInventoryActionPerformed);
 
         btnIdols.setText("Idols");
 
@@ -134,13 +150,31 @@ public class GameMenuPanel extends javax.swing.JPanel {
         if (index == -1)
             return;
 
-        GameGUI.startDungeon(GameGUI.getDungeons()[index]);
+        Dungeon[] dungeons = GameGUI.getDungeons();
+        Dungeon chosen;
+
+        if (GameGUI.isBossUnlocked()) {
+            // Only one entry is ever shown in this state: the final dungeon.
+            chosen = dungeons[dungeons.length - 1];
+        } else {
+            chosen = dungeons[index];
+            if (chosen.isCompleted(GameGUI.getYohane())) {
+                return; // already cleared - ignore the click
+            }
+        }
+
+        GameGUI.startDungeon(chosen);
 
         frame.getGamePanel().refreshStats();
         frame.getGamePanel().refreshMap();
 
         frame.showCard("GAME");
     }//GEN-LAST:event_btnEnterActionPerformed
+
+    private void btnInventoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInventoryActionPerformed
+        frame.getInventoryPanel().refresh();
+        frame.showCard("INVENTORY");
+    }//GEN-LAST:event_btnInventoryActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

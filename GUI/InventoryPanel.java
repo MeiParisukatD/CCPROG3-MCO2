@@ -10,13 +10,32 @@ package GUI;
  */
 public class InventoryPanel extends javax.swing.JPanel {
 
+    private MainFrame frame;
     /**
      * Creates new form InventoryPanel
      */
-    public InventoryPanel() {
+    public InventoryPanel(MainFrame frame) {
         initComponents();
+        this.frame = frame;
     }
 
+    public void refresh() {
+        Character_Classes.PlayableChar yohane = game.GameGUI.getYohane();
+        if (yohane == null) return;
+
+        lblStats.setText(String.format("HP: %.1f / %.1f      Total Gold: %d GP",
+                yohane.getHealth(), yohane.getMaxHealth(), yohane.getGoldOwned()));
+
+        Item_Classes.Item[] items = game.GameGUI.getItems();
+
+        int tears = java.util.Collections.frequency(yohane.getInventory(), items[0]);
+        int bread = java.util.Collections.frequency(yohane.getInventory(), items[1]);
+        int iceCream = java.util.Collections.frequency(yohane.getInventory(), items[8]);
+
+        lblItem1.setText("1. Tears of a fallen angel   x " + tears);
+        lblItem2.setText("2. Noppo bread               x " + bread);
+        lblItem3.setText("3. Choco-mint ice cream      x " + iceCream);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,19 +45,72 @@ public class InventoryPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblHeader = new javax.swing.JLabel();
+        lblStats = new javax.swing.JLabel();
+        lblItem1 = new javax.swing.JLabel();
+        lblItem2 = new javax.swing.JLabel();
+        lblItem3 = new javax.swing.JLabel();
+        btnReturn = new javax.swing.JButton();
+
+        lblHeader.setText("Lailaps: These are the items you have, Yohane!");
+
+        lblStats.setText("HP: -- / --      Total Gold: -- GP");
+
+        lblItem1.setText(": 1. Tears of a fallen angel   x 0");
+
+        lblItem2.setText("2. Noppo bread                    x 0");
+
+        lblItem3.setText("3. Choco-mint ice cream      x 0");
+
+        btnReturn.setText("Return");
+        btnReturn.addActionListener(this::btnReturnActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblItem2)
+                    .addComponent(btnReturn)
+                    .addComponent(lblItem3)
+                    .addComponent(lblItem1)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(lblStats)
+                        .addComponent(lblHeader)))
+                .addContainerGap(129, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(lblHeader)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblStats)
+                .addGap(61, 61, 61)
+                .addComponent(lblItem1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblItem2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblItem3)
+                .addGap(41, 41, 41)
+                .addComponent(btnReturn)
+                .addContainerGap(58, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
+        frame.showCard("GAMEMENU");
+    }//GEN-LAST:event_btnReturnActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnReturn;
+    private javax.swing.JLabel lblHeader;
+    private javax.swing.JLabel lblItem1;
+    private javax.swing.JLabel lblItem2;
+    private javax.swing.JLabel lblItem3;
+    private javax.swing.JLabel lblStats;
     // End of variables declaration//GEN-END:variables
 }
