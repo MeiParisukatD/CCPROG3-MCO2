@@ -34,6 +34,7 @@ public class GamePanel extends javax.swing.JPanel {
      */
     public GamePanel(MainFrame frame) {
         initComponents();
+        UITheme.apply(this);
         loadIcons();
         this.frame = frame;
         mapPanel.setFont(new Font("Monospaced", Font.PLAIN, 14));

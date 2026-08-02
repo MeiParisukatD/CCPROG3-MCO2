@@ -16,6 +16,7 @@ public class InventoryPanel extends javax.swing.JPanel {
      */
     public InventoryPanel(MainFrame frame) {
         initComponents();
+        UITheme.apply(this);
         this.frame = frame;
     }
 

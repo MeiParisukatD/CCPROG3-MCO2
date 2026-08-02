@@ -23,6 +23,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
      */
     public GameMenuPanel(MainFrame frame) {
         initComponents();
+        UITheme.apply(this);
         this.frame = frame;
         btnInventory.addActionListener(this::btnInventoryActionPerformed);
         btnQuit.addActionListener(this::btnQuitActionPerformed);
