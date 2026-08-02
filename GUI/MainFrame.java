@@ -24,6 +24,9 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         
+        getContentPane().setLayout(new java.awt.BorderLayout());
+        getContentPane().add(cardPanel, java.awt.BorderLayout.CENTER);
+        
         menuPanel = new MainMenuPanel(this);
         gameMenuPanel = new GameMenuPanel(this);
         gamePanel = new GamePanel(this);
@@ -86,17 +89,15 @@ public class MainFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1024, 768));
         setPreferredSize(new java.awt.Dimension(1024, 768));
-        setResizable(false);
 
-        cardPanel.setMinimumSize(new java.awt.Dimension(700, 1000));
-        cardPanel.setPreferredSize(new java.awt.Dimension(700, 1000));
+        cardPanel.setMinimumSize(new java.awt.Dimension(1024, 768));
         cardPanel.setLayout(new java.awt.CardLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(cardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
+            .addComponent(cardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,7 +130,12 @@ public class MainFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new MainFrame().setVisible(true));
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> {
+            MainFrame frame = new MainFrame();
+            frame.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+            frame.setVisible(true);
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -12,7 +12,9 @@ import Dungeon_Classes.Tile;
 import Item_Classes.Item;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.util.Collections;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
@@ -24,16 +26,47 @@ import javax.swing.SwingConstants;
 public class GamePanel extends javax.swing.JPanel {
 
     private MainFrame frame;
+    private static final int CELL_SIZE = 18;
+    private final java.util.Map<Character, ImageIcon> tileIcons = new java.util.HashMap<>();
     
     /**
      * Creates new form GamePanel
      */
     public GamePanel(MainFrame frame) {
         initComponents();
+        loadIcons();
         mapPanel.setLayout(new GridLayout(12, 55));
         this.frame = frame;
         mapPanel.setFont(new Font("Monospaced", Font.PLAIN, 14));
         setupKeyBindings();
+    }
+    private void loadIcons() {
+        tileIcons.put('.', loadIcon("/resources/floor.png"));
+        tileIcons.put('*', loadIcon("/resources/border.png"));
+        tileIcons.put('v', loadIcon("/resources/wall.png"));
+        tileIcons.put('x', loadIcon("/resources/spike.png"));
+        tileIcons.put('w', loadIcon("/resources/water.png"));
+        tileIcons.put('h', loadIcon("/resources/heat.png"));
+        tileIcons.put('T', loadIcon("/resources/treasure.png"));
+        tileIcons.put('E', loadIcon("/resources/exit.png"));
+        tileIcons.put('g', loadIcon("/resources/gold.png"));
+        tileIcons.put('0', loadIcon("/resources/switch.png"));
+        tileIcons.put('Y', loadIcon("/resources/yohane.png"));
+        tileIcons.put('L', loadIcon("/resources/lailaps.png"));
+        tileIcons.put('b', loadIcon("/resources/bat.png"));
+        tileIcons.put('B', loadIcon("/resources/bat_attack.png")); // the capital-B fix from before
+        tileIcons.put('S', loadIcon("/resources/siren.png"));
+    }
+
+    private ImageIcon loadIcon(String path) {
+        java.net.URL url = getClass().getResource(path);
+        if (url == null) {
+            System.out.println("[!] Missing image: " + path);
+            return null;
+        }
+        Image scaled = new ImageIcon(url).getImage()
+                .getScaledInstance(CELL_SIZE, CELL_SIZE, Image.SCALE_SMOOTH);
+        return new ImageIcon(scaled);
     }
     
     public void refreshStats() {
@@ -92,7 +125,7 @@ public class GamePanel extends javax.swing.JPanel {
         PlayableChar lailaps = isBossFight ? GameGUI.getLailaps() : null;
 
         Tile[][] map = floor.getMap();
-        mapPanel.setLayout(new GridLayout(map.length, map[0].length));
+        mapPanel.setPreferredSize(new java.awt.Dimension(map[0].length * CELL_SIZE, map.length * CELL_SIZE));
 
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
@@ -122,20 +155,42 @@ public class GamePanel extends javax.swing.JPanel {
                     symbol = 'Y';
                 }
             
-                JLabel tile = new JLabel(String.valueOf(symbol), SwingConstants.CENTER);
-                if (symbol == 'Y' || symbol == 'L')
-                    tile.setForeground(Color.BLUE);
-                else if (symbol == 'b' || symbol == 'B' || symbol == 'S')
-                    tile.setForeground(Color.RED);
-                else if (symbol == 'E')
-                    tile.setForeground(Color.GREEN);
-                
+                JLabel tile = new JLabel();
+                tile.setPreferredSize(new java.awt.Dimension(CELL_SIZE, CELL_SIZE));
+                tile.setHorizontalAlignment(SwingConstants.CENTER);
+                ImageIcon icon = tileIcons.get(symbol);
+
+                if (icon != null) {
+                    tile.setIcon(icon);
+                } else {
+                    // fallback until you've made an image for this symbol
+                    tile.setOpaque(true);
+                    tile.setText(String.valueOf(symbol));
+                    tile.setBackground(fallbackColor(symbol));
+                }
+
                 mapPanel.add(tile);
             }
         }
 
         mapPanel.revalidate();
         mapPanel.repaint();
+    }
+    
+    private Color fallbackColor(char symbol) {
+        switch (symbol) {
+            case '*': return Color.DARK_GRAY;
+            case 'v': return new Color(120, 80, 40);
+            case 'x': return Color.ORANGE;
+            case 'w': return Color.CYAN;
+            case 'h': return Color.RED.darker();
+            case 'T': return Color.MAGENTA;
+            case 'E': return Color.GREEN;
+            case 'g': return Color.YELLOW;
+            case 'L': return Color.BLUE;
+            case 'b': case 'B': case 'S': return Color.RED;
+            default: return Color.WHITE;
+        }
     }
     
     /**
@@ -266,6 +321,8 @@ public class GamePanel extends javax.swing.JPanel {
         mapPanel = new javax.swing.JPanel();
         lblTurn = new javax.swing.JLabel();
 
+        setPreferredSize(new java.awt.Dimension(1024, 700));
+
         lblHP.setText("HP: 20/20");
 
         lblGold.setText("Gold: 67 GP");
@@ -280,16 +337,17 @@ public class GamePanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(txtLog);
 
         mapPanel.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
+        mapPanel.setPreferredSize(new java.awt.Dimension(1024, 700));
 
         javax.swing.GroupLayout mapPanelLayout = new javax.swing.GroupLayout(mapPanel);
         mapPanel.setLayout(mapPanelLayout);
         mapPanelLayout.setHorizontalGroup(
             mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 428, Short.MAX_VALUE)
+            .addGap(0, 1024, Short.MAX_VALUE)
         );
         mapPanelLayout.setVerticalGroup(
             mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 198, Short.MAX_VALUE)
+            .addGap(0, 700, Short.MAX_VALUE)
         );
 
         lblTurn.setText("jLabel1");
@@ -303,40 +361,36 @@ public class GamePanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblFloor)
-                            .addComponent(lblHP))
-                        .addGap(114, 114, 114))
+                            .addComponent(lblGold)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblHP)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblTurn))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblGold)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblTurn)
-                        .addGap(37, 37, 37)))
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(251, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblFloor)
+                            .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(40, 40, 40)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblHP)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblGold)
-                            .addComponent(lblTurn))
-                        .addGap(26, 26, 26)
-                        .addComponent(lblFloor))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(259, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblHP)
+                    .addComponent(lblTurn))
+                .addGap(18, 18, 18)
+                .addComponent(lblGold)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblFloor)
+                .addGap(18, 18, 18)
                 .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
