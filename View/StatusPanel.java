@@ -2,18 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package GUI;
+package View;
 
 /**
  *
  * @author rhian
  */
-public class ShopPanel extends javax.swing.JPanel {
+public class StatusPanel extends javax.swing.JPanel {
 
     /**
-     * Creates new form ShopPanel
+     * Creates new form StatusPanel
      */
-    public ShopPanel() {
+    public StatusPanel() {
         initComponents();
     }
 

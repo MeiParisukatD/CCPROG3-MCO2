@@ -6,9 +6,9 @@ import Character_Classes.PlayableChar;
 /**
  * Represents a permanent stat upgrade item (e.g., Stewshine, Mikan Mochi, Kurosawa Matcha).
  * Directly modifies character stats upon application.
- * 
+ *
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class UpgradeItem extends Item {
     /** The specific character stat targeted for modification. */
@@ -24,6 +24,7 @@ public class UpgradeItem extends Item {
      * @param price the monetary gold cost of the item
      * @param targetStat the attribute stat targeted by this upgrade
      * @param upgradeAmt the magnitude of stat adjustment applied by this item
+     * @param condition the NPC that must be rescued to unlock this item, or null if unconditional
      */
     public UpgradeItem(String name, int price, String targetStat, float upgradeAmt, NPChar condition) {
         super(name, price, condition);
@@ -81,7 +82,7 @@ public class UpgradeItem extends Item {
     }
 
     /**
-     * Overrides the base use execution. Stat upgrades take effect automatically 
+     * Overrides the base use execution. Stat upgrades take effect automatically
      * upon purchase via applyUpgrade rather than manual inventory usage.
      *
      * @param player the playable character interacting with the item

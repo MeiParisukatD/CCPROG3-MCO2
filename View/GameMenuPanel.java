@@ -2,24 +2,32 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package GUI;
+package View;
 
 import Character_Classes.PlayableChar;
 import Dungeon_Classes.Dungeon;
 import Item_Classes.Item;
-import game.GameGUI;
+import Controller.GameGUI;
 import javax.swing.DefaultListModel;
 
 /**
- *
- * @author rhian
+ * View panel shown between dungeon runs, letting the player check their
+ * stats, choose a dungeon to enter, open their inventory, or return to
+ * the main menu. Reads all displayed state from {@link Controller.GameGUI}
+ * and forwards user actions back to it; this panel computes no game state
+ * of its own.
+ * 
+ * @author Katigbak and Porciuncula
+ * @version 2.0
  */
 public class GameMenuPanel extends javax.swing.JPanel {
 
     private MainFrame frame;
 
     /**
-     * Creates new form GameMenuPanel
+     * Constructs the dungeon-select menu panel and applies the shared UI theme.
+     *
+     * @param frame the main application frame, used for card navigation
      */
     public GameMenuPanel(MainFrame frame) {
         initComponents();
@@ -29,6 +37,11 @@ public class GameMenuPanel extends javax.swing.JPanel {
         btnQuit.addActionListener(this::btnQuitActionPerformed);
     }
 
+    /**
+     * Refreshes every displayed value - HP, gold, held item, dungeon list,
+     * and shop button state - to match the Controller's current game
+     * state. Call this immediately before showing this panel.
+     */
     public void refresh() {
         
         PlayableChar yohane = GameGUI.getYohane();
@@ -170,6 +183,13 @@ public class GameMenuPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Handles the "Enter Dungeon" button: resolves the selected list entry
+     * to a {@link Dungeon}, ignores clicks on already-cleared dungeons,
+     * starts the run via the Controller, and switches to the game view.
+     *
+     * @param evt the button click event
+     */
     private void btnEnterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnterActionPerformed
         int index = lstDungeons.getSelectedIndex();
 
@@ -197,10 +217,23 @@ public class GameMenuPanel extends javax.swing.JPanel {
         frame.showCard("GAME");
     }//GEN-LAST:event_btnEnterActionPerformed
 
+     /**
+     * Handles the "Enter Dungeon" button: resolves the selected list entry
+     * to a {@link Dungeon}, ignores clicks on already-cleared dungeons,
+     * starts the run via the Controller, and switches to the game view.
+     *
+     * @param evt the button click event
+     */
     private void btnInventoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInventoryActionPerformed
         frame.getInventoryPanel().refresh();
         frame.showCard("INVENTORY");
     }//GEN-LAST:event_btnInventoryActionPerformed
+
+    /**
+     * Handles the "Save and Quit" button: returns to the main menu screen.
+     *
+     * @param evt the button click event
+     */
 
     private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
         frame.showCard("MENU");

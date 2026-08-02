@@ -9,16 +9,17 @@ import Character_Classes.*;
 
 /**
  * Represents a single layer or floor layout within the dungeon.
- * Handles reading structural text maps, generating and spawning hostile entities, 
+ * Handles reading structural text maps, generating and spawning hostile entities,
  * rendering colorized matrix maps to the console, and evaluating step coordinates.
- * 
+ *
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class Floor {
     //attributes
     /** The 2D grid matrix of Tile items making up the map landscape. */
     protected Tile[][] map;
+    /** The name of the text map file this floor is generated from. */
     protected String file;
     /** The active tracking collection storing hostile NPCs on this floor layer. */
     protected ArrayList<EnemyChar> enemies;
@@ -28,14 +29,16 @@ public class Floor {
     protected int colLen;
     /** The designation or layout index track level number of this floor. */
     protected int floorNum;
+    /** Flag tracking whether this floor has been cleared (the player has reached its exit). */
     protected boolean complete;
 
     //constructor
     /**
-     * Constructs a floor tracking environment, sets standard boundaries, and populates 
+     * Constructs a floor tracking environment, sets standard boundaries, and populates
      * structural elements via dynamic tile generations.
      *
      * @param floorNum the unique level index tracking identifier for this map
+     * @param file the name of the text map file to generate this floor's layout from
      */
     public Floor(int floorNum, String file) {
         enemies = new ArrayList<>();
@@ -45,12 +48,12 @@ public class Floor {
         rowLen = map.length;
         colLen = map[0].length;
         this.complete = false;
-    } 
+    }
 
     //getters/setters
     /**
      * Retrieves the entire grid layout of the game world.
-     * 
+     *
      * @return the multi-dimensional layout array of tiles
      */
     public Tile[][] getMap() {
@@ -59,20 +62,25 @@ public class Floor {
 
     /**
      * Overwrites the current game grid with a completely new grid layout.
-     * 
+     *
      * @param map the replacement 2D array structure layout
      */
     public void setMap(Tile[][] map) {
         this.map = map;
     }
 
+    /**
+     * Retrieves the name of the text map file this floor was generated from.
+     *
+     * @return the source map file name
+     */
     public String getFile() {
         return this.file;
     }
 
     /**
      * Gets the current level or dungeon floor the player is exploring.
-     * 
+     *
      * @return the current floor numerical index
      */
     public int getFloorNum() {
@@ -81,16 +89,16 @@ public class Floor {
 
     /**
      * Updates the current floor tracker to a new level index.
-     * 
+     *
      * @param floorNum the new floor number value to record
      */
     public void setFloorNum(int floorNum) {
         this.floorNum = floorNum;
-    }  
+    }
 
     /**
      * Retrieves a collection of all active opponents currently present on this floor.
-     * 
+     *
      * @return the list reference containing spawned enemies
      */
     public ArrayList<EnemyChar> getEnemies() {
@@ -98,9 +106,9 @@ public class Floor {
     }
 
     /**
-     * Retrieves a collection of all active opponents currently present on this floor.
-     * 
-     * @return the list reference containing spawned enemies
+     * Appends a new hostile entity to this floor's active enemy tracking collection.
+     *
+     * @param enemy the EnemyChar instance to add
      */
     public void addEnemy(EnemyChar enemy) {
         this.enemies.add(enemy);
@@ -108,7 +116,7 @@ public class Floor {
 
     /**
      * Gets the maximum number of rows (horizontal height) defining the map boundaries.
-     * 
+     *
      * @return the row maximum size metric
      */
     public int getRowLen() {
@@ -117,7 +125,7 @@ public class Floor {
 
     /**
      * Sets the maximum number of rows to redefine the map's horizontal boundary.
-     * 
+     *
      * @param rowLen the new horizontal limit length
      */
     public void setRowLen(int rowLen) {
@@ -126,7 +134,7 @@ public class Floor {
 
     /**
      * Gets the maximum number of columns (vertical width) defining the map boundaries.
-     * 
+     *
      * @return the column maximum size metric
      */
     public int getColLen() {
@@ -135,16 +143,16 @@ public class Floor {
 
     /**
      * Sets the maximum number of columns to redefine the map's vertical boundary.
-     * 
+     *
      * @param colLen the new vertical limit length
      */
     public void setColLen(int colLen) {
         this.colLen = colLen;
     }
-    
+
     //additional methods
     /**
-     * Parses the flat document matrix file stream to initialize structural symbols, 
+     * Parses the flat document matrix file stream to initialize structural symbols,
      * allocating destructible elements and forwarding enemy spawn definitions seamlessly.
      */
     public void generateFloor() {
@@ -156,16 +164,16 @@ public class Floor {
         row = col = 0;
 
         this.map = new Tile[ROW][COL];
-InputStream stream = getClass().getResourceAsStream("/" + this.file);
+        InputStream stream = getClass().getResourceAsStream("/" + this.file);
 
-if (stream == null) {
-    System.out.println("[!] File not found: " + this.file);
-    return;
-}
+        if (stream == null) {
+            System.out.println("[!] File not found: " + this.file);
+            return;
+        }
 
-this.enemies.clear();
+        this.enemies.clear();
 
-try (Scanner reader = new Scanner(stream)) {
+        try (Scanner reader = new Scanner(stream)) {
             while (reader.hasNextLine()){
                 line = reader.nextLine();
 
@@ -197,12 +205,11 @@ try (Scanner reader = new Scanner(stream)) {
     }
 
     /**
-     * Instantiates hostile NPCs directly into the floor layout tracker, scaling metrics 
+     * Instantiates hostile NPCs directly into the floor layout tracker, scaling metrics
      * like attack thresholds or step movement delay intervals based on current level progress.
      *
-     * @param symbol the character key identifying enemy types ('b' for Bat, 'S' for Siren)
-     * @param row the target X coordinate destination
-     * @param col the target Y coordinate destination
+     * @param positions the list of Tile markers collected during map parsing, each carrying
+     *                   the enemy type symbol ('b' for Bat, 'S' for Siren) and spawn coordinates
      */
     private void generateEnemies(ArrayList<Tile> positions) {
         int i, size;
@@ -226,7 +233,7 @@ try (Scanner reader = new Scanner(stream)) {
                         moves,                     // Moves every 1-2 turns
                         detection = (this.floorNum == 3) ? 1.5f : 1.0f,
                         this.floorNum == 3,       // diagonal movement if floor 3
-                        x, y                    //coordinates                     
+                        x, y                    //coordinates
                     );
 
                     //add bat to enemy arraylist
@@ -242,79 +249,14 @@ try (Scanner reader = new Scanner(stream)) {
             }
         }
 
-        //once all enemies are generated, attach current to each
+        //once all enemies are generated, attach current floor to each
         for (EnemyChar enemy: this.enemies) {
             enemy.setFloor(this);
         }
     }
 
     /**
-     * Compiles and outputs colorized display strings to print the visual map grid out, 
-     * handling priority layer overlays for the player character and active enemy status transformations.
-     *
-     * @param player the user character instance utilized to cross-check grid overlapping
-     */
-    public void displayMap(PlayableChar player, PlayableChar companion) {
-        int i, j;
-        String COLOR, RESET = "\u001B[0m";
-
-        for (i = 0; i < rowLen; i++) {
-            for (j = 0; j < colLen; j++) {
-                boolean occupied = false;
-
-                // 1. Check Yohane
-                if (player.getX() == i && player.getY() == j) {
-                    //Dynamically chooses color if Yohane is being damaged
-                    if (player.isJustDamaged()) {
-                        COLOR = "\u001B[38;5;214m"; //Orange
-                        player.setJustDamaged(false);
-                    } else {
-                        COLOR = "\u001B[38;5;153m"; //Light Blue
-                    }
-
-                    System.out.print(COLOR + 'Y' + RESET);
-                    occupied = true;
-                } 
-
-                // 2. Check Lailaps
-                if (companion != null && companion.getX() == i && companion.getY() == j) {
-                    COLOR = "\u001B[38;5;153m"; // Light Blue
-                    System.out.print(COLOR + 'L' + RESET);
-                    occupied = true;
-                }
-
-                // 3. Check Enemies (Bats & Siren)
-                if (!occupied) {
-                    for (EnemyChar e : this.enemies) {
-                        if (e.getX() == i && e.getY() == j) {
-                            COLOR = "\u001B[38;5;196m"; // Red
-                            char symbol = e.getName().equalsIgnoreCase("Bat") ? 'b' : 'S';
-
-                            if (e.getName().equalsIgnoreCase("Bat") 
-                                && e.detectPlayer(this.map, player)
-                                && player.getTurnCount() % e.getTurnsPerMove() == 0) {
-                                symbol = 'B';
-                            }
-
-                            System.out.print(COLOR + symbol + RESET);
-                            occupied = true;
-                            break;
-                        }
-                    }
-                }
-
-                // 4. Print base tile if no entity is standing on it
-                if (!occupied) {
-                    COLOR = map[i][j].assignColor();
-                    System.out.print(COLOR + map[i][j].getSymbol() + RESET);
-                }
-            }
-            System.out.println();
-        }
-    }
-
-    /**
-     * Validates if a chosen step destination falls safely inside the boundaries of the 
+     * Validates if a chosen step destination falls safely inside the boundaries of the
      * map grid and checks whether the physical layout features allow structural passability.
      *
      * @param dest the target destination Tile component node being evaluated
@@ -346,7 +288,7 @@ try (Scanner reader = new Scanner(stream)) {
      */
     public void destroyTile(Tile tile) {
         int x, y;
-        
+
         x = tile.getX();
         y = tile.getY();
 
@@ -355,7 +297,7 @@ try (Scanner reader = new Scanner(stream)) {
     }
 
     /**
-     * Checks if the user-controlled character stands directly on top of the escape Exit structure, 
+     * Checks if the user-controlled character stands directly on top of the escape Exit structure,
      * qualifying them to successfully finish exploration on this map level layer.
      *
      * @param entity the user character instance to cross-reference
@@ -380,7 +322,7 @@ try (Scanner reader = new Scanner(stream)) {
     }
 
     /**
-     * Iterates across tracking lists to find if a hostile enemy occupies the specified 
+     * Iterates across tracking lists to find if a hostile enemy occupies the specified
      * coordinate values.
      *
      * @param x target row horizontal grid element coordinate
@@ -398,6 +340,13 @@ try (Scanner reader = new Scanner(stream)) {
         return null;
     }
 
+    /**
+     * Checks whether an enemy currently occupies the given grid coordinates.
+     *
+     * @param x target row horizontal grid element coordinate
+     * @param y target column vertical grid element coordinate
+     * @return true if an enemy occupies the tile, false otherwise
+     */
     public boolean tileTaken(int x, int y) {
         //check for enemy
         EnemyChar enemy = this.findEnemy(x, y);
@@ -405,7 +354,7 @@ try (Scanner reader = new Scanner(stream)) {
         //if enemy found at that position, tile is taken
         if (enemy != null && enemy.getX() == x && enemy.getY() == y) {
             return true;
-        } 
+        }
 
         //otherwise, tile is not taken
         return false;

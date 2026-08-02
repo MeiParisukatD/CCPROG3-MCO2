@@ -23,12 +23,15 @@ public class PlayableChar extends GameCharacter {
     private int turnCount;
     /** The storage bag of items currently held by the character. */
     private ArrayList<Item> inventory;
+    /** The collection of special abilities currently unlocked by the character. */    
     private ArrayList<String> abilities;
     /** The item currently selected or equipped from the inventory layout. */
     private Item curItem;
     /** The source of damage or hazard that caused the character to lose all health. */
     private String causeOfDeath;
+    /** Flag tracking whether the character was just damaged, used for map display purposes. */
     private boolean justDamaged;
+    /** Flag tracking whether the character has already been attacked during the current turn. */
     private boolean attackedThisTurn;
 
     //constructor
@@ -114,10 +117,21 @@ public class PlayableChar extends GameCharacter {
         return this.inventory;
     }
 
+    /**
+     * Unlocks a new special ability for the character.
+     *
+     * @param ability the identifier string of the ability to add
+     */    
     public void addAbility(String ability) {
         this.abilities.add(ability);
     }
 
+    /**
+     * Checks whether the character currently has a given special ability unlocked.
+     *
+     * @param ability the identifier string of the ability to check
+     * @return true if the character has the ability, false otherwise
+     */    
     public boolean hasAbility(String ability) {
         return this.abilities.contains(ability);
     }
@@ -149,18 +163,39 @@ public class PlayableChar extends GameCharacter {
         return this.causeOfDeath;
     }
 
+    /**
+     * Checks whether the character was just damaged, for map display purposes.
+     *
+     * @return true if the character was just damaged, false otherwise
+     */    
     public boolean isJustDamaged() {
         return this.justDamaged;
     }
 
+    /**
+     * Updates the flag tracking whether the character was just damaged.
+     *
+     * @param status the new just-damaged status
+     */    
     public void setJustDamaged(boolean status) {
         this.justDamaged = status;
     }
     
+
+    /**
+     * Checks whether the character has already been attacked during the current turn.
+     *
+     * @return true if the character has been attacked this turn, false otherwise
+     */    
     public boolean isAttackedThisTurn() {
         return this.attackedThisTurn;
     }
 
+    /**
+     * Updates the flag tracking whether the character has been attacked during the current turn.
+     *
+     * @param status the new attacked-this-turn status
+     */
     public void setAttackedThisTurn(boolean status) {
         this.attackedThisTurn = status;
     }
@@ -401,8 +436,9 @@ public class PlayableChar extends GameCharacter {
      * Implements step direction handling ('w','a','s','d'), combat conflict discovery, 
      * hazard step environmental damage logging, and destructible path routing interactions.
      *
-     * @param direction the character character layout input indicating path target
-     * @param floor the target Floor system execution reference
+     * @param direction the character movement input key ('w', 'a', 's', or 'd')
+     * @param cX the character's X coordinate prior to the move (reserved, currently unused)
+     * @param cY the character's Y coordinate prior to the move (reserved, currently unused)
      */
     public void move(char direction, int cX, int cY) {
         int d = -1; //assigned sentinel value to accomodate compilation
@@ -461,7 +497,15 @@ public class PlayableChar extends GameCharacter {
         }
     }
     
-        public void checkHeatDamage(int prevX, int prevY) {
+    /**
+     * Checks whether the character is currently standing on a heat tile and,
+     * if so and the character has not moved since the previous check, applies
+     * heat damage unless the character has heat immunity.
+     *
+     * @param prevX the character's X coordinate at the previous check
+     * @param prevY the character's Y coordinate at the previous check
+     */
+    public void checkHeatDamage(int prevX, int prevY) {
         if (this.floor == null) return;
         if (this.x == prevX && this.y == prevY) {
             Tile current = this.floor.getMap()[this.x][this.y];

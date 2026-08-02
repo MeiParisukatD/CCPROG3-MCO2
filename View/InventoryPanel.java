@@ -2,17 +2,23 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package GUI;
+package View;
 
 /**
- *
- * @author rhian
+ * View panel showing the player's held items and current stats. Reads
+ * counts and totals from {@link Character_Classes.PlayableChar} (via
+ * {@link Controller.GameGUI}) and formats them for display only.
+ * 
+ * @author Katigbak and Porciuncula
+ * @version 2.0
  */
 public class InventoryPanel extends javax.swing.JPanel {
 
     private MainFrame frame;
     /**
-     * Creates new form InventoryPanel
+     * Constructs the inventory panel and applies the shared UI theme.
+     *
+     * @param frame the main application frame, used for card navigation
      */
     public InventoryPanel(MainFrame frame) {
         initComponents();
@@ -20,14 +26,18 @@ public class InventoryPanel extends javax.swing.JPanel {
         this.frame = frame;
     }
 
+    /**
+     * Refreshes the displayed stats and item counts to match the
+     * Controller's current game state. Does nothing if no game is active.
+     */
     public void refresh() {
-        Character_Classes.PlayableChar yohane = game.GameGUI.getYohane();
+        Character_Classes.PlayableChar yohane = Controller.GameGUI.getYohane();
         if (yohane == null) return;
 
         lblStats.setText(String.format("HP: %.1f / %.1f      Total Gold: %d GP",
                 yohane.getHealth(), yohane.getMaxHealth(), yohane.getGoldOwned()));
 
-        Item_Classes.Item[] items = game.GameGUI.getItems();
+        Item_Classes.Item[] items = Controller.GameGUI.getItems();
 
         int tears = java.util.Collections.frequency(yohane.getInventory(), items[0]);
         int bread = java.util.Collections.frequency(yohane.getInventory(), items[1]);
@@ -101,6 +111,11 @@ public class InventoryPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Handles the "Return" button: navigates back to the dungeon-select menu.
+     *
+     * @param evt the button click event
+     */
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
         frame.showCard("GAMEMENU");
     }//GEN-LAST:event_btnReturnActionPerformed

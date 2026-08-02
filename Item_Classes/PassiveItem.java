@@ -7,7 +7,7 @@ import Character_Classes.PlayableChar;
  * Represents passive equipment or upgrades purchased from Hanamaru's store.
  * Passive items grant ongoing effects or abilities to the player character
  * without being consumed upon use.
- * 
+ *
  * @author Katigbak and Porciuncula
  * @version 2.0
  */
@@ -21,6 +21,7 @@ public class PassiveItem extends Item {
      * @param name    the display name of the passive item
      * @param price   the cost in gold (GP) to purchase the item
      * @param ability the passive effect or immunity conferred by the item
+     * @param condition the NPC that must be rescued to unlock this item, or null if unconditional
      */
     public PassiveItem(String name, int price, String ability, NPChar condition) {
         super(name, price, condition);
@@ -47,7 +48,7 @@ public class PassiveItem extends Item {
             Yohane.addAbility(this.ability);
         }
     }
-    
+
     /**
      * Overrides the item activation behavior. Passive items are non-consumable
      * persistent effects, so manually using them returns false.

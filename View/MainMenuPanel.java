@@ -2,18 +2,24 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package GUI;
-import game.GameGUI;
+package View;
+import Controller.GameGUI;
 /**
- *
- * @author rhian
+ * View panel for the game's main menu: lets the player start a new run,
+ * continue one in progress, or quit. Button visibility and labeling
+ * reflect the Controller's current run state.
+ * 
+ * @author Katigbak and Porciuncula
+ * @version 2.0
  */
 public class MainMenuPanel extends javax.swing.JPanel {
 
     private MainFrame frame;
     
     /**
-     * Creates new form MainMenuPanel
+     * Constructs the main menu panel and applies the shared UI theme.
+     *
+     * @param frame the main application frame, used for card navigation
      */
     public MainMenuPanel(MainFrame frame) {
         initComponents();
@@ -105,15 +111,31 @@ public class MainMenuPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Handles the "Continue" button: refreshes and shows the dungeon-select menu.
+     *
+     * @param evt the button click event
+     */
     private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
         frame.getGameMenuPanel().refresh();
         frame.showCard("GAMEMENU");
     }//GEN-LAST:event_btnContinueActionPerformed
 
+    /**
+     * Handles the "Status" button. Not yet implemented.
+     *
+     * @param evt the button click event
+     */   
     private void btnStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStatusActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnStatusActionPerformed
 
+    /**
+     * Handles the "New Game" / "New Game+" button: starts a new run via
+     * the Controller, refreshes the dungeon-select menu, and shows it.
+     *
+     * @param evt the button click event
+     */   
     private void btnNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewGameActionPerformed
         GameGUI.beginNewRun();
 
@@ -122,6 +144,11 @@ public class MainMenuPanel extends javax.swing.JPanel {
         frame.showCard("GAMEMENU");
     }//GEN-LAST:event_btnNewGameActionPerformed
 
+    /**
+     * Handles the "Quit" button: exits the application immediately.
+     *
+     * @param evt the button click event
+     */
     private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_btnQuitActionPerformed

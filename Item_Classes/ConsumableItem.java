@@ -5,35 +5,37 @@ import Character_Classes.PlayableChar;
 
 /**
  * Represents a restorative item type that can be consumed by a player character.
- * Provides functional behavior to restore a character's health points based on a 
+ * Provides functional behavior to restore a character's health points based on a
  * predefined healing constant upon usage.
- * 
+ *
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class ConsumableItem extends Item {
     /** The flat amount of health points restored to the character upon consumption. */
     private float healAmount;
 
     /**
-     * Constructs a consumable item with a name and a restoration value, 
+     * Constructs a consumable item with a name and a restoration value,
      * defaulting its monetary price handling to the parent class baseline.
      *
      * @param name the descriptive name of the item
      * @param healAmount the quantity of health points this item recovers
+     * @param condition the NPC that must be rescued to unlock this item, or null if unconditional
      */
     public ConsumableItem(String name, float healAmount, NPChar condition) {
         super(name, condition);
         this.healAmount = healAmount;
     }
-    
+
     /**
-     * Constructs a consumable item with a name, store purchase price, 
+     * Constructs a consumable item with a name, store purchase price,
      * and a restorative health value.
      *
      * @param name the descriptive name of the item
      * @param price the gold buy or sell value of the item
      * @param healAmount the quantity of health points this item recovers
+     * @param condition the NPC that must be rescued to unlock this item, or null if unconditional
      */
     public ConsumableItem(String name, int price, float healAmount, NPChar condition) {
         super(name, price, condition);

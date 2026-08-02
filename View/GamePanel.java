@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package GUI;
+package View;
 
-import game.GameGUI;
+import Controller.GameGUI;
 import Character_Classes.*;
 import Dungeon_Classes.*;
 import java.awt.GridLayout;

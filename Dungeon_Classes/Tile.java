@@ -3,11 +3,11 @@ package Dungeon_Classes;
 
 /**
  * Represents a fundamental structural unit or coordinate node within the dungeon grid map.
- * Tracks individual positioning coordinates, symbol identifiers, passability metrics, 
+ * Tracks individual positioning coordinates, symbol identifiers, passability metrics,
  * breakable traits, and environmental hazard damage weights.
- * 
+ *
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class Tile {
     //attribute
@@ -26,7 +26,7 @@ public class Tile {
 
     //constructors
     /**
-     * Constructs a tile element setting up specific grid values, map representation characters, 
+     * Constructs a tile element setting up specific grid values, map representation characters,
      * and initializes its movement property configurations.
      *
      * @param x the horizontal row coordinate position
@@ -53,7 +53,7 @@ public class Tile {
         this.assignProperties();
     }
 
-    //getters/setters 
+    //getters/setters
 
     /**
      * Retrieves the row position index of this tile.
@@ -138,8 +138,8 @@ public class Tile {
     }
 
     /**
-     * Updates the modification constraint status fro this tile.
-     * 
+     * Updates the modification constraint status for this tile.
+     *
      * @param destructible the new modification constraint status
      */
     public void setDestructible(boolean destructible) {
@@ -166,39 +166,7 @@ public class Tile {
 
     //additional methods
     /**
-     * Evaluates the active character symbol signature to supply a matching ANSI text 
-     * formatting escape color code for terminal output rendering.
-     *
-     * @return a string tracking the target terminal layout formatting color sequence
-     */
-    public String assignColor() {
-        String color = "\u001B[0m"; //no effect
-
-        switch(this.symbol) {
-            case 'w': //water tiles
-                color = "\u001B[38;5;81m"; //blue
-                break;
-            case 'h': //heat tiles
-                color = "\u001B[38;5;214m"; //orange
-                break;
-            case 'T': //treasure tiles
-                color = "\u001B[38;5;119m"; //green
-                break;
-            case 'E': //exit tiles
-            case 'g':
-                color = "\u001B[38;5;227m"; //yellow
-                break;
-            case 'I': //item tiles
-                color = "\u001B[38;5;158m"; //turquoise
-            default:
-                break;
-        }
-
-        return color;
-    }
-
-    /**
-     * Configures the path passability, modification criteria, and default floor hazard damage metrics 
+     * Configures the path passability, modification criteria, and default floor hazard damage metrics
      * by resolving structural parameters mapped to individual entity symbols.
      */
     public void assignProperties() {
@@ -213,7 +181,7 @@ public class Tile {
                 this.destructible = false;
                 this.damage = 0.0f;
                 break;
-            case 'v': //wall tiles 
+            case 'v': //wall tiles
                 this.passable = false;
                 this.destructible = true;
                 this.damage = 0.0f;
@@ -271,7 +239,3 @@ public class Tile {
         }
     }
 }
-
-// case 'L': //Lailaps tile
-            //     color = "\u001B[38;5;153m"; //blue
-            //     break;

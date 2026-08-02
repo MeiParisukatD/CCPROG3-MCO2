@@ -4,20 +4,20 @@ import Item_Classes.*;
 
 /**
  * Represents a tile within the dungeon layout that can be broken or collected.
- * Manages specialized behaviors for dynamic map objects including spawning 
+ * Manages specialized behaviors for dynamic map objects including spawning
  * treasure rewards, dropping randomized currency amounts, and granting items.
- * 
+ *
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class DestructibleTile extends Tile {
     //attributes
     /** Flag indicating if this tile holds hidden or uncollected treasure. */
-    private boolean treasure; 
+    private boolean treasure;
     /** The amount of gold dropped when this tile is destroyed. */
     private int goldDrop;
-    /** The item asset dropped when this tile is destroyed. */ 
-    private Item itemDrop; 
+    /** The item asset dropped when this tile is destroyed. */
+    private Item itemDrop;
 
     //constructor
     /**
@@ -106,7 +106,7 @@ public class DestructibleTile extends Tile {
 
     //additional methods
     /**
-     * Randomizes the treasure tile's content state, transforming its layout 
+     * Randomizes the treasure tile's content state, transforming its layout
      * representation into either a raw item drop ('I') or a gold drop ('g').
      */
     public void dropTreasure() {
@@ -122,7 +122,7 @@ public class DestructibleTile extends Tile {
     }
 
     /**
-     * Overrides state definitions to assign specialized parameters like randomized 
+     * Overrides state definitions to assign specialized parameters like randomized
      * currency scaling or default consumable items based on the active symbol signature.
      */
     public void assignProperties() {

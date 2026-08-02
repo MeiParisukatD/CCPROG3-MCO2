@@ -7,7 +7,7 @@ import Dungeon_Classes.*;
  * Acts as the base class for Yohane, Lailaps, the Siren, and enemy Bats.
  * 
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class GameCharacter {
     //attributes
@@ -17,13 +17,17 @@ public class GameCharacter {
     protected float health;
     /** The attack power used to deal damage to opponents. */
     protected float attack;
-    /** The X and Y coordinates mapping the position on the 2D dungeon grid. */
-    protected int x, y; //coordinates
-    protected Floor floor; //floor that the character is a part of
+    /** The X coordinate mapping the character's position on the 2D dungeon grid. */
+    protected int x;
+    /** The Y coordinate mapping the character's position on the 2D dungeon grid. */
+    protected int y;
+    /** The Floor instance that this character currently belongs to. */
+    protected Floor floor;
 
     //constructor
     /**
-     * Constructs a character with base stats, dialogue, and sets position to (0,0). Optimized for PlayableChar.
+     * Constructs a character with base stats and sets position to (0,0).
+     * Optimized for PlayableChar.
      *
      * @param name the name of the character
      * @param health the initial health points
@@ -57,10 +61,11 @@ public class GameCharacter {
     }
 
     /**
-     * Constructs a non-combatant character (e.g., Shopkeeper) at (0,0). Optimized for NPChar.
+     * Constructs a non-combatant character (e.g., Shopkeeper) at (0,0), with
+     * health and attack defaulted to 0.
+     * Optimized for NPChar.
      *
      * @param name the name of the character
-     * @param dialogue the text lines spoken by the character
      */
     public GameCharacter(String name) {
         this.name = name;
@@ -161,10 +166,20 @@ public class GameCharacter {
         this.y = y;
     }
 
+    /**
+     * Assigns the Floor instance that this character belongs to.
+     *
+     * @param floor the Floor context to associate with this character
+     */    
     public void setFloor(Floor floor) {
         this.floor = floor;
     }
 
+    /**
+     * Retrieves the Floor instance that this character currently belongs to.
+     *
+     * @return the current Floor context
+     */    
     public Floor getFloor() {
         return this.floor;
     }
@@ -194,24 +209,31 @@ public class GameCharacter {
     }
 
     /**
-     * Deducts health from this character when taking damage from combat or traps.
+     * Deducts health from this character based on an attacking character's attack power.
      *
-     * @param damage the amount of health to lose
+     * @param enemy the GameCharacter dealing the damage
      */
     public void takeDmg(GameCharacter enemy) {
         this.health -= enemy.getAttack();
     }
 
+    /**
+     * Deducts a fixed amount of health from this character, used for
+     * non-combat sources such as trap or hazard damage.
+     *
+     * @param damage the amount of health to lose
+     */ 
     public void takeDmg(float damage) {
         this.health -= damage;
     }
 
     /**
      * Calculates the adjacent tile coordinate based on an input direction.
-     * Map controls correspond to: 0 (Up/W), 1 (Down/S), 2 (Left/A), and 3 (Right/D).
+     * Map controls correspond to: 0 (Up/W), 1 (Down/S), 2 (Left/A), 3 (Right/D),
+     * and, when diagonal movement is enabled, 4 (upper left), 5 (upper right),
+     * 6 (bottom left), and 7 (bottom right).
      *
-     * @param direction integer value from 0 to 3
-     * @param floor     the current Floor grid context
+     * @param direction integer value from 0 to 7 representing the movement direction
      * @return the destination Tile target
      */
     protected Tile nextTile(int direction) {
@@ -248,6 +270,14 @@ public class GameCharacter {
         return next;
     }
 
+    /**
+     * Retrieves the Tile located at the given grid coordinates on this
+     * character's current floor.
+     *
+     * @param x the target X grid coordinate
+     * @param y the target Y grid coordinate
+     * @return the Tile found at the given coordinates
+     */    
     protected Tile nextTile(int x, int y) {
         return this.floor.getMap()[x][y];
     }
@@ -258,7 +288,7 @@ public class GameCharacter {
      * If blocked by a breakable wall, this action handles the digging logic instead.
      *
      * @param direction movement direction index (0 to 7)
-     * @param override  if the movement must be overriden for any reason
+     * @param override  if the movement must be allowed regardless of normal validation rules
      */
     public void move(int direction, boolean override) {
         Tile next = this.nextTile(direction);

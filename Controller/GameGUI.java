@@ -1,4 +1,4 @@
-package game;
+package Controller;
 
 //Playable file
 import Character_Classes.*;
@@ -12,35 +12,53 @@ import java.util.Iterator;
  * Holds all game state (player, dungeons, items, npcs) and exposes the operations the
  * Swing UI (GUI.MainFrame and its panels) calls in response to user actions.
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class GameGUI {
 
+    /** Flag tracking whether a game run is currently in progress. */
     private static boolean ongoingGame = false;
+    /** Flag tracking whether Hanamaru's shop has been unlocked. */
     private static boolean shopUnlocked = false;
+    /** Flag tracking whether the boss dungeon has been unlocked. */
     private static boolean bossUnlocked = false;
+    /** Flag tracking whether the Siren boss fight is currently in progress. */
     private static boolean bossOngoing = false;
+    /** Flag tracking whether the current run has been completed. */
     private static boolean completed = false;
+    /** Flag tracking whether the current run has ended in a game over. */
     private static boolean gameOver = false;
+    /** The running total of gold spent across the current run. */
     private static int goldSpent = 0;
+    /** The running count of times the Siren has been defeated across all runs. */
     private static int sirenDefeated = 0;
+    /** The running count of game overs suffered across all runs. */
     private static int gameOvers = 0;
 
     // Central initializer
+    /** The Initialize instance responsible for building the current run's game state. */
     private static Initialize init;
 
     // References pulled from initializer
+    /** The primary playable character. */
     private static PlayableChar Yohane;
+    /** The secondary playable character, active during the boss fight. */
     private static PlayableChar Lailaps;
+    /** The set of dungeons for the current run. */
     private static Dungeon[] dungeons;
+    /** The catalog of purchasable items for the current run. */
     private static Item[] items;
+    /** The roster of rescuable idol NPCs for the current run. */
     private static NPChar[] npcs;
 
     // Which dungeon/floor the player is currently exploring (null until startDungeon() runs)
+    /** The dungeon the player is currently exploring, or null if none has been entered yet. */
     private static Dungeon currentDungeon;
+    /** The floor the player is currently exploring, or null if none has been entered yet. */
     private static Floor currentFloor;
 
     // Currently active switch pair during the Siren boss fight (null outside of it)
+    /** The currently active pair of switch tiles during Phase 1 of the Siren fight, or null outside of it. */
     private static Tile[] activeSwitches;
 
     /**
@@ -114,6 +132,8 @@ public class GameGUI {
      * first floor, and clears the underlying 'Y' tile so it's not drawn twice.
      * If the dungeon's first floor is the BossFloor, sets up the Siren fight instead
      * (spawning Lailaps too and dealing out the first pair of switches).
+     *
+     * @param dungeon the Dungeon instance the player has chosen to enter
      */
     public static void startDungeon(Dungeon dungeon) {
         currentDungeon = dungeon;
@@ -129,6 +149,8 @@ public class GameGUI {
     /**
      * Places both Yohane and Lailaps on the boss floor (clearing their spawn tiles),
      * and spawns the first pair of switches to kick off Phase 1 of the fight.
+     *
+     * @param bossFloor the BossFloor instance to set up    
      */
     private static void startBossFloor(BossFloor bossFloor) {
         currentFloor = bossFloor;
@@ -152,6 +174,8 @@ public class GameGUI {
     /**
      * Locates Yohane's spawn tile ('Y') on the given floor, sets it as her current
      * floor, and clears that tile to a passable floor tile so it isn't drawn twice.
+     *
+     * @param floor the Floor instance to place Yohane on
      */
     private static void spawnYohaneOnFloor(Floor floor) {
         currentFloor = floor;
@@ -309,6 +333,13 @@ public class GameGUI {
         return false;
     }
 
+    /**
+     * Routes a key press to the appropriate playable-character action: movement
+     * for 'w'/'a'/'s'/'d' (moving Lailaps too while on the boss floor), item use
+     * for ' ', or cycling the selected item for '[' and ']'.
+     *
+     * @param input the key pressed
+     */    
     public static void characterMoves(char input) {
         //if valid direction, moves characters
         if ("wasd".contains(Character.toString(input))) {
@@ -329,6 +360,13 @@ public class GameGUI {
         }
     }
 
+    /**
+     * Prompts a turn of action from every enemy on the given floor: removes and
+     * drops gold for any enemy that has died, and otherwise delegates to that
+     * enemy's own move behavior (Bat or Siren).
+     *
+     * @param currentFloor the Floor whose enemies should act this turn
+     */    
     public static void enemyMoves(Floor currentFloor) {
         //prompts action from enemy characters
         Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
@@ -357,26 +395,56 @@ public class GameGUI {
                 && dungeons[2].isCompleted(Yohane);
     }
 
+    /**
+     * Retrieves the primary playable character.
+     *
+     * @return the Yohane PlayableChar instance
+     */    
     public static PlayableChar getYohane() {
         return Yohane;
     }
 
+    /**
+     * Retrieves the set of dungeons for the current run.
+     *
+     * @return the array of Dungeon instances
+     */    
     public static Dungeon[] getDungeons() {
         return dungeons;
     }
-
+    
+    /**
+     * Retrieves the catalog of purchasable items for the current run.
+     *
+     * @return the array of Item instances
+     */
     public static Item[] getItems() {
         return items;
     }
-
+    
+    /**
+     * Checks whether Hanamaru's shop has been unlocked.
+     *
+     * @return true if the shop is unlocked, false otherwise
+     */
     public static boolean isShopUnlocked() {
         return shopUnlocked;
     }
-
+    
+    /**
+     * Checks whether the boss dungeon has been unlocked.
+     *
+     * @return true if the boss dungeon is unlocked, false otherwise
+     */
     public static boolean isBossUnlocked() {
         return bossUnlocked;
     }
-
+    
+    /**
+     * Checks whether a game run is currently in progress.
+     *
+     * @return true if a run is ongoing, false otherwise
+     */
     public static boolean isOngoingGame() {
         return ongoingGame;
     }
@@ -411,19 +479,36 @@ public class GameGUI {
     /**
      * True once the player has ever completed a run or suffered a game over -
      * used to swap the main menu's "New Game" label to "New Game+".
+     *
+     * @return true if the player has a prior completed or ended run, false otherwise
      */
     public static boolean hasPriorRun() {
         return completed || gameOver;
     }
-
+    
+    /**
+     * Retrieves the secondary playable character.
+     *
+     * @return the Lailaps PlayableChar instance
+     */
     public static PlayableChar getLailaps() {
         return Lailaps;
     }
-
+    
+    /**
+     * Retrieves the floor the player is currently exploring.
+     *
+     * @return the current Floor instance, or null if none has been entered yet
+     */
     public static Floor getCurrentFloor() {
         return currentFloor;
     }
-
+    
+    /**
+     * Retrieves the dungeon the player is currently exploring.
+     *
+     * @return the current Dungeon instance, or null if none has been entered yet
+     */
     public static Dungeon getCurrentDungeon() {
         return currentDungeon;
     }

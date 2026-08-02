@@ -9,7 +9,7 @@ import Dungeon_Classes.*;
  * random movement avoiding heat tiles, and dropping gold upon defeat.
  * 
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class EnemyChar extends GameCharacter {
     //attributes
@@ -19,6 +19,7 @@ public class EnemyChar extends GameCharacter {
     protected int turnsPerMove;
     /** The Manhattan distance radius within which the enemy can detect the player. */
     protected float detectionRange;
+    /** Whether this enemy is permitted to move diagonally as well as orthogonally. */
     protected boolean diagonal;
 
     //constructor
@@ -31,6 +32,7 @@ public class EnemyChar extends GameCharacter {
      * @param goldDrop the amount of gold dropped upon death
      * @param turnsPerMove how often the enemy moves relative to player turns
      * @param detectionRange the sight radius for spotting the player
+     * @param diagonal whether the enemy is allowed to move diagonally
      * @param x the starting X grid coordinate
      * @param y the starting Y grid coordinate
      */
@@ -45,7 +47,7 @@ public class EnemyChar extends GameCharacter {
 
     //getters/setters
     /**
-     * Calculates or retrieves the amount of currency awarded when this entity is defeated.
+     * Retrieves the amount of currency awarded when this entity is defeated.
      * 
      * @return the gold drop amount
      */
@@ -97,13 +99,31 @@ public class EnemyChar extends GameCharacter {
     public void setDetectionRange(float detectionRange) {
         this.detectionRange = detectionRange;
     }
+    
+    /**
+     * Checks whether this enemy is permitted to move diagonally.
+     *
+     * @return true if diagonal movement is allowed, false otherwise
+     */
+    public boolean isDiagonal() {
+        return this.diagonal;
+    }
+
+    /**
+     * Updates whether this enemy is permitted to move diagonally.
+     *
+     * @param diagonal the new diagonal movement permission flag
+     */
+    public void setDiagonal(boolean diagonal) {
+        this.diagonal = diagonal;
+    }
 
     //additional methods
 
     /**
      * Spawns a gold treasure tile at the enemy's current grid position upon defeat.
      *
-     * @param floor the current Floor map context where the tile is placed
+     * @param f the current Floor map context where the tile is placed
      */
     public void dropGold(Floor f) {
         int x = this.x;
@@ -115,6 +135,16 @@ public class EnemyChar extends GameCharacter {
             null, true);
     }
 
+    /**
+     * Calculates the straight-line (Euclidean) distance between two points
+     * using the distance formula.
+     *
+     * @param x1 the X coordinate of the first point
+     * @param y1 the Y coordinate of the first point
+     * @param x2 the X coordinate of the second point
+     * @param y2 the Y coordinate of the second point
+     * @return the distance between the two points
+     */    
     protected double calcDistance(double x1, double y1, double x2, double y2) {
         double xPow, yPow, distance;
 
@@ -130,7 +160,7 @@ public class EnemyChar extends GameCharacter {
      * using the distance formula.
      *
      * @param map the 2D grid matrix of the current floor
-     * @param Yohane the playable character instance to track
+     * @param entity the playable character instance to track
      * @return true if the player is within range, false otherwise
      */
     public boolean detectPlayer(Tile[][] map, PlayableChar entity) {

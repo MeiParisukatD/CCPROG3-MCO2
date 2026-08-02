@@ -2,20 +2,49 @@ package Character_Classes;
 
 import Dungeon_Classes.*;
 
+/**
+ * Represents the Siren boss enemy encountered on the BossFloor.
+ * The Siren remains dormant until released, at which point it pursues and
+ * attacks the nearer of the two playable characters, and can summon Bat
+ * reinforcements scaled to the current difficulty tier.
+ *
+ * @author Katigbak and Porciuncula
+ * @version 2.0
+ */
 public class Siren extends EnemyChar {
+    
+    /** Flag tracking whether the Siren has been released and is active. */
     private boolean released;
     //private BossFloor bossFloor;
 
+    /**
+     * Constructs a Siren boss enemy at the given grid position with fixed
+     * combat stats (10.0 attack, 750 gold drop, 1 turn per move, detection
+     * range of 100, diagonal movement enabled) and a starting health of 1.0.
+     * The Siren begins in a dormant, unreleased state.
+     *
+     * @param x the starting X grid coordinate
+     * @param y the starting Y grid coordinate
+     */    
     public Siren(int x, int y) {
         super("Siren", 1.0f, 10.0f, 750,1, 100, true, x, y);
         //this.bossFloor = null;
         this.released = false;
     }
 
+    /**
+     * Checks whether the Siren has been released and is currently active.
+     *
+     * @return true if the Siren has been released, false otherwise
+     */    
     public boolean isReleased() {
         return this.released;
     }
     
+
+    /**
+     * Releases the Siren, activating its movement and attack behavior.
+     */    
     public void release() {
         System.out.println("RELEASE SUCCESSFUL");
         this.released = true;
@@ -23,7 +52,14 @@ public class Siren extends EnemyChar {
     }
 
     /**
-     * Spawns a Bat with tiered difficulty based on switch triggers.
+     * Spawns a Bat with tiered difficulty based on switch triggers, placing it
+     * on a randomly chosen empty tile that is not occupied by Lailaps, Yohane,
+     * another enemy, or an exclusion zone.
+     *
+     * @param xL the X coordinate of Lailaps
+     * @param yL the Y coordinate of Lailaps
+     * @param xY the X coordinate of Yohane
+     * @param yY the Y coordinate of Yohane
      */
     public void summonBat(int xL, int yL, int xY, int yY) {
         BossFloor bossFloor = (BossFloor)this.floor;
@@ -60,6 +96,14 @@ public class Siren extends EnemyChar {
         bossFloor.addEnemy(bat);
     }
 
+    /**
+     * Manages the Siren's turn execution while released: attacks whichever
+     * playable character is adjacent, or otherwise moves one tile toward the
+     * nearer of the two playable characters. Takes no action while dormant.
+     *
+     * @param Yohane  the first playable character reference
+     * @param Lailaps the second playable character reference
+     */    
     public void move(PlayableChar Yohane, PlayableChar Lailaps) {
         BossFloor bossFloor = (BossFloor)this.floor;
         System.out.println("RELEASED " + this.released);

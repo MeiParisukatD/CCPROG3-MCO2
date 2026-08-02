@@ -5,16 +5,18 @@ import Character_Classes.*;
 /**
  * Manages item offerings, dynamic menu rendering, and purchasing logic in Hanamaru's Store.
  * Handles store availability, item unlocking based on rescued NPCs, and player transactions.
- * 
+ *
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class Shop {
     /** The catalog of items available in the shop. */
     private Item[] items;
 
     /**
-     * Constructs Hanamaru's Shop and initializes the item catalog with default inventory.
+     * Constructs Hanamaru's Shop with the given item catalog.
+     *
+     * @param items the array of Item entries stocked in the shop
      */
     public Shop(Item[] items) {
         this.items = items;
@@ -28,10 +30,10 @@ public class Shop {
     }
 
     /**
-     * Displays only unlocked shop items alongside the player's total gold balance 
+     * Displays only unlocked shop items alongside the player's total gold balance
      * and transaction outcome notifications.
      *
-     * @param savedIdols  array of rescued NPChar idols to evaluate unlock conditions
+     * @param idols  array of rescued NPChar idols to evaluate unlock conditions
      * @param player      the active PlayableChar accessing the shop
      * @param lastMessage status message from the previous purchase attempt
      */
@@ -66,7 +68,7 @@ public class Shop {
     }
 
     /**
-     * Processes an item sale transaction for the player after verifying gold 
+     * Processes an item sale transaction for the player after verifying gold
      * reserves and duplicate ownership rules.
      *
      * @param choice the 1-based index of the item selected from the catalog

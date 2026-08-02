@@ -1,4 +1,4 @@
-package game;
+package Controller;
 
 //class for initializing variables
 import java.util.ArrayList; // Import the ArrayList class
@@ -6,14 +6,35 @@ import Character_Classes.*;
 import Dungeon_Classes.*;
 import Item_Classes.*;
 
+/**
+ * Handles the one-time setup and randomized generation of core game state.
+ * Constructs the playable characters, the roster of rescuable NPCs, the shop
+ * item catalog, and the set of dungeons (with randomized names, floor counts,
+ * and map files) used to start a game or New Game+ run.
+ *
+ * @author Katigbak and Porciuncula
+ * @version 2.0
+ */
 public class Initialize {
+    /** The catalog of purchasable items available across the run. */
     private Item[] items;
+    /** The roster of rescuable idol NPCs available across the run. */
     private NPChar[] NPCs;
+    /** The primary playable character. */
     private PlayableChar Yohane;
+    /** The secondary playable character, active during the boss fight. */
     private PlayableChar Lailaps;
+    /** The set of generated dungeons for this run. */
     private Dungeon[] dungeons;
+    /** Helper collection tracking dungeon names and map files already assigned, to avoid duplicates. */
     private ArrayList<String> taken;
-
+    
+    /**
+     * Constructs the initializer, creating fresh playable characters and
+     * generating the run's dungeons. NPCs and items are only generated if
+     * they have not already been assigned, so that New Game+ runs can reuse
+     * the same rescued-idol and item state.
+     */
     public Initialize() {
         this.Yohane = new PlayableChar("Yohane", 3, 1);
         this.Lailaps = new PlayableChar("Lailaps", 4, 0);
@@ -25,36 +46,74 @@ public class Initialize {
         initializeDungeons();
     }
 
-    //Getters
+    /**
+     * Assigns the item catalog to reuse, typically carried over from a prior run.
+     *
+     * @param items the item catalog to assign
+     */
     public void setItems(Item[] items) {
         this.items = items;
     }
-
+    
+    /**
+     * Assigns the NPC roster to reuse, typically carried over from a prior run.
+     *
+     * @param NPCs the NPC roster to assign
+     */
     public void setNPCs(NPChar[] NPCs) {
         this.NPCs = NPCs;
     }
 
+    /**
+     * Retrieves the item catalog.
+     *
+     * @return the array of items
+     */
     public Item[] getItems() {
         return this.items;
     }
 
+    /**
+     * Retrieves the NPC roster.
+     *
+     * @return the array of rescuable NPCs
+     */
     public NPChar[] getNPCs() {
         return this.NPCs;
     }
 
+    /**
+     * Retrieves the primary playable character.
+     *
+     * @return the Yohane PlayableChar instance
+     */
     public PlayableChar getYohane() {
         return this.Yohane;
     }
 
+    /**
+     * Retrieves the secondary playable character.
+     *
+     * @return the Lailaps PlayableChar instance
+     */
     public PlayableChar getLailaps() {
         return this.Lailaps;
     }
 
+    /**
+     * Retrieves the set of generated dungeons.
+     *
+     * @return the array of Dungeon instances for this run
+     */
     public Dungeon[] getDungeons() {
         return this.dungeons;
     }
 
     //initializers
+    /**
+     * Builds the full catalog of purchasable items, linking each locked item
+     * to the NPC whose rescue unlocks it.
+     */
     private void initializeItems() {
         //all game items
         this.items = new Item[] {
@@ -70,6 +129,9 @@ public class Initialize {
         };
     }
 
+    /**
+     * Builds the fixed roster of rescuable idol NPCs, one per dungeon.
+     */
     private void initializeNPCs() {
         //idols to be saved
         this.NPCs = new NPChar[] {
@@ -84,6 +146,11 @@ public class Initialize {
         };
     }
 
+    /**
+     * Randomly assigns names, floor counts, and map layouts to build the
+     * four dungeons for this run: three standard dungeons of increasing
+     * floor count, followed by the fixed single-floor Siren boss dungeon.
+     */
     private void initializeDungeons() {
         String[] names = { //library of dungeon names
             "Uchiura Bay Pier",
@@ -95,7 +162,7 @@ public class Initialize {
             "Numazu Deep Sea Aquarium",
             "Awashima Marine Park",
         };
-        
+
         this.dungeons = new Dungeon[4];
         int i, n, NumFloor;
         String name;
@@ -126,6 +193,13 @@ public class Initialize {
         }
     }
 
+    /**
+     * Generates a set of Floor instances for a standard dungeon, randomly
+     * assigning a distinct, not-yet-used map file to each floor.
+     *
+     * @param amount the number of floors to generate
+     * @return the array of generated Floor instances
+     */
     private Floor[] assignFloors(int amount) {
         Floor[] floors = new Floor[amount];
         String file;
@@ -146,6 +220,13 @@ public class Initialize {
         return floors;
     }
 
+    /**
+     * Resolves the NPC idol associated with a given dungeon name.
+     *
+     * @param name the name of the dungeon to look up
+     * @return the corresponding NPChar rescue target, or null if the name is
+     *         unrecognized or belongs to the Siren's dungeon
+     */
     private NPChar assignNPC(String name) {
         //assigns corresponding NPC based on dungeon name
         if (name.equalsIgnoreCase("Uchiura Bay Pier")) {

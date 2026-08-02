@@ -2,13 +2,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package GUI;
+package View;
 
-import game.GameGUI;
+import Controller.GameGUI;
 import java.awt.CardLayout;
 /**
- *
- * @author rhian
+ * Top-level Swing window and entry point of the View layer. Hosts every
+ * game screen as a card in a {@link java.awt.CardLayout}, owns one
+ * instance of each panel, and switches between them via {@link #showCard}.
+ * Panels reach each other through this frame for cross-panel navigation
+ * and refresh calls.
+ * 
+ * @author Katigbak and Porciuncula
+ * @version 2.0
  */
 public class MainFrame extends javax.swing.JFrame {
     
@@ -19,7 +25,8 @@ public class MainFrame extends javax.swing.JFrame {
     private InventoryPanel inventoryPanel;
     
     /**
-     * Creates new form MainFrame
+     * Constructs the main window, builds and registers every screen as a
+     * card, and shows the main menu first.
      */
     public MainFrame() {
         initComponents();
@@ -40,6 +47,14 @@ public class MainFrame extends javax.swing.JFrame {
         showCard("MENU");
     }
     
+    /**
+     * Switches the visible card to the one registered under the given
+     * name, refreshing the main menu first if that's the card being shown.
+     *
+     * @param cardName the registered card identifier - one of
+     *                 {@code "MENU"}, {@code "GAMEMENU"}, {@code "GAME"},
+     *                 or {@code "INVENTORY"}
+     */
     public void showCard(String cardName) {
         if (cardName.equals("MENU")) {
             menuPanel.refresh();
@@ -48,6 +63,10 @@ public class MainFrame extends javax.swing.JFrame {
         layout.show(cardPanel, cardName);
     }
     
+    /**
+     * Starts a fresh run: resets Controller state, refreshes the game
+     * panel's stats and map, then switches to the game card.
+     */
     public void startGame() {
 
         GameGUI.initialize();
@@ -58,18 +77,30 @@ public class MainFrame extends javax.swing.JFrame {
         showCard("GAME");
     }
     
+    /**
+     * @return the game panel instance
+     */
     public GamePanel getGamePanel() {
         return gamePanel;
     }
-
+    
+    /**
+     * @return the dungeon-select menu panel instance
+     */
     public GameMenuPanel getGameMenuPanel() {
         return gameMenuPanel;
     }
-
+    
+    /**
+     * @return the main menu panel instance
+     */
     public MainMenuPanel getMainMenuPanel() {
         return menuPanel;
     }
-    
+
+    /**
+     * @return the inventory panel instance
+     */ 
     public InventoryPanel getInventoryPanel() {
         return inventoryPanel;
     }
@@ -87,7 +118,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1060, 460));
-        setPreferredSize(new java.awt.Dimension(1060, 460));
         setResizable(false);
 
         cardPanel.setMinimumSize(new java.awt.Dimension(1060, 460));
@@ -109,7 +139,10 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * @param args the command line arguments
+     * Application entry point: applies the Nimbus look and feel if
+     * available, then constructs and shows the main window.
+     *
+     * @param args command line arguments (unused)
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

@@ -4,11 +4,11 @@ import Character_Classes.*;
 
 /**
  * Represents a multi-floor dungeon layout within the game world.
- * Manages the progressive tracking of floors, verification of completion criteria, 
+ * Manages the progressive tracking of floors, verification of completion criteria,
  * floor transition increments, and end-of-game logic when a player character is defeated.
- * 
+ *
  * @author Katigbak and Porciuncula
- * @version 1.0
+ * @version 2.0
  */
 public class Dungeon {
     //attributes
@@ -18,24 +18,25 @@ public class Dungeon {
     private int dungeonNum;
     /** The total count of floor stages contained in this dungeon. */
     private int numFloors;
-    /** The total count of floor stages contained in this dungeon. */
+    /** The current floor stage the player is progressing through. */
     private int curFloor;
-    /** The array array structure managing the individual Floor environments. */
+    /** The array structure managing the individual Floor environments. */
     private Floor[] floors;
     /** Flag tracking whether the final floor has been fully cleared. */
     private boolean completion;
-    /** Member to be saved from dungeon. */
+    /** The NPC idol to be rescued upon clearing this dungeon. */
     private NPChar member;
 
     //constructor
     /**
-     * Constructs a dungeon environment with predefined floors, resetting the current 
+     * Constructs a dungeon environment with predefined floors, resetting the current
      * floor tracking index to its baseline starting stage.
      *
      * @param name the structural name of the dungeon
      * @param dungeonNum the identifying number of the dungeon
      * @param numFloors the ceiling number of floors inside this structure
      * @param floors the composite array of Floor items making up the dungeon layout
+     * @param member the NPC idol to be rescued upon clearing this dungeon
      */
     public Dungeon(String name, int dungeonNum, int numFloors, Floor[] floors, NPChar member) {
         this.name = name;
@@ -102,7 +103,7 @@ public class Dungeon {
         return this.floors;
     }
 
-     /**
+    /**
      * Retrieves the associated member.
      *
      * @return NPChar instance
@@ -111,10 +112,9 @@ public class Dungeon {
         return this.member;
     }
 
-
     //additional methods
     /**
-     * Evaluates dungeon completion by checking the termination status of 
+     * Evaluates dungeon completion by checking the termination status of
      * the final floor within the array stack.
      *
      * @param entity the playable character instance to evaluate
@@ -127,7 +127,7 @@ public class Dungeon {
     }
 
     /**
-     * Advances the tracking index for the player's active floor map level, 
+     * Advances the tracking index for the player's active floor map level,
      * capped at the defined upper bound number of maximum floors.
      */
     public void incrementCurFloor() {
@@ -137,7 +137,7 @@ public class Dungeon {
     }
 
     /**
-     * Monitors the user's survival state. If death is detected, it logs 
+     * Monitors the user's survival state. If death is detected, it logs
      * formatted console readouts indicating the asset culprit responsible.
      *
      * @param entity the user-controlled character instance to monitor
