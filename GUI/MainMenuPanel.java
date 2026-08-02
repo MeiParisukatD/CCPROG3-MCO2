@@ -18,7 +18,6 @@ public class MainMenuPanel extends javax.swing.JPanel {
     public MainMenuPanel(MainFrame frame) {
         initComponents();
         UITheme.apply(this);
-        System.out.println("Icon loaded: " + (lblTitle.getIcon() != null));
         this.frame = frame;
     }
     
