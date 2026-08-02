@@ -23,6 +23,8 @@ public class MainFrame extends javax.swing.JFrame {
     private GameMenuPanel gameMenuPanel;
     private GamePanel gamePanel;
     private InventoryPanel inventoryPanel;
+    private StatusPanel statusPanel;
+    private ShopPanel shopPanel;
     
     /**
      * Constructs the main window, builds and registers every screen as a
@@ -38,11 +40,15 @@ public class MainFrame extends javax.swing.JFrame {
         gameMenuPanel = new GameMenuPanel(this);
         gamePanel = new GamePanel(this);
         inventoryPanel = new InventoryPanel(this);
+        statusPanel = new StatusPanel(this);
+        shopPanel = new ShopPanel(this);
 
         cardPanel.add(menuPanel, "MENU");
         cardPanel.add(gameMenuPanel, "GAMEMENU");
         cardPanel.add(gamePanel, "GAME");
         cardPanel.add(inventoryPanel, "INVENTORY");
+        cardPanel.add(statusPanel, "STATUS");
+        cardPanel.add(statusPanel, "SHOP");
 
         showCard("MENU");
     }
