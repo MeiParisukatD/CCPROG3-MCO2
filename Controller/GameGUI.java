@@ -11,6 +11,7 @@ import java.util.Iterator;
  * Serves as the main orchestrator for "Yohane The Parhelion! The Siren in the Mirror World!".
  * Holds all game state (player, dungeons, items, npcs) and exposes the operations the
  * Swing UI (GUI.MainFrame and its panels) calls in response to user actions.
+ *
  * @author Katigbak and Porciuncula
  * @version 2.0
  */
@@ -150,7 +151,7 @@ public class GameGUI {
      * Places both Yohane and Lailaps on the boss floor (clearing their spawn tiles),
      * and spawns the first pair of switches to kick off Phase 1 of the fight.
      *
-     * @param bossFloor the BossFloor instance to set up    
+     * @param bossFloor the BossFloor instance to set up
      */
     private static void startBossFloor(BossFloor bossFloor) {
         currentFloor = bossFloor;
@@ -235,9 +236,17 @@ public class GameGUI {
                 }
 
                 // Unlock Hanamaru's shop once she's been rescued
-                if (currentDungeon.getMember().getName().equalsIgnoreCase("Hanamaru Kunikida")) {
+                boolean unlockedShopNow = currentDungeon.getMember().getName().equalsIgnoreCase("Hanamaru Kunikida");
+                if (unlockedShopNow) {
                     shopUnlocked = true;
                 }
+
+                // Announce the rescue and play the idol's story dialogue
+                printRescueDialogue(
+                    currentDungeon.getName(),
+                    currentDungeon.getMember(),
+                    unlockedShopNow ? "Unlocked: Hanamaru's Store Now Available!" : null
+                );
 
                 // Recheck whether all 3 non-boss dungeons are now cleared
                 refreshBossUnlockStatus();
@@ -284,7 +293,7 @@ public class GameGUI {
 
         Yohane.checkHeatDamage(prevXY, prevYY);
         Lailaps.checkHeatDamage(prevXL, prevYL);
-        
+
         Yohane.setAttackedThisTurn(false);
         Lailaps.setAttackedThisTurn(false);
 
@@ -339,7 +348,7 @@ public class GameGUI {
      * for ' ', or cycling the selected item for '[' and ']'.
      *
      * @param input the key pressed
-     */    
+     */
     public static void characterMoves(char input) {
         //if valid direction, moves characters
         if ("wasd".contains(Character.toString(input))) {
@@ -366,7 +375,7 @@ public class GameGUI {
      * enemy's own move behavior (Bat or Siren).
      *
      * @param currentFloor the Floor whose enemies should act this turn
-     */    
+     */
     public static void enemyMoves(Floor currentFloor) {
         //prompts action from enemy characters
         Iterator<EnemyChar> it = currentFloor.getEnemies().iterator();
@@ -396,10 +405,46 @@ public class GameGUI {
     }
 
     /**
+     * Prints the "Dungeon Cleared" banner and story dialogue for a newly rescued
+     * idol. Each idol's dialogue is keyed by name below; idols without a written
+     * scene yet fall through to the default case and only show the banner.
+     *
+     * @param dungeonName   the name of the dungeon that was just cleared
+     * @param member        the NPC idol who was just rescued
+     * @param unlockMessage an optional extra "Unlocked: ..." line shown under the
+     *                      banner (e.g. for Hanamaru's shop), or null if none applies
+     */
+    private static void printRescueDialogue(String dungeonName, NPChar member, String unlockMessage) {
+        System.out.println("\n************************************************************");
+        System.out.println("Dungeon Cleared!");
+        System.out.println(dungeonName + " Completed!");
+        System.out.println(member.getName() + " rescued!");
+        if (unlockMessage != null) {
+            System.out.println(unlockMessage);
+        }
+        System.out.println("************************************************************\n");
+
+        switch (member.getName()) {
+            case "Hanamaru Kunikida":
+                System.out.println("Hanamaru: Yohane-chan, zura! You're here!");
+                System.out.println("Yohane: Hanamaru! We have to get out of here quickly!");
+                System.out.println("Hanamaru: Oh? I was wondering what this place was and why there are bats everywhere, zura!");
+                System.out.println("Yohane: Seems like there's a Siren that wants to take your voices and is holding you in this dimension so that your counterparts in the real world can't sing!");
+                System.out.println("Hanamaru: Really? That sounds terrifying, zura. What have we got to do?");
+                System.out.println("Yohane: First, we have to get out of here, Zuramaru! I know the way out.");
+                System.out.println("Hanamaru: Lead the way, zura!");
+                break;
+            default:
+                // TODO: add rescue dialogue for the remaining idols
+                break;
+        }
+    }
+
+    /**
      * Retrieves the primary playable character.
      *
      * @return the Yohane PlayableChar instance
-     */    
+     */
     public static PlayableChar getYohane() {
         return Yohane;
     }
@@ -408,11 +453,11 @@ public class GameGUI {
      * Retrieves the set of dungeons for the current run.
      *
      * @return the array of Dungeon instances
-     */    
+     */
     public static Dungeon[] getDungeons() {
         return dungeons;
     }
-    
+
     /**
      * Retrieves the catalog of purchasable items for the current run.
      *
@@ -421,7 +466,7 @@ public class GameGUI {
     public static Item[] getItems() {
         return items;
     }
-    
+
     /**
      * Checks whether Hanamaru's shop has been unlocked.
      *
@@ -430,7 +475,7 @@ public class GameGUI {
     public static boolean isShopUnlocked() {
         return shopUnlocked;
     }
-    
+
     /**
      * Checks whether the boss dungeon has been unlocked.
      *
@@ -439,7 +484,7 @@ public class GameGUI {
     public static boolean isBossUnlocked() {
         return bossUnlocked;
     }
-    
+
     /**
      * Checks whether a game run is currently in progress.
      *
@@ -485,7 +530,7 @@ public class GameGUI {
     public static boolean hasPriorRun() {
         return completed || gameOver;
     }
-    
+
     /**
      * Retrieves the secondary playable character.
      *
@@ -494,7 +539,7 @@ public class GameGUI {
     public static PlayableChar getLailaps() {
         return Lailaps;
     }
-    
+
     /**
      * Retrieves the floor the player is currently exploring.
      *
@@ -503,7 +548,7 @@ public class GameGUI {
     public static Floor getCurrentFloor() {
         return currentFloor;
     }
-    
+
     /**
      * Retrieves the dungeon the player is currently exploring.
      *
