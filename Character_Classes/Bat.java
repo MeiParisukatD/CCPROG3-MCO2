@@ -33,15 +33,13 @@ public class Bat extends EnemyChar {
                 //enemies are not mentioned to be able to move over heat tiles
                 //this is exclusive to enemies, thus is checked uniquely in this method
                 do {
-                    //checks if another enemy is already at that position
-                    //generate random direction
                     direction = (int)(Math.random() * max);
                     next = nextTile(direction);
-
                     taken = this.floor.tileTaken(next.getX(), next.getY());
                 } while (next.getSymbol() == 'h' || next.getSymbol() == 'E' || taken);
 
-                super.move(direction, false);
+                boolean crossWater = (next.getSymbol() == 'w');
+                super.move(direction, crossWater);   // was: super.move(direction, false);
             }
         }
     }
