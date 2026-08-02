@@ -253,6 +253,35 @@ public class GameGUI {
         return ongoingGame;
     }
 
+    /**
+     * Call when the player has just chosen "New Game" / "New Game+" from the
+     * main menu. Resets game state and marks a run as in progress.
+     */
+    public static void beginNewRun() {
+        initialize();
+        ongoingGame = true;
+    }
+
+    /**
+     * Call once, right after detecting Yohane.charDeath() (or Lailaps' during
+     * the boss fight), to record the game over and reset state for next time.
+     * Read any death info (HP, cause) from the player BEFORE calling this -
+     * initialize() replaces Yohane with a fresh PlayableChar.
+     */
+    public static void handleGameOver() {
+        gameOvers++;
+        gameOver = true;
+        initialize();
+    }
+
+    /**
+     * True once the player has ever completed a run or suffered a game over -
+     * used to swap the main menu's "New Game" label to "New Game+".
+     */
+    public static boolean hasPriorRun() {
+        return completed || gameOver;
+    }
+
     public static PlayableChar getLailaps() {
         return Lailaps;
     }

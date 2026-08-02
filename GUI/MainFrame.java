@@ -29,7 +29,6 @@ public class MainFrame extends javax.swing.JFrame {
         gamePanel = new GamePanel(this);
         inventoryPanel = new InventoryPanel(this);
 
-
         cardPanel.add(menuPanel, "MENU");
         cardPanel.add(gameMenuPanel, "GAMEMENU");
         cardPanel.add(gamePanel, "GAME");
@@ -40,6 +39,9 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public void showCard(String cardName) {
+        if (cardName.equals("MENU")) {
+            menuPanel.refresh();
+        }
         CardLayout layout = (CardLayout) cardPanel.getLayout();
         layout.show(cardPanel, cardName);
     }

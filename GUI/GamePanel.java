@@ -5,13 +5,14 @@
 package GUI;
 
 import game.GameGUI;
-import Character_Classes.PlayableChar;
+import Character_Classes.*;
 import Dungeon_Classes.Floor;
 import java.awt.GridLayout;
 import Dungeon_Classes.Tile;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 /**
@@ -65,20 +66,23 @@ public class GamePanel extends javax.swing.JPanel {
 
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                char symbol;
-
-                // Draw Yohane on top of the map
+                char symbol= map[i][j].getSymbol();
+                
+                for (EnemyChar enemy : floor.getEnemies()) {
+                    if (enemy.getX() == i && enemy.getY() == j) {
+                        symbol = (enemy instanceof Siren) ? 'S' : 'b';
+                        break;
+                    }
+                }
+                
                 if (player != null && player.getX() == i && player.getY() == j) {
                     symbol = 'Y';
                 }
-                else {
-                    symbol = map[i][j].getSymbol();
-                }
-
+            
                 JLabel tile = new JLabel(String.valueOf(symbol), SwingConstants.CENTER);
                 if (symbol == 'Y')
                     tile.setForeground(Color.BLUE);
-                else if (symbol == 'B' || symbol == 'S')
+                else if (symbol == 'b' || symbol == 'B' || symbol == 'S')
                     tile.setForeground(Color.RED);
                 else if (symbol == 'E')
                     tile.setForeground(Color.GREEN);
@@ -98,48 +102,77 @@ public class GamePanel extends javax.swing.JPanel {
 
         boolean dungeonCleared = GameGUI.processTurn(input);
 
-        refreshStats();
-        refreshMap();
-        
-        if (dungeonCleared) {
-            frame.getGameMenuPanel().refresh();
-            frame.showCard("GAMEMENU");
-            return;
-}       
-
         PlayableChar player = GameGUI.getYohane();
 
+        // --- Game Over ---
         if (player != null && player.charDeath()) {
-            txtLog.append("\nGame Over!");
+            String killer = player.getCauseOfDeath();
+
+            // Reads/records the death BEFORE calling handleGameOver(), which
+            // replaces Yohane with a fresh PlayableChar via initialize().
+            GameGUI.handleGameOver();
+
+            JOptionPane.showMessageDialog(this,
+                    "You Died!\nKilled by: " + killer,
+                    "Game Over",
+                    JOptionPane.ERROR_MESSAGE);
+
             frame.showCard("MENU");
+            return;
+        }
+
+        refreshStats();
+        refreshMap();
+
+        // --- Dungeon Cleared ---
+        if (dungeonCleared) {
+            Dungeon_Classes.Dungeon dungeon = GameGUI.getCurrentDungeon();
+            String memberName = dungeon.getMember().getName();
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("Dungeon Cleared!\n");
+            msg.append(dungeon.getName()).append(" Completed!\n");
+            msg.append(memberName).append(" rescued!");
+
+            if (memberName.equalsIgnoreCase("Hanamaru Kunikida")) {
+                msg.append("\n\nUnlocked: Hanamaru's Store Now Available!");
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    msg.toString(),
+                    "Dungeon Cleared!",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            frame.getGameMenuPanel().refresh();
+            frame.showCard("GAMEMENU");
         }
     }
     
     private void setupKeyBindings() {
-    javax.swing.InputMap im = this.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW);
-    javax.swing.ActionMap am = this.getActionMap();
+        javax.swing.InputMap im = this.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW);
+        javax.swing.ActionMap am = this.getActionMap();
 
-    im.put(javax.swing.KeyStroke.getKeyStroke('w'), "moveUp");
-    im.put(javax.swing.KeyStroke.getKeyStroke('a'), "moveLeft");
-    im.put(javax.swing.KeyStroke.getKeyStroke('s'), "moveDown");
-    im.put(javax.swing.KeyStroke.getKeyStroke('d'), "moveRight");
-    im.put(javax.swing.KeyStroke.getKeyStroke(' '), "useItem");
+        im.put(javax.swing.KeyStroke.getKeyStroke('w'), "moveUp");
+        im.put(javax.swing.KeyStroke.getKeyStroke('a'), "moveLeft");
+        im.put(javax.swing.KeyStroke.getKeyStroke('s'), "moveDown");
+        im.put(javax.swing.KeyStroke.getKeyStroke('d'), "moveRight");
+        im.put(javax.swing.KeyStroke.getKeyStroke(' '), "useItem");
 
-    am.put("moveUp", new javax.swing.AbstractAction() {
-        @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('w'); }
-    });
-    am.put("moveLeft", new javax.swing.AbstractAction() {
-        @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('a'); }
-    });
-    am.put("moveDown", new javax.swing.AbstractAction() {
-        @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('s'); }
-    });
-    am.put("moveRight", new javax.swing.AbstractAction() {
-        @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('d'); }
-    });
-    am.put("useItem", new javax.swing.AbstractAction() {
-        @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn(' '); }
-    });
+        am.put("moveUp", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('w'); }
+        });
+        am.put("moveLeft", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('a'); }
+        });
+        am.put("moveDown", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('s'); }
+        });
+        am.put("moveRight", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn('d'); }
+        });
+        am.put("useItem", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { processTurn(' '); }
+        });
 }
     
     /**
@@ -157,10 +190,6 @@ public class GamePanel extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextArea();
         mapPanel = new javax.swing.JPanel();
-        btnUp = new javax.swing.JButton();
-        btnLeft = new javax.swing.JButton();
-        btnRight = new javax.swing.JButton();
-        btnDown = new javax.swing.JButton();
         lblTurn = new javax.swing.JLabel();
 
         lblHP.setText("HP: 20/20");
@@ -189,18 +218,6 @@ public class GamePanel extends javax.swing.JPanel {
             .addGap(0, 198, Short.MAX_VALUE)
         );
 
-        btnUp.setText("^");
-        btnUp.addActionListener(this::btnUpActionPerformed);
-
-        btnLeft.setText("<");
-        btnLeft.addActionListener(this::btnLeftActionPerformed);
-
-        btnRight.setText(">");
-        btnRight.addActionListener(this::btnRightActionPerformed);
-
-        btnDown.setText("v");
-        btnDown.addActionListener(this::btnDownActionPerformed);
-
         lblTurn.setText("jLabel1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -225,19 +242,7 @@ public class GamePanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(55, 55, 55)
-                        .addComponent(btnLeft)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
-                        .addComponent(btnRight)
-                        .addGap(67, 67, 67))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnDown)
-                            .addComponent(btnUp))
-                        .addGap(116, 116, 116))))
+                .addContainerGap(251, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -256,44 +261,13 @@ public class GamePanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(259, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnUp)
-                        .addGap(19, 19, 19)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnLeft)
-                            .addComponent(btnRight))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnDown)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26))))
+                .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpActionPerformed
-        processTurn('w');
-    }//GEN-LAST:event_btnUpActionPerformed
-
-    private void btnLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLeftActionPerformed
-        processTurn('a');
-    }//GEN-LAST:event_btnLeftActionPerformed
-
-    private void btnDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDownActionPerformed
-        processTurn('s');
-    }//GEN-LAST:event_btnDownActionPerformed
-
-    private void btnRightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRightActionPerformed
-        processTurn('d');
-    }//GEN-LAST:event_btnRightActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnDown;
-    private javax.swing.JButton btnLeft;
-    private javax.swing.JButton btnRight;
-    private javax.swing.JButton btnUp;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFloor;
     private javax.swing.JLabel lblGold;

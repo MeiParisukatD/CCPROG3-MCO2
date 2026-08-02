@@ -24,6 +24,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
         initComponents();
         this.frame = frame;
         btnInventory.addActionListener(this::btnInventoryActionPerformed);
+        btnQuit.addActionListener(this::btnQuitActionPerformed);
     }
 
     public void refresh() {
@@ -95,6 +96,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
         btnIdols.setText("Idols");
 
         btnQuit.setText("Quit");
+        btnQuit.addActionListener(this::btnQuitActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -175,6 +177,10 @@ public class GameMenuPanel extends javax.swing.JPanel {
         frame.getInventoryPanel().refresh();
         frame.showCard("INVENTORY");
     }//GEN-LAST:event_btnInventoryActionPerformed
+
+    private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
+        frame.showCard("MENU");
+    }//GEN-LAST:event_btnQuitActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

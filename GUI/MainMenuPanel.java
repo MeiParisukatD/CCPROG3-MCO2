@@ -19,6 +19,18 @@ public class MainMenuPanel extends javax.swing.JPanel {
         initComponents();
         this.frame = frame;
     }
+    
+    /**
+     * Shows/hides Continue depending on whether a run is in progress, and
+     * swaps the New Game button's label to "New Game+" once the player has
+     * ever completed a run or hit a game over. Call this every time before
+     * this panel is shown (MainFrame.showCard("MENU") already does this).
+     */
+    public void refresh() {
+        btnContinue.setVisible(GameGUI.isOngoingGame());
+        btnNewGame.setText(GameGUI.hasPriorRun() ? "New Game+" : "New Game");
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -84,7 +96,8 @@ public class MainMenuPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
-        // TODO add your handling code here:
+        frame.getGameMenuPanel().refresh();
+        frame.showCard("GAMEMENU");
     }//GEN-LAST:event_btnContinueActionPerformed
 
     private void btnStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStatusActionPerformed
@@ -92,11 +105,11 @@ public class MainMenuPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_btnStatusActionPerformed
 
     private void btnNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewGameActionPerformed
-        GameGUI.initialize();
+        GameGUI.beginNewRun();
 
-    frame.getGameMenuPanel().refresh();
+        frame.getGameMenuPanel().refresh();
 
-    frame.showCard("GAMEMENU");
+        frame.showCard("GAMEMENU");
     }//GEN-LAST:event_btnNewGameActionPerformed
 
 
