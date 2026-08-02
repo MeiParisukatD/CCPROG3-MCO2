@@ -74,8 +74,7 @@ public class ShopPanel extends JPanel {
             }
         });
         right.addActionListener(e -> {
-            Item[] visibleItems = getVisibleItems();
-            if ((pageIndex + 1) * 4 < visibleItems.length) {
+            if ((pageIndex + 1) * 4 < getCurrentItems().length) {
                 pageIndex++;
                 renderPage(pageIndex);
             }
@@ -117,54 +116,50 @@ public class ShopPanel extends JPanel {
     }
 
     private void renderPage(int index) {
-        Item[] visibleItems = getVisibleItems();
-        if (visibleItems.length == 0) {
-            pageIndex = 0;
-        } else if (index * 4 >= visibleItems.length) {
-            pageIndex = Math.max(0, (visibleItems.length - 1) / 4);
-        } else {
-            pageIndex = index;
-        }
-
+        Item[] items = getCurrentItems();
         itemGrid.removeAll();
-        itemGrid.setLayout(new GridLayout(0, 2, 10, 10));
+        itemGrid.setLayout(new GridLayout(2, 2, 10, 10));
 
-        int start = pageIndex * 4;
+        int start = index * 4;
         for (int slot = 0; slot < 4; slot++) {
             int itemIndex = start + slot;
-            Item item = (itemIndex < visibleItems.length) ? visibleItems[itemIndex] : null;
-            if (item == null) {
-                continue;
-            }
+            Item item = (itemIndex < items.length) ? items[itemIndex] : null;
 
             JPanel box = new JPanel(new BorderLayout(4, 4));
             box.setBackground(darkPink);
             box.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-            JButton button = new JButton(getScaledIconForItem(item, 64, 64));
-            button.setFocusable(false);
-            button.setBorderPainted(false);
-            button.setContentAreaFilled(false);
-            button.setPreferredSize(new Dimension(64, 64));
-            button.setMinimumSize(new Dimension(64, 64));
-            button.setMaximumSize(new Dimension(64, 64));
-            button.addActionListener(e -> buyItem(item));
+            if (item == null) {
+                JButton empty = new JButton(" ");
+                empty.setFocusable(false);
+                box.add(empty, BorderLayout.CENTER);
+            } else {
+                JButton button = new JButton(getScaledIcon(itemIndex, 64, 64));
+                button.setFocusable(false);
+                button.setBorderPainted(false);
+                button.setContentAreaFilled(false);
+                button.setPreferredSize(new Dimension(64, 64));
+                button.setMinimumSize(new Dimension(64, 64));
+                button.setMaximumSize(new Dimension(64, 64));
+                button.addActionListener(e -> buyItem(item));
 
-            JLabel name = new JLabel(item.getName(), SwingConstants.CENTER);
-            name.setFont(new Font("SansSerif", Font.PLAIN, 11));
-            name.setForeground(purple);
-            JLabel price = new JLabel(item.getPrice() + " gold", SwingConstants.CENTER);
-            price.setFont(new Font("SansSerif", Font.PLAIN, 11));
-            price.setForeground(purple);
+                JLabel name = new JLabel(item.getName(), SwingConstants.CENTER);
+                name.setFont(new Font("SansSerif", Font.PLAIN, 11));
+                name.setForeground(purple);
+                JLabel price = new JLabel(item.getPrice() + " gold", SwingConstants.CENTER);
+                price.setFont(new Font("SansSerif", Font.PLAIN, 11));
+                price.setForeground(purple);
 
-            box.add(name, BorderLayout.NORTH);
-            box.add(button, BorderLayout.CENTER);
-            box.add(price, BorderLayout.SOUTH);
+                box.add(name, BorderLayout.NORTH);
+                box.add(button, BorderLayout.CENTER);
+                box.add(price, BorderLayout.SOUTH);
+            }
+
             itemGrid.add(box);
         }
 
-        left.setVisible(pageIndex > 0);
-        right.setVisible((pageIndex + 1) * 4 < visibleItems.length);
+        left.setVisible(index > 0);
+        right.setVisible((index + 1) * 4 < items.length);
 
         itemGrid.revalidate();
         itemGrid.repaint();
@@ -203,62 +198,12 @@ public class ShopPanel extends JPanel {
         return (items != null) ? items : new Item[0];
     }
 
-    private Item[] getVisibleItems() {
-        Item[] items = getCurrentItems();
-        int count = 0;
-        for (Item item : items) {
-            if (item != null && item.isUnlocked() && item.isAvailable()) {
-                count++;
-            }
-        }
-
-        Item[] visibleItems = new Item[count];
-        int index = 0;
-        for (Item item : items) {
-            if (item != null && item.isUnlocked() && item.isAvailable()) {
-                visibleItems[index++] = item;
-            }
-        }
-        return visibleItems;
-    }
-
-    private ImageIcon getScaledIconForItem(Item item, int width, int height) {
-        int iconIndex = getIconIndex(item);
-        if (iconIndex < 0 || iconIndex >= icons.length || icons[iconIndex] == null) {
+    private ImageIcon getScaledIcon(int itemIndex, int width, int height) {
+        if (itemIndex < 0 || itemIndex >= icons.length || icons[itemIndex] == null) {
             return new ImageIcon(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
         }
-        Image image = icons[iconIndex].getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        Image image = icons[itemIndex].getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(image);
-    }
-
-    private int getIconIndex(Item item) {
-        if (item == null) {
-            return -1;
-        }
-
-        String name = item.getName().trim().toLowerCase();
-        switch (name) {
-            case "tears of a fallen angel":
-                return 0;
-            case "noppo bread":
-                return 1;
-            case "shovel upgrade":
-                return 2;
-            case "bat tamer":
-                return 3;
-            case "air shoes":
-                return 4;
-            case "stewshine":
-                return 5;
-            case "mikan mochi":
-                return 6;
-            case "kurosawa matcha":
-                return 7;
-            case "choco-mint ice cream":
-                return 8;
-            default:
-                return -1;
-        }
     }
 
     private void loadIcons() {

@@ -6,6 +6,7 @@ package View;
 
 import Controller.GameGUI;
 import java.awt.CardLayout;
+import javax.swing.SwingUtilities;
 /**
  * Top-level Swing window and entry point of the View layer. Hosts every
  * game screen as a card in a {@link java.awt.CardLayout}, owns one

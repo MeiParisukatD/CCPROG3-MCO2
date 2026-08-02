@@ -100,6 +100,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
         lstDungeons = new javax.swing.JList<>();
         btnEnter = new javax.swing.JButton();
         btnShop = new javax.swing.JButton();
+        btnTestShop = new javax.swing.JButton();
         btnInventory = new javax.swing.JButton();
         btnQuit = new javax.swing.JButton();
         lblItem = new javax.swing.JLabel();
@@ -125,6 +126,9 @@ public class GameMenuPanel extends javax.swing.JPanel {
         btnInventory.setText("Inventory");
         btnInventory.addActionListener(this::btnInventoryActionPerformed);
 
+        btnTestShop.setText("Test Shop");
+        btnTestShop.addActionListener(this::btnTestShopActionPerformed);
+
         btnQuit.setText("Save and Quit");
         btnQuit.addActionListener(this::btnQuitActionPerformed);
 
@@ -148,6 +152,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnTestShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnInventory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(144, 144, 144))
@@ -175,6 +180,8 @@ public class GameMenuPanel extends javax.swing.JPanel {
                         .addComponent(btnInventory)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnShop)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnTestShop)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnQuit))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -246,12 +253,18 @@ public class GameMenuPanel extends javax.swing.JPanel {
         frame.showCard("SHOP");
     }//GEN-LAST:event_btnShopActionPerformed
 
+    private void btnTestShopActionPerformed(java.awt.event.ActionEvent evt) {
+        frame.getShopPanel().refresh();
+        frame.showCard("SHOP");
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEnter;
     private javax.swing.JButton btnInventory;
     private javax.swing.JButton btnQuit;
     private javax.swing.JButton btnShop;
+    private javax.swing.JButton btnTestShop;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblGold;
     private javax.swing.JLabel lblHP;
