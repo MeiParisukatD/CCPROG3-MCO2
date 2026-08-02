@@ -173,7 +173,15 @@ public class ShopPanel extends JPanel {
         revalidate();
         repaint();
     }
-
+    
+    /**
+     * Handles a click on an item's buy button: validates gold and availability,
+     * locks single-purchase items out of future pages, and on a successful
+     * purchase logs the gold spent, refreshes the displayed gold total and
+     * message, and re-renders the current page.
+     *
+     * @param item the shop Item that was clicked
+     */
     private void buyItem(Item item) {
         PlayableChar player = GameGUI.getYohane();
         if (player == null || item == null) return;
@@ -192,6 +200,7 @@ public class ShopPanel extends JPanel {
 
         boolean success = player.buyItem(item);
         if (success) {
+            GameGUI.incrementGoldSpent(item.getPrice());            
             refreshGold();
             refreshMessage("Successfully bought " + item.getName() + "!");
             renderPage(pageIndex);

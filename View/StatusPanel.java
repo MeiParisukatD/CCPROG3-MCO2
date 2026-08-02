@@ -46,7 +46,7 @@ public class StatusPanel extends JPanel {
 
         this.npcPanel = new JPanel();
         this.npcPanel.setBackground(pink);
-        this.npcPanel.setLayout(new GridLayout(8, 0, 5, 5));
+        this.npcPanel.setLayout(new GridLayout(0, 1, 5, 5)); // row count set dynamically in refresh()
 
         this.bottomPanel = new JPanel();
         this.bottomPanel.setBackground(pink);
@@ -126,13 +126,21 @@ public class StatusPanel extends JPanel {
         gold.add(right3, BorderLayout.EAST);
         this.bottomPanel.add(gold);
     }
-
+    
+    /**
+     * Builds one labeled row per NPC showing their rescue count, sizing the
+     * grid's row count to match the roster so no empty rows are left over
+     * (and none are cut off) regardless of how many NPCs exist.
+     *
+     * @param npcs the roster of rescuable idol NPCs to display
+     */
     private void NPCLabels(NPChar[] npcs) {
         if (npcs == null) {
             return; 
         }
 
         int size = npcs.length;
+        this.npcPanel.setLayout(new GridLayout(size, 1, 5, 5));
 
         for (int i = 0; i < size; i++) {
             // creates new box for each NPC display

@@ -30,17 +30,37 @@ public class Initialize {
     private ArrayList<String> taken;
     
     /**
-     * Constructs the initializer, creating fresh playable characters and
-     * generating the run's dungeons. NPCs and items are only generated if
-     * they have not already been assigned, so that New Game+ runs can reuse
-     * the same rescued-idol and item state.
+     * Constructs the initializer for a brand-new run: creates fresh playable
+     * characters and generates a fresh NPC roster, item catalog, and set of
+     * dungeons from scratch. Equivalent to calling {@link #Initialize(NPChar[], Item[])}
+     * with both arguments null.
      */
     public Initialize() {
+        this(null, null);
+    }
+
+    /**
+     * Constructs the initializer, creating fresh playable characters and
+     * generating the run's dungeons. If a previously persisted NPC roster
+     * and/or item catalog are supplied (for New Game+ or a post-game-over
+     * run), they are assigned before dungeons are built, so every Dungeon's
+     * rescued-idol reference points at the same persisted NPChar object used
+     * everywhere else in the game rather than a throwaway one generated fresh
+     * for this instance. Passing null for either regenerates it from scratch.
+     *
+     * @param npcs  a previously persisted NPC roster to reuse, or null to generate a fresh one
+     * @param items a previously persisted item catalog to reuse, or null to generate a fresh one
+     */
+    public Initialize(NPChar[] npcs, Item[] items) {
         this.Yohane = new PlayableChar("Yohane", 3, 1);
         this.Lailaps = new PlayableChar("Lailaps", 4, 0);
         this.taken = new ArrayList<>(); //helper attribute for dungeon-making
 
-        //to facilitate new game+ logic, NPCs and items are not regenerated after the first time
+        //assign any persisted state up front - initializeDungeons() below must see
+        //the FINAL NPCs array, not a placeholder that gets swapped out later
+        this.NPCs = npcs;
+        this.items = items;
+
         if (this.NPCs == null) initializeNPCs();
         if (this.items == null) initializeItems();
         initializeDungeons();

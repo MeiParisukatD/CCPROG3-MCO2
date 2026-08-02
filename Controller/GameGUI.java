@@ -87,11 +87,10 @@ public class GameGUI {
                 gold = Yohane.getGoldOwned();
             } //preserve Yohane's previous gold
 
-            //reuse existing idols and items
-            Initialize newInit = new Initialize();
-            newInit.setNPCs(npcs);
-            newInit.setItems(items);
-            init = newInit;
+            //reuse existing idols and items - passed into the constructor so that
+            //initializeDungeons() (called inside the constructor) builds every
+            //Dungeon's member reference against these same persisted objects
+            init = new Initialize(npcs, items);
         }
 
         //refresh Yohane
@@ -129,14 +128,19 @@ public class GameGUI {
     }
 
     /**
-     * Enters a dungeon for the first time: sets it as current, places Yohane on its
-     * first floor, and clears the underlying 'Y' tile so it's not drawn twice.
-     * If the dungeon's first floor is the BossFloor, sets up the Siren fight instead
-     * (spawning Lailaps too and dealing out the first pair of switches).
+     * Enters a dungeon for the first time: resets Yohane's turn counter so
+     * turn-interval effects (bat move cadence, the boss fight's every-8-turn bat
+     * summon) always start from a clean 0 rather than whatever parity was left
+     * over from the previous dungeon; sets the dungeon as current; places Yohane
+     * on its first floor; and clears the underlying 'Y' tile so it's not drawn
+     * twice. If the dungeon's first floor is the BossFloor, sets up the Siren
+     * fight instead (spawning Lailaps too and dealing out the first pair of
+     * switches).
      *
      * @param dungeon the Dungeon instance the player has chosen to enter
      */
     public static void startDungeon(Dungeon dungeon) {
+        Yohane.setTurnCount(0);
         currentDungeon = dungeon;
         Floor floor = dungeon.getFloors()[0];
 
@@ -559,9 +563,12 @@ public class GameGUI {
         gameOvers++;
         gameOver = true;
 
-        // Dying mid boss-fight resets the Siren's floor (fresh switches/triggers) for next time
+        // Dying mid boss-fight resets the Siren's floor (fresh switches/triggers) for next time.
+        // dungeonNum is pulled from the boss Dungeon itself rather than hardcoded, so this stays
+        // correct even if the dungeon ordering or count ever changes.
         if (currentFloor instanceof BossFloor) {
-            dungeons[dungeons.length - 1].getFloors()[0] = new BossFloor(1);
+            Dungeon bossDungeon = dungeons[dungeons.length - 1];
+            bossDungeon.getFloors()[0] = new BossFloor(1, bossDungeon.getDungeonNum());
         }
 
         initialize();
