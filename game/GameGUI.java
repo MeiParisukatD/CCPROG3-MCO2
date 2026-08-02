@@ -112,23 +112,11 @@ public class GameGUI {
         //refresh Lailaps and dungeons
         Lailaps = init.getLailaps();
         dungeons = init.getDungeons();
-        
-        currentDungeon = dungeons[0];
-        currentFloor = currentDungeon.getFloors()[0];
-    
-        Yohane.setFloor(currentFloor);
-        Lailaps.setFloor(currentFloor);
-        
-        Yohane.findCharTile(currentFloor.getMap());
 
-        System.out.println("Yohane spawned at: "
-        + Yohane.getX() + ", "
-        + Yohane.getY());
-        
-        int x = Yohane.getX();
-        int y = Yohane.getY();
-
-        currentFloor.getMap()[x][y] = new Tile(x, y, '.');
+        // Spawning happens in startDungeon(), once the player actually
+        // picks a dungeon — not here.
+        currentDungeon = null;
+        currentFloor = null;
     }
 
     /**
@@ -475,42 +463,43 @@ public class GameGUI {
     
     public static boolean processTurn(char input) {
 
-    Yohane.incrementTurn();
+        System.out.println("Before move: " + Yohane.getX() + "," + Yohane.getY());
+        Yohane.incrementTurn();
 
-    characterMoves(input);
+        characterMoves(input);
 
-    if (currentFloor != null) {
-        enemyMoves(currentFloor);
-    }
-
-    if (currentFloor.completeFloor(Yohane)) {
-
-        // Last floor in dungeon
-        if (currentDungeon.getCurFloor() == currentDungeon.getNumFloors()) {
-
-            currentDungeon.getMember().setSaved(true);
-
-            // Unlock shop later
-
-            return true;
+        if (currentFloor != null) {
+            enemyMoves(currentFloor);
         }
 
-        // Go to next floor
-        currentDungeon.incrementCurFloor();
+        if (currentFloor.completeFloor(Yohane)) {
 
-        currentFloor = currentDungeon.getFloors()[currentDungeon.getCurFloor() - 1];
+            // Last floor in dungeon
+            if (currentDungeon.getCurFloor() == currentDungeon.getNumFloors()) {
 
-        Yohane.setFloor(currentFloor);
-        Yohane.findCharTile(currentFloor.getMap());
+                currentDungeon.getMember().setSaved(true);
 
-        int x = Yohane.getX();
-        int y = Yohane.getY();
+                // Unlock shop later
 
-        currentFloor.getMap()[x][y] = new Tile(x, y, '.');
+                return true;
+            }
+
+            // Go to next floor
+            currentDungeon.incrementCurFloor();
+
+            currentFloor = currentDungeon.getFloors()[currentDungeon.getCurFloor() - 1];
+
+            Yohane.setFloor(currentFloor);
+            Yohane.findCharTile(currentFloor.getMap());
+
+            int x = Yohane.getX();
+            int y = Yohane.getY();
+
+            currentFloor.getMap()[x][y] = new Tile(x, y, '.');
+        }
+
+        return false;
     }
-
-    return false;
-}
 
     public static void enemyMoves(Floor currentFloor) {
         //prompts action from enemy characters
@@ -818,13 +807,16 @@ public class GameGUI {
     
     public static void startDungeon(Dungeon dungeon) {
 
+        
         currentDungeon = dungeon;
-
         currentFloor = dungeon.getFloors()[0];
 
         Yohane.setFloor(currentFloor);
 
         Yohane.findCharTile(currentFloor.getMap());
+
+        System.out.println("startDungeon called");
+new Exception().printStackTrace();
 
         int x = Yohane.getX();
         int y = Yohane.getY();
