@@ -9,6 +9,7 @@ import Dungeon_Classes.Dungeon;
 import Item_Classes.Item;
 import Controller.GameGUI;
 import javax.swing.DefaultListModel;
+import java.awt.*;
 
 /**
  * View panel shown between dungeon runs, letting the player check their
@@ -21,7 +22,6 @@ import javax.swing.DefaultListModel;
  * @version 2.0
  */
 public class GameMenuPanel extends javax.swing.JPanel {
-
     private MainFrame frame;
 
     /**
@@ -36,6 +36,20 @@ public class GameMenuPanel extends javax.swing.JPanel {
         btnInventory.addActionListener(this::btnInventoryActionPerformed);
         btnQuit.addActionListener(this::btnQuitActionPerformed);
         btnShop.addActionListener(this::btnShopActionPerformed);
+        
+        // Create dungeon buttons
+        dungeonButtons = new javax.swing.JButton[3];
+        for (int i = 0; i < 3; i++) {
+            dungeonButtons[i] = new javax.swing.JButton();
+            dungeonButtons[i].setBackground(UITheme.PURPLE);
+            dungeonButtons[i].setForeground(UITheme.PINK);
+            dungeonButtons[i].setOpaque(true);
+            dungeonButtons[i].setBorderPainted(false);
+            dungeonButtons[i].setFocusPainted(false);
+            final int idx = i;
+            dungeonButtons[i].addActionListener(e -> btnDungeonActionPerformed(idx));
+            dungeonPanel.add(dungeonButtons[i]);
+        }
     }
 
     /**
@@ -44,12 +58,12 @@ public class GameMenuPanel extends javax.swing.JPanel {
      * state. Call this immediately before showing this panel.
      */
     public void refresh() {
-        
         PlayableChar yohane = GameGUI.getYohane();
 
-         lblHP.setText(String.format("HP: %.1f / %.1f", yohane.getHealth(), yohane.getMaxHealth()));
+        lblHP.setText(String.format("HP: %.1f / %.1f", yohane.getHealth(), yohane.getMaxHealth()));
         lblGold.setText("Gold: " + yohane.getGoldOwned());
-        
+
+        //item display
         Item curItem = yohane.getCurItem();
         if (curItem != null) {
             int qty = java.util.Collections.frequency(yohane.getInventory(), curItem);
@@ -62,26 +76,32 @@ public class GameMenuPanel extends javax.swing.JPanel {
             lblItem.setText("Item on hand: N/A");
         }
         
-        DefaultListModel<String> model = new DefaultListModel<>();
-        
         Dungeon[] dungeons = GameGUI.getDungeons();
 
         if (GameGUI.isBossUnlocked()) {
             // All 3 dungeons cleared - the only choice left is the final dungeon.
-            model.addElement("Face the " + dungeons[dungeons.length - 1].getName());
+            dungeonButtons[0].setText("Face the " + dungeons[dungeons.length - 1].getName());
+            dungeonButtons[1].setVisible(false);
+            dungeonButtons[2].setVisible(false);
         } else {
-            // dungeons[dungeons.length - 1] is the final/boss dungeon - don't
-            // list it until it's actually unlocked.
-            for (int i = 0; i < dungeons.length - 1; i++) {
+            // only list normal dungeons until boss is unlocked
+            for (int i = 0; i < 3 && i < dungeons.length - 1; i++) {
                 Dungeon d = dungeons[i];
                 String label = d.isCompleted(yohane)
                         ? "[Cleared] " + d.getName()
                         : d.getName();
-                model.addElement(label);
+                dungeonButtons[i].setText(label);
+                //if dungeon is complete, gray out the button; otherwise reset to purple
+                if(d.isCompleted(yohane)) {
+                    dungeonButtons[i].setBackground(Color.GRAY);
+                    dungeonButtons[i].setForeground(Color.darkGray);
+                } else {
+                    dungeonButtons[i].setBackground(UITheme.PURPLE);
+                    dungeonButtons[i].setForeground(UITheme.PINK);
+                }
+                dungeonButtons[i].setVisible(true);
             }
         }
-
-        lstDungeons.setModel(model);
 
         btnShop.setEnabled(GameGUI.isShopUnlocked());
     }
@@ -93,12 +113,9 @@ public class GameMenuPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         lblGold = new javax.swing.JLabel();
         lblTitle = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        lstDungeons = new javax.swing.JList<>();
-        btnEnter = new javax.swing.JButton();
+        dungeonPanel = new javax.swing.JPanel();
         btnShop = new javax.swing.JButton();
         btnInventory = new javax.swing.JButton();
         btnQuit = new javax.swing.JButton();
@@ -109,15 +126,8 @@ public class GameMenuPanel extends javax.swing.JPanel {
 
         lblTitle.setText("Choose a Dungeon");
 
-        lstDungeons.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane1.setViewportView(lstDungeons);
-
-        btnEnter.setText("Enter Dungeon");
-        btnEnter.addActionListener(this::btnEnterActionPerformed);
+        dungeonPanel.setLayout(new java.awt.GridLayout(3, 1, 5, 5));
+        dungeonPanel.setBackground(UITheme.PINK);
 
         btnShop.setText("Shop");
         btnShop.addActionListener(this::btnShopActionPerformed);
@@ -137,27 +147,26 @@ public class GameMenuPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(116, 116, 116)
+                .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblTitle)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jScrollPane1)
-                                .addComponent(btnEnter)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnInventory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(144, 144, 144))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblGold)
                         .addGap(45, 45, 45)
                         .addComponent(lblItem)
                         .addGap(55, 55, 55)
                         .addComponent(lblHP)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblTitle)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnInventory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(40, 40, 40)
+                        .addComponent(dungeonPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(30, 30, 30))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -170,34 +179,26 @@ public class GameMenuPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(btnInventory)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnShop)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnQuit))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEnter)))
-                .addContainerGap(44, Short.MAX_VALUE))
+                    .addComponent(dungeonPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * Handles the "Enter Dungeon" button: resolves the selected list entry
-     * to a {@link Dungeon}, ignores clicks on already-cleared dungeons,
-     * starts the run via the Controller, and switches to the game view.
+     * Handles dungeon button clicks: resolves the dungeon index, ignores
+     * clicks on already-cleared dungeons, starts the run via the Controller,
+     * and switches to the game view.
      *
-     * @param evt the button click event
+     * @param index the dungeon button index (0-2)
      */
-    private void btnEnterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnterActionPerformed
-        int index = lstDungeons.getSelectedIndex();
-
-        if (index == -1)
-            return;
-
+    private void btnDungeonActionPerformed(int index) {
         Dungeon[] dungeons = GameGUI.getDungeons();
         Dungeon chosen;
 
@@ -205,6 +206,9 @@ public class GameMenuPanel extends javax.swing.JPanel {
             // Only one entry is ever shown in this state: the final dungeon.
             chosen = dungeons[dungeons.length - 1];
         } else {
+            if (index >= dungeons.length - 1) {
+                return; // Not available yet
+            }
             chosen = dungeons[index];
             if (chosen.isCompleted(GameGUI.getYohane())) {
                 return; // already cleared - ignore the click
@@ -217,7 +221,7 @@ public class GameMenuPanel extends javax.swing.JPanel {
         frame.getGamePanel().refreshMap();
 
         frame.showCard("GAME");
-    }//GEN-LAST:event_btnEnterActionPerformed
+    }//GEN-LAST:event_btnDungeonActionPerformed
 
      /**
      * Handles the "Enter Dungeon" button: resolves the selected list entry
@@ -249,16 +253,14 @@ public class GameMenuPanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnEnter;
     private javax.swing.JButton btnInventory;
     private javax.swing.JButton btnQuit;
     private javax.swing.JButton btnShop;
-    private javax.swing.JButton btnTestShop;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel dungeonPanel;
     private javax.swing.JLabel lblGold;
     private javax.swing.JLabel lblHP;
     private javax.swing.JLabel lblItem;
     private javax.swing.JLabel lblTitle;
-    private javax.swing.JList<String> lstDungeons;
+    private javax.swing.JButton[] dungeonButtons;
     // End of variables declaration//GEN-END:variables
 }

@@ -33,6 +33,8 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+
+        GameGUI.initialize();
         
         getContentPane().setLayout(new java.awt.BorderLayout());
         getContentPane().add(cardPanel, java.awt.BorderLayout.CENTER);
